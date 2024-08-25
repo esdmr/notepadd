@@ -124,7 +124,7 @@ function toOutputHtml(
 		properties: {
 			controls: true,
 		},
-		children: Object.entries(items).map(([k, v]) => ({
+		children: Object.entries(items).map<hast.Element>(([k, v]) => ({
 			type: 'element',
 			tagName: 'source',
 			properties: {
