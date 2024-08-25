@@ -5,6 +5,7 @@ import type {JsonValue} from 'type-fest';
 import {stringToUint8Array} from 'uint8array-extras';
 import * as yaml from 'yaml';
 import {
+	builtinMimeTypeOfLangIds,
 	cellDirective,
 	executionDirective,
 	html,
@@ -89,10 +90,10 @@ function addOutputMarkdown(context: NotePadd, node: mdast.RootContent) {
 		}
 
 		case 'code': {
-			const [lang, mime] = node.lang?.split(' ', 2) ?? [];
+			const [lang = 'plaintext', mime] = node.lang?.split(' ', 2) ?? [];
 			addOutput(
 				context,
-				mime ?? (lang ? `text/x-${lang}` : `text/plain`),
+				mime ?? builtinMimeTypeOfLangIds[lang] ?? `text/x-${lang}`,
 				node.value,
 			);
 			break;

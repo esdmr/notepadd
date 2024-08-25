@@ -8,6 +8,7 @@ import {
 } from 'uint8array-extras';
 import * as yaml from 'yaml';
 import {
+	builtinLangIdOfMimeTypes,
 	cellDirective,
 	executionDirective,
 	html,
@@ -192,7 +193,9 @@ function toOutput(output: NotePaddOutput): mdast.RootContent {
 	for (const [k, v] of Object.entries(text)) {
 		children.push({
 			type: 'code',
-			lang: `${k.split('/', 2)[1] ?? 'plaintext'} ${k}`,
+			lang:
+				builtinLangIdOfMimeTypes[k] ??
+				`${k.split('/', 2)[1]?.split('+', 2)[1] ?? 'plaintext'} ${k}`,
 			value: typeof v === 'string' ? v : uint8ArrayToString(v),
 		});
 	}
