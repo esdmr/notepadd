@@ -4,15 +4,27 @@
 		"module": "ES2022",
 		"moduleResolution": "bundler",
 		"strict": true,
-		"noEmit": true,
-		"strictNullChecks": true,
+		"emitDeclarationOnly": true,
 		"noUncheckedIndexedAccess": true,
 		"allowImportingTsExtensions": true,
-		"verbatimModuleSyntax": true
+		"verbatimModuleSyntax": true,
+		"skipLibCheck": true,
+		"noImplicitOverride": true,
+		"noEmitOnError": true,
+		"composite": true,
 	},
 	"include": [
-		"*/*",
-		"*/src/**/*",
 		"*",
+	],
+	"references": [
+		{
+			"path": "./notepadd-core/tsconfig.json"
+		},
+		{
+			"path": "./vite-plugin-vscode/tsconfig.json"
+		},
+		{
+			"path": "./vscode-notepadd/tsconfig.json"
+		},
 	],
 }

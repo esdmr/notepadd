@@ -1,0 +1,18 @@
+{
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"outDir": "types",
+	},
+	"include": [
+		"src/**/*",
+		"*",
+	],
+	"references": [
+		{
+			"path": "../vite-plugin-vscode",
+		},
+		{
+			"path": "../notepadd-core",
+		},
+	],
+}
