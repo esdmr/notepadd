@@ -1,0 +1,4 @@
+packages:
+  - notepadd-core
+  - vite-plugin-vscode
+  - vscode-notepadd

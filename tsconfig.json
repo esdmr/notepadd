@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+		"target": "ES2022",
+		"module": "ES2022",
+		"moduleResolution": "bundler",
+		"strict": true,
+		"noEmit": true,
+		"strictNullChecks": true,
+		"noUncheckedIndexedAccess": true,
+		"allowImportingTsExtensions": true,
+		"verbatimModuleSyntax": true
+	},
+	"include": [
+		"*/*",
+		"*/src/**/*",
+		"*",
+	],
+}

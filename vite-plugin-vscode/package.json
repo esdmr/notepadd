@@ -1,0 +1,15 @@
+{
+	"name": "vite-plugin-vscode",
+	"version": "0.1.0",
+	"private": true,
+	"exports": "./src/index.ts",
+	"devDependencies": {
+		"@types/node": "20",
+		"type-fest": "4.25.0",
+		"vite": "5.4.1"
+	},
+	"peerDependencies": {
+		"vite": "^5.4.0"
+	},
+	"packageManager": "pnpm@9.7.1"
+}

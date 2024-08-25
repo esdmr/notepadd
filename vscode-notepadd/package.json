@@ -1,0 +1,63 @@
+{
+	"name": "notepadd",
+	"displayName": "NotePADD",
+	"version": "0.1.0",
+	"private": true,
+	"description": "Note-taking and dashboard tool.",
+	"categories": [
+		"Notebooks"
+	],
+	"homepage": "https://github.com/esdmr/notepadd#readme",
+	"bugs": "https://github.com/esdmr/notepadd/issues",
+	"repository": "https://github.com/esdmr/notepadd",
+	"license": "MIT",
+	"author": {
+		"name": "Saeed M Rad",
+		"email": "esdmr0@gmail.com",
+		"url": "https://esdmr.ir"
+	},
+	"publisher": "esdmr",
+	"type": "module",
+	"main": "src/index.ts",
+	"contributes": {
+		"notebooks": [
+			{
+				"type": "notepadd",
+				"displayName": "NotePADD",
+				"selector": [
+					{
+						"filenamePattern": "*.{md,markdown}"
+					}
+				]
+			}
+		]
+	},
+	"activationEvents": [
+		"onNotebook:notepadd"
+	],
+	"dependencies": {
+		"notepadd-core": "workspace:*"
+	},
+	"devDependencies": {
+		"@types/node": "20",
+		"@types/vscode": "1.91.0",
+		"@vscode/vsce": "3.0.0",
+		"vite": "5.4.1",
+		"vite-plugin-inspect": "0.8.5",
+		"vite-plugin-vscode": "workspace:*"
+	},
+	"packageManager": "pnpm@9.7.1",
+	"engines": {
+		"vscode": "^1.91.0"
+	},
+	"capabilities": {
+		"untrustedWorkspaces": {
+			"supported": false,
+			"description": "// FIXME"
+		},
+		"virtualWorkspaces": {
+			"supported": false,
+			"description": "// FIXME"
+		}
+	}
+}
