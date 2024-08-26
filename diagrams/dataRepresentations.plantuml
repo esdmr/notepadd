@@ -1,0 +1,23 @@
+@startdot dataRepresentations
+graph G {
+	edge [dir=both]
+
+	mdstr[label="Markdown String"]
+	mdast[label="Markdown AST"]
+	html[label="HTML String"]
+	hast[label="HTML AST"]
+	yaml[label="YAML String"]
+	ydata[label="YAML Data"]
+	prsd[label="Parsed Data"]
+	npir[label="NotePADD IR"]
+	vscr[label="VS Code Representation"]
+
+	mdstr -- mdast [label="remark library"]
+	mdast -- {html, yaml}
+	html -- hast [label="rehype library"]
+	yaml -- ydata [label="yaml library"]
+	{mdast, hast, ydata} -- prsd
+	prsd -- npir [label="NotePADD Core"]
+	npir -- vscr [label="NotePADD VS Code Ext"]
+}
+@enddot

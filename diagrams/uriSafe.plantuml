@@ -1,0 +1,18 @@
+@startebnf uriSafe
+(* RFC 2397 *)
+dataurl = "data:", (? (omitted for brevity) ?), ",", data;
+data = {uric (* urlchar in original RFC, fixed in errata 2045 *)};
+
+(* RFC 2396 *)
+uric = reserved | unreserved | escaped;
+unreserved = alphanum | mark;
+alphanum = alpha | digit;
+alpha = lowalpha | upalpha;
+escaped = "%", hex, hex;
+hex = digit | ? [A-F] ? | ? [a-f] ?;
+lowalpha = ? [a-z] ?;
+upalpha = ? [A-Z] ?;
+digit = ? [0-9] ?;
+reserved = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | ",";
+mark = "-" | "_" | "." | "!" | "~" | "*" | "'" | "(" | ")";
+@endebnf
