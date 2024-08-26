@@ -31,4 +31,4 @@ export type NotePaddOutput = {
 };
 
 export type NotePaddOutputItems = Record<string, Uint8Array>;
-export type NotePaddMetadata = Record<string, Jsonifiable>;
+export type NotePaddMetadata = Record<string, Jsonifiable | undefined>;

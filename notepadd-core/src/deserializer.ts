@@ -141,6 +141,16 @@ function addOutputMarkdown(context: NotePadd, node: mdast.RootContent) {
 	}
 }
 
+function deserializeMetadata(
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	attributes: Record<string, string | null | undefined> | null | undefined,
+) {
+	return mapObject(filterNullishValues(attributes ?? {}), ([k, v]) => [
+		k,
+		JSON.parse(v) as JsonValue,
+	]);
+}
+
 // eslint-disable-next-line complexity
 function addCell(context: NotePadd, node: mdast.RootContent) {
 	switch (node.type) {
@@ -161,9 +171,8 @@ function addCell(context: NotePadd, node: mdast.RootContent) {
 
 		case 'leafDirective': {
 			if (node.name === cellDirective) {
-				getLastCell(context).metadata = mapObject(
-					filterNullishValues(node.attributes ?? {}),
-					([k, v]) => [k, JSON.parse(v) as JsonValue],
+				getLastCell(context).metadata = deserializeMetadata(
+					node.attributes,
 				);
 
 				return;
@@ -176,10 +185,7 @@ function addCell(context: NotePadd, node: mdast.RootContent) {
 				success,
 				start: startTime,
 				end: endTime,
-			} = mapObject(
-				filterNullishValues(node.attributes ?? {}),
-				([k, v]) => [k, JSON.parse(v) as JsonValue],
-			);
+			} = deserializeMetadata(node.attributes);
 
 			const timing =
 				typeof startTime === 'number' && typeof endTime === 'number'
@@ -203,10 +209,7 @@ function addCell(context: NotePadd, node: mdast.RootContent) {
 			lastCell.outputs ??= [];
 			lastCell.outputs.push({
 				items: {},
-				metadata: mapObject(
-					filterNullishValues(node.attributes ?? {}),
-					([k, v]) => [k, JSON.parse(v) as JsonValue],
-				),
+				metadata: deserializeMetadata(node.attributes),
 			});
 
 			for (const child of node.children) {

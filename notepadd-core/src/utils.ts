@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import type {JsonValue} from 'type-fest';
 import MIMEType from 'whatwg-mimetype';
 import type {NotePadd, NotePaddCell, NotePaddOutput} from './types.ts';
 
@@ -53,15 +52,6 @@ export function getLastOutput(context: NotePadd) {
 
 	lastCell.outputs.push(dummyOutput);
 	return dummyOutput;
-}
-
-export function parseMetadata(
-	attributes: Record<string, string | null | undefined> | null | undefined,
-) {
-	return mapObject(filterNullishValues(attributes ?? {}), ([k, v]) => [
-		k,
-		JSON.parse(v) as JsonValue,
-	]);
 }
 
 const builtinMimeTypeOfLangIds: Record<string, string> = {

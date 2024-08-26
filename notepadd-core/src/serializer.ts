@@ -16,7 +16,12 @@ import {
 	markdown,
 	outputDirective,
 } from './parsers.ts';
-import type {NotePadd, NotePaddCell, NotePaddOutput} from './types.ts';
+import type {
+	NotePadd,
+	NotePaddCell,
+	NotePaddMetadata,
+	NotePaddOutput,
+} from './types.ts';
 import {
 	filterNullishValues,
 	getMarkdownLangOfMimeType,
@@ -78,6 +83,13 @@ function toOutputHtml(
 			children: [],
 		})),
 	};
+}
+
+function serializeMetadata(metadata: NotePaddMetadata | undefined) {
+	return mapObject(filterNullishValues(metadata ?? {}), ([k, v]) => [
+		k,
+		JSON.stringify(v),
+	]);
 }
 
 function toOutput(output: NotePaddOutput): mdast.RootContent {
@@ -163,10 +175,7 @@ function toOutput(output: NotePaddOutput): mdast.RootContent {
 	return {
 		type: 'containerDirective',
 		name: outputDirective,
-		attributes: mapObject(
-			filterNullishValues(output.metadata ?? {}),
-			([k, v]) => [k, JSON.stringify(v)],
-		),
+		attributes: serializeMetadata(output.metadata),
 		children,
 	};
 }
@@ -180,10 +189,7 @@ function* toCell(
 		yield* markdown.parse(cell.source).children;
 	}
 
-	const metadata = mapObject(
-		filterNullishValues(cell.metadata ?? {}),
-		([k, v]) => [k, JSON.stringify(v)],
-	);
+	const metadata = serializeMetadata(cell.metadata);
 
 	if (Object.keys(metadata).length > 0) {
 		yield {
@@ -194,15 +200,12 @@ function* toCell(
 		};
 	}
 
-	const executionSummary = mapObject(
-		filterNullishValues({
-			order: cell.executionSummary?.executionOrder,
-			success: cell.executionSummary?.success,
-			start: cell.executionSummary?.timing?.startTime,
-			end: cell.executionSummary?.timing?.endTime,
-		}),
-		([k, v]) => [k, JSON.stringify(v)],
-	);
+	const executionSummary = serializeMetadata({
+		order: cell.executionSummary?.executionOrder,
+		success: cell.executionSummary?.success,
+		start: cell.executionSummary?.timing?.startTime,
+		end: cell.executionSummary?.timing?.endTime,
+	});
 
 	if (Object.keys(executionSummary).length > 0) {
 		yield {
