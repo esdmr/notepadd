@@ -2,6 +2,11 @@
 	"prettier": true,
 	"rules": {
 		"n/file-extension-in-import": "off",
-		"import/extensions": "off"
+		"import/extensions": "off",
+		"import/no-extraneous-dependencies": "off",
+		"@typescript-eslint/class-literal-property-style": [
+			"error",
+			"fields"
+		]
 	}
 }

@@ -84,6 +84,26 @@
 			"enabled": false
 		},
 		{
+			"matchPackageNames": [
+				"@types/vscode"
+			],
+			"matchUpdateTypes": [
+				"major",
+				"minor",
+				"patch"
+			],
+			"enabled": false
+		},
+		{
+			"matchPackageNames": [
+				"@types/node"
+			],
+			"matchUpdateTypes": [
+				"major"
+			],
+			"enabled": false
+		}
+		{
 			"matchDepTypes": [
 				"dependencies",
 				"optionalDependencies",
