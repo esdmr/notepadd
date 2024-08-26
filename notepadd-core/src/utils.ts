@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import type {JsonValue} from 'type-fest';
+import MIMEType from 'whatwg-mimetype';
 import type {NotePadd, NotePaddCell, NotePaddOutput} from './types.ts';
 
 export function isNullish(value: unknown): value is null | undefined {
@@ -61,4 +62,44 @@ export function parseMetadata(
 		k,
 		JSON.parse(v) as JsonValue,
 	]);
+}
+
+const builtinMimeTypeOfLangIds: Record<string, string> = {
+	html: 'text/html',
+	svg: 'image/svg+xml',
+	markdown: 'text/markdown',
+	plaintext: 'text/plain',
+};
+
+export function getMimeTypeOfLangId(langId: string) {
+	return builtinMimeTypeOfLangIds[langId] ?? `text/x-${langId}`;
+}
+
+export function getMimeTypeOfMarkdownLang(mdLang: string | null | undefined) {
+	const [langId = 'plaintext', mime] = mdLang?.split(' ', 2) ?? [];
+
+	return mime ?? getMimeTypeOfLangId(langId);
+}
+
+const builtinLangIdOfMimeTypes = mapObject(
+	builtinMimeTypeOfLangIds,
+	([k, v]) => [v, k],
+);
+
+const mimeSubTypeLangIdRegExp = /^(?:x[-.]|vnd[-.])?(?:[^+]+\+)*([^+]+)$/;
+
+export function getLangIdOfMimeType(mime: string) {
+	const mimeType = new MIMEType(mime);
+
+	return (
+		builtinLangIdOfMimeTypes[mimeType.essence] ??
+		mimeSubTypeLangIdRegExp.exec(mimeType.subtype)?.[1] ??
+		mimeType.subtype
+	);
+}
+
+export function getMarkdownLangOfMimeType(mime: string) {
+	const langId = getLangIdOfMimeType(mime);
+
+	return getMimeTypeOfLangId(langId) === mime ? langId : `${langId} ${mime}`;
 }

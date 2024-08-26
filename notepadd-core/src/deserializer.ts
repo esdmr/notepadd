@@ -1,11 +1,11 @@
 import parseDataUrl from 'data-urls';
 import type * as hast from 'hast';
 import type * as mdast from 'mdast';
+import {parseSrcset} from 'srcset';
 import type {JsonValue} from 'type-fest';
 import {stringToUint8Array} from 'uint8array-extras';
 import * as yaml from 'yaml';
 import {
-	builtinMimeTypeOfLangIds,
 	cellDirective,
 	executionDirective,
 	html,
@@ -17,6 +17,7 @@ import {
 	filterNullishValues,
 	getLastCell,
 	getLastOutput,
+	getMimeTypeOfMarkdownLang,
 	mapObject,
 } from './utils.ts';
 
@@ -56,10 +57,10 @@ function addOutputHtml(context: NotePadd, node: hast.RootContent) {
 			const sources = [];
 
 			if (typeof srcSet === 'string') {
-				sources.push(
-					...srcSet.split(',').map((i) => i.split(' ', 1)[0]!),
-				);
-			} else if (typeof src === 'string') {
+				sources.push(...parseSrcset(srcSet).map((i) => i.url));
+			}
+
+			if (typeof src === 'string') {
 				sources.push(src);
 			}
 
@@ -90,10 +91,9 @@ function addOutputMarkdown(context: NotePadd, node: mdast.RootContent) {
 		}
 
 		case 'code': {
-			const [lang = 'plaintext', mime] = node.lang?.split(' ', 2) ?? [];
 			addOutput(
 				context,
-				mime ?? builtinMimeTypeOfLangIds[lang] ?? `text/x-${lang}`,
+				getMimeTypeOfMarkdownLang(node.lang),
 				node.value,
 			);
 			break;

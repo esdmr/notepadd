@@ -1,14 +1,15 @@
 import type * as hast from 'hast';
 import type * as mdast from 'mdast';
+import {stringifySrcset} from 'srcset';
 import {
 	stringToBase64,
 	stringToUint8Array,
 	uint8ArrayToBase64,
 	uint8ArrayToString,
 } from 'uint8array-extras';
+import MIMEType from 'whatwg-mimetype';
 import * as yaml from 'yaml';
 import {
-	builtinLangIdOfMimeTypes,
 	cellDirective,
 	executionDirective,
 	html,
@@ -16,7 +17,11 @@ import {
 	outputDirective,
 } from './parsers.ts';
 import type {NotePadd, NotePaddCell, NotePaddOutput} from './types.ts';
-import {filterNullishValues, mapObject} from './utils.ts';
+import {
+	filterNullishValues,
+	getMarkdownLangOfMimeType,
+	mapObject,
+} from './utils.ts';
 
 function ord(ch: string) {
 	return ch.codePointAt(0)!;
@@ -89,32 +94,28 @@ function toOutputHtml(
 	items: Record<string, Uint8Array>,
 	type: 'audio' | 'image' | 'video',
 ): hast.RootContent {
+	const entries = Object.entries(items);
+
 	if (type === 'image') {
-		const children = Object.entries(items).map<hast.Element>(([k, v]) => ({
-			type: 'element',
-			tagName: 'source',
-			properties: {
-				srcSet: toOutputUri(k, v),
-				type: k,
-			},
-			children: [],
-		}));
-
-		const lastChild = children.at(-1);
-
-		if (lastChild) {
-			lastChild.tagName = 'img';
-			lastChild.properties.src = lastChild.properties.srcSet;
-			lastChild.properties.alt = '';
-			delete lastChild.properties.type;
-			delete lastChild.properties.srcSet;
-		}
-
 		return {
 			type: 'element',
-			tagName: 'picture',
-			properties: {},
-			children,
+			tagName: 'img',
+			properties: {
+				src:
+					entries.length > 0
+						? toOutputUri(...entries[0]!)
+						: undefined,
+				srcSet:
+					entries.length > 1
+						? stringifySrcset(
+								entries.slice(1).map(([k, v]) => ({
+									url: toOutputUri(k, v),
+								})),
+							)
+						: undefined,
+				alt: '',
+			},
+			children: [],
 		};
 	}
 
@@ -124,7 +125,7 @@ function toOutputHtml(
 		properties: {
 			controls: true,
 		},
-		children: Object.entries(items).map<hast.Element>(([k, v]) => ({
+		children: entries.map<hast.Element>(([k, v]) => ({
 			type: 'element',
 			tagName: 'source',
 			properties: {
@@ -144,9 +145,9 @@ function toOutput(output: NotePaddOutput): mdast.RootContent {
 	const binary: Record<string, Uint8Array> = {};
 
 	for (const [k, v] of Object.entries(output.items)) {
-		const mimeType = k.split('/', 1)[0]!;
+		const mimeType = new MIMEType(k);
 
-		switch (mimeType) {
+		switch (mimeType.type) {
 			case 'audio': {
 				audio[k] = v;
 				break;
@@ -193,9 +194,7 @@ function toOutput(output: NotePaddOutput): mdast.RootContent {
 	for (const [k, v] of Object.entries(text)) {
 		children.push({
 			type: 'code',
-			lang:
-				builtinLangIdOfMimeTypes[k] ??
-				`${k.split('/', 2)[1]?.split('+', 2)[1] ?? 'plaintext'} ${k}`,
+			lang: getMarkdownLangOfMimeType(k),
 			value: typeof v === 'string' ? v : uint8ArrayToString(v),
 		});
 	}
