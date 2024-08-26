@@ -171,11 +171,13 @@ function toOutput(output: NotePaddOutput): mdast.RootContent {
 	};
 }
 
-function toCell(md: mdast.Root, cell: NotePaddCell) {
+function* toCell(
+	cell: NotePaddCell,
+): Generator<mdast.RootContent, void, undefined> {
 	if (cell.type === 'code') {
-		md.children.push({type: 'code', lang: cell.lang, value: cell.source});
+		yield {type: 'code', lang: cell.lang, value: cell.source};
 	} else {
-		md.children.push(...markdown.parse(cell.source).children);
+		yield* markdown.parse(cell.source).children;
 	}
 
 	const metadata = mapObject(
@@ -184,12 +186,12 @@ function toCell(md: mdast.Root, cell: NotePaddCell) {
 	);
 
 	if (Object.keys(metadata).length > 0) {
-		md.children.push({
+		yield {
 			type: 'leafDirective',
 			name: cellDirective,
 			children: [],
 			attributes: metadata,
-		});
+		};
 	}
 
 	const executionSummary = mapObject(
@@ -203,16 +205,16 @@ function toCell(md: mdast.Root, cell: NotePaddCell) {
 	);
 
 	if (Object.keys(executionSummary).length > 0) {
-		md.children.push({
+		yield {
 			type: 'leafDirective',
 			name: executionDirective,
 			children: [],
 			attributes: executionSummary,
-		});
+		};
 	}
 
 	for (const output of cell.outputs ?? []) {
-		md.children.push(toOutput(output));
+		yield toOutput(output);
 	}
 }
 
@@ -230,7 +232,9 @@ export function serializeNotePadd(data: NotePadd) {
 	}
 
 	for (const cell of data.cells) {
-		toCell(md, cell);
+		for (const child of toCell(cell)) {
+			md.children.push(child);
+		}
 	}
 
 	return stringToUint8Array(markdown.stringify(md));
