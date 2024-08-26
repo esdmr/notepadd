@@ -103,3 +103,62 @@ export function getMarkdownLangOfMimeType(mime: string) {
 
 	return getMimeTypeOfLangId(langId) === mime ? langId : `${langId} ${mime}`;
 }
+
+export function codePointOf(ch: string) {
+	return ch.codePointAt(0)!;
+}
+
+export const uriSafeChars = new Set([
+	// From RFC 2396:
+	//     uric = reserved | unreserved | escaped
+	//     unreserved = alphanum | mark
+	//     alphanum = alpha | digit
+	//     alpha = lowalpha | upalpha
+
+	// `reserved`:
+	codePointOf(';'),
+	codePointOf('/'),
+	codePointOf('?'),
+	codePointOf(':'),
+	codePointOf('@'),
+	codePointOf('&'),
+	codePointOf('='),
+	codePointOf('+'),
+	codePointOf('$'),
+	codePointOf(','),
+
+	// `lowalpha`:
+	...Array.from({length: 26}, (_, i) => i + codePointOf('a')),
+
+	// `upalpha`:
+	...Array.from({length: 26}, (_, i) => i + codePointOf('A')),
+
+	// `digit`:
+	...Array.from({length: 10}, (_, i) => i + codePointOf('0')),
+
+	// `mark`:
+	codePointOf('-'),
+	codePointOf('_'),
+	codePointOf('.'),
+	codePointOf('!'),
+	codePointOf('~'),
+	codePointOf('*'),
+	codePointOf("'"),
+	codePointOf('('),
+	codePointOf(')'),
+]);
+
+/**
+ * @see {@link uriSafeChars}
+ */
+const uriSafeRegExp = /^[;/?:@&=+$,a-zA-Z0-9-_.!~*'()]*$/u;
+
+export function isUriSafe(body: Uint8Array | string) {
+	return typeof body === 'string'
+		? uriSafeRegExp.test(body)
+		: body.every((i) => uriSafeChars.has(i));
+}
+
+export function isBinary(body: Uint8Array | string) {
+	return typeof body === 'string' ? body.includes('\0') : body.includes(0);
+}

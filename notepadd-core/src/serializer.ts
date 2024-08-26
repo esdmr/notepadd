@@ -20,67 +20,10 @@ import type {NotePadd, NotePaddCell, NotePaddOutput} from './types.ts';
 import {
 	filterNullishValues,
 	getMarkdownLangOfMimeType,
+	isBinary,
+	isUriSafe,
 	mapObject,
 } from './utils.ts';
-
-function ord(ch: string) {
-	return ch.codePointAt(0)!;
-}
-
-const uriSafeChars = new Set([
-	// From RFC 2396:
-	//     uric = reserved | unreserved | escaped
-	//     unreserved = alphanum | mark
-	//     alphanum = alpha | digit
-	//     alpha = lowalpha | upalpha
-
-	// `reserved`:
-	ord(';'),
-	ord('/'),
-	ord('?'),
-	ord(':'),
-	ord('@'),
-	ord('&'),
-	ord('='),
-	ord('+'),
-	ord('$'),
-	ord(','),
-
-	// `lowalpha`:
-	...Array.from({length: 26}, (_, i) => i + ord('a')),
-
-	// `upalpha`:
-	...Array.from({length: 26}, (_, i) => i + ord('A')),
-
-	// `digit`:
-	...Array.from({length: 10}, (_, i) => i + ord('0')),
-
-	// `mark`:
-	ord('-'),
-	ord('_'),
-	ord('.'),
-	ord('!'),
-	ord('~'),
-	ord('*'),
-	ord("'"),
-	ord('('),
-	ord(')'),
-]);
-
-/**
- * @see {@link uriSafeChars}
- */
-const uriSafeRegExp = /^[;/?:@&=+$,a-zA-Z0-9-_.!~*'()]*$/u;
-
-function isUriSafe(body: Uint8Array | string) {
-	return typeof body === 'string'
-		? uriSafeRegExp.test(body)
-		: body.every((i) => uriSafeChars.has(i));
-}
-
-function isBinary(body: Uint8Array | string) {
-	return typeof body === 'string' ? body.includes('\0') : body.includes(0);
-}
 
 function toOutputUri(mimeType: string, body: Uint8Array | string) {
 	if (isUriSafe(body)) {
