@@ -102,7 +102,7 @@
 				"major"
 			],
 			"enabled": false
-		}
+		},
 		{
 			"matchDepTypes": [
 				"dependencies",
