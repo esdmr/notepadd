@@ -10,6 +10,9 @@
 	],
 	"references": [
 		{
+			"path": "../vite-plugin-nearley",
+		},
+		{
 			"path": "../vite-plugin-vscode",
 		},
 		{

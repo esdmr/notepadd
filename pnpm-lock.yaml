@@ -60,6 +60,9 @@ importers:
         specifier: 2.5.0
         version: 2.5.0
     devDependencies:
+      '@esdmr/nearley':
+        specifier: 3.0.3
+        version: 3.0.3
       '@types/data-urls':
         specifier: 3.0.4
         version: 3.0.4
@@ -82,6 +85,18 @@ importers:
         specifier: 4.25.0
         version: 4.25.0
 
+  vite-plugin-nearley:
+    devDependencies:
+      '@esdmr/nearley':
+        specifier: 3.0.3
+        version: 3.0.3
+      '@types/node':
+        specifier: 20.16.1
+        version: 20.16.1
+      vite:
+        specifier: 5.4.1
+        version: 5.4.1(@types/node@20.16.1)
+
   vite-plugin-vscode:
     devDependencies:
       '@types/node':
@@ -96,6 +111,9 @@ importers:
 
   vscode-notepadd:
     dependencies:
+      '@esdmr/nearley':
+        specifier: 3.0.3
+        version: 3.0.3
       notepadd-core:
         specifier: workspace:*
         version: link:../notepadd-core
@@ -115,6 +133,9 @@ importers:
       vite-plugin-inspect:
         specifier: 0.8.5
         version: 0.8.5(rollup@4.21.0)(vite@5.4.1(@types/node@20.16.1))
+      vite-plugin-nearley:
+        specifier: workspace:*
+        version: link:../vite-plugin-nearley
       vite-plugin-vscode:
         specifier: workspace:*
         version: link:../vite-plugin-vscode
@@ -183,6 +204,11 @@ packages:
   '@babel/highlight@7.24.7':
     resolution: {integrity: sha512-EStJpq4OuY8xYfhGVXngigBJRWxftKX9ksiGDnmlY3o7B/V7KIAc9X4oiK87uPJSc/vs5L869bem5fhZa8caZw==}
     engines: {node: '>=6.9.0'}
+
+  '@commander-js/extra-typings@11.1.0':
+    resolution: {integrity: sha512-GuvZ38d23H+7Tz2C9DhzCepivsOsky03s5NI+KCy7ke1FNUvsJ2oO47scQ9YaGGhgjgNW5OYYNSADmbjcSoIhw==}
+    peerDependencies:
+      commander: 11.1.x
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -321,6 +347,10 @@ packages:
     engines: {node: '>=12'}
     cpu: [x64]
     os: [win32]
+
+  '@esdmr/nearley@3.0.3':
+    resolution: {integrity: sha512-k7z9cl0JuLM0t0r2LZP/GykX6TGmOOuBzIXlu9YihJg/PSxUFovs5EpczuvV2fVuJFpaCxZeyoJpAW4rxujg4A==}
+    hasBin: true
 
   '@eslint-community/eslint-utils@4.4.0':
     resolution: {integrity: sha512-1/sA4dwrzBAyeUoQ6oxahHKmrZvsnLCg4RfxW3ZFGGmQkSNQPFNLV9CUEFQP1x9EYXHTo5p6xdhZM1Ne9p/AfA==}
@@ -510,6 +540,9 @@ packages:
 
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
+
+  '@types/moo@0.5.9':
+    resolution: {integrity: sha512-ZsFVecFi66jGQ6L41TonEaBhsIVeVftTz6iQKWTctzacHhzYHWvv9S0IyAJi4BhN7vb9qCQ3+kpStP2vbZqmDg==}
 
   '@types/ms@0.7.34':
     resolution: {integrity: sha512-nG96G3Wp6acyAgJqGasjODb+acrI7KltPiRxzHPXnP3NgI28bpQDRv53olbqGXbfcgF5aiiHmO3xpwEpS5Ld9g==}
@@ -872,6 +905,10 @@ packages:
 
   comma-separated-tokens@2.0.3:
     resolution: {integrity: sha512-Fu4hJdvzeylCfQPp9SGWidpzrMs7tTrlu6Vb8XGaRGck8QSNZJJp538Wrb60Lax4fPwR64ViY468OIUTbRlGZg==}
+
+  commander@11.1.0:
+    resolution: {integrity: sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ==}
+    engines: {node: '>=16'}
 
   commander@6.2.1:
     resolution: {integrity: sha512-U7VdrJFnJgo4xjrHpTzu0yrHPGImdsmD95ZlgYSEajAn2JKzDhDTPG9kBTefmObL2w/ngeZnilk+OV9CG3d7UA==}
@@ -2190,6 +2227,9 @@ packages:
   mkdirp-classic@0.5.3:
     resolution: {integrity: sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==}
 
+  moo@0.5.2:
+    resolution: {integrity: sha512-iSAJLHYKnX41mKcJKjqvnAN9sf0LMDTXDEvFv+ffuRR9a1MIuXLjMNL6EsnDHSkKLTWNqQQ5uo61P4EbU4NU+Q==}
+
   mrmime@2.0.0:
     resolution: {integrity: sha512-eu38+hdgojoyq63s+yTpN4XMBdt5l8HhMhc4VKLO9KM5caLIBvUm4thi7fFaxyTmCKeNnXZ5pAlBwCUnhA09uw==}
     engines: {node: '>=10'}
@@ -3180,6 +3220,10 @@ snapshots:
       js-tokens: 4.0.0
       picocolors: 1.0.1
 
+  '@commander-js/extra-typings@11.1.0(commander@11.1.0)':
+    dependencies:
+      commander: 11.1.0
+
   '@esbuild/aix-ppc64@0.21.5':
     optional: true
 
@@ -3248,6 +3292,13 @@ snapshots:
 
   '@esbuild/win32-x64@0.21.5':
     optional: true
+
+  '@esdmr/nearley@3.0.3':
+    dependencies:
+      '@commander-js/extra-typings': 11.1.0(commander@11.1.0)
+      '@types/moo': 0.5.9
+      commander: 11.1.0
+      moo: 0.5.2
 
   '@eslint-community/eslint-utils@4.4.0(eslint@8.57.0)':
     dependencies:
@@ -3417,6 +3468,8 @@ snapshots:
   '@types/mdast@4.0.4':
     dependencies:
       '@types/unist': 3.0.3
+
+  '@types/moo@0.5.9': {}
 
   '@types/ms@0.7.34': {}
 
@@ -3841,6 +3894,8 @@ snapshots:
       delayed-stream: 1.0.0
 
   comma-separated-tokens@2.0.3: {}
+
+  commander@11.1.0: {}
 
   commander@6.2.1: {}
 
@@ -5561,6 +5616,8 @@ snapshots:
 
   mkdirp-classic@0.5.3:
     optional: true
+
+  moo@0.5.2: {}
 
   mrmime@2.0.0: {}
 

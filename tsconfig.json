@@ -7,6 +7,7 @@
 		"emitDeclarationOnly": true,
 		"noUncheckedIndexedAccess": true,
 		"allowImportingTsExtensions": true,
+		"allowArbitraryExtensions": true,
 		"resolveJsonModule": true,
 		"verbatimModuleSyntax": true,
 		"skipLibCheck": true,
@@ -20,6 +21,9 @@
 	"references": [
 		{
 			"path": "./notepadd-core/tsconfig.json"
+		},
+		{
+			"path": "./vite-plugin-nearley/tsconfig.json"
 		},
 		{
 			"path": "./vite-plugin-vscode/tsconfig.json"

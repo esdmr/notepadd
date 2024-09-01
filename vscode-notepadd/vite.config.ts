@@ -1,8 +1,9 @@
 import {defineConfig} from 'vite';
 import inspect from 'vite-plugin-inspect';
+import {nearley} from '../vite-plugin-nearley/src/index.ts';
 import {vscode} from '../vite-plugin-vscode/src/index.ts';
-// Note: Vite does not build files in `node_modules`, so keep the path to
-// `vite-plugin-vscode` relative.
+// Note: Vite does not build files in `node_modules`, so keep the path to vite
+// plugins relative.
 
 export default defineConfig((env) => ({
 	cacheDir: 'node_modules/.cache/vite',
@@ -13,6 +14,9 @@ export default defineConfig((env) => ({
 		inspect({
 			build: true,
 			outputDir: 'node_modules/.cache/vite-inspect',
+		}),
+		nearley({
+			extension: '.ts',
 		}),
 		vscode({
 			packageJsonTransformers: [

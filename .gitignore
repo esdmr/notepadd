@@ -3,6 +3,7 @@ node_modules/
 *.js
 *.map
 *.log
+*.generated.ts
 build/
 types/
 .vscode/
