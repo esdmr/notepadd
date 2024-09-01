@@ -66,10 +66,7 @@ abs_date -> (
 abs_date -> %today {% _.builder(_.AbsoluteDateContextualNode) %}
 abs_date -> %tomorrow {% _.builder(_.AbsoluteDateContextualNode) %}
 
-calendar -> %gregory {% _.builder(_.CalendarNode) %}
-calendar -> %islamic {% _.builder(_.CalendarNode) %}
-calendar -> %persian {% _.builder(_.CalendarNode) %}
-calendar -> %calendar {% _.builder(_.CalendarNode) %}
+calendar -> %identifier {% _.builder(_.CalendarNode) %}
 
 abs_time -> unsigned_integer %colon unsigned_integer offset:? {%
 	_.builder(_.AbsoluteTimeExactNode)

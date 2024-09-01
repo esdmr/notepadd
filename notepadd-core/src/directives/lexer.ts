@@ -1,8 +1,8 @@
 import * as nearley from '@esdmr/nearley';
 
 export const lexer = nearley.lexer.compile({
-	unknown: {
-		match: /\p{ID_Start}\p{ID_Continue}*/u,
+	identifier: {
+		match: /[a-z_]+/u,
 		type: nearley.lexer.keywords({
 			alarm: 'alarm',
 			timer: 'timer',
@@ -14,9 +14,6 @@ export const lexer = nearley.lexer.compile({
 			now: 'now',
 			today: 'today',
 			tomorrow: 'tomorrow',
-			gregory: 'gregory',
-			islamic: 'islamic',
-			persian: 'persian',
 			this: 'this',
 			time: 'time',
 			midnight: 'midnight',
@@ -34,12 +31,6 @@ export const lexer = nearley.lexer.compile({
 		}),
 	},
 	dash: /-/u,
-	calendar: {
-		match: /\[u-ca=[\w-]+\]/u,
-		value(x) {
-			return /\[u-ca=([\w-]+)\]/u.exec(x)![1]!;
-		},
-	},
 	colon: /:/u,
 	plus: /\+/u,
 	digits: /[0-9]+/u,

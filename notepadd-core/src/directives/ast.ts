@@ -208,9 +208,9 @@ export class CalendarNode extends SyntaxNode<[MooToken]> {
 	override serialize() {
 		return {
 			value:
-				this.children[0].type === 'islamic'
+				this.children[0].value === 'islamic'
 					? 'islamic-umalqura'
-					: this.children[0].value,
+					: this.children[0].value.replaceAll('_', '-'),
 		};
 	}
 }
