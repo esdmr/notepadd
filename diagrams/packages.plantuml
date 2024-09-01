@@ -1,0 +1,45 @@
+@startuml packages
+!$VSC = "#d73027"
+!$NJS = "#fc8d59"
+!$VITE = "#4575b4"
+
+component "notepadd" as np {
+	port "Vite API" as api_vite $VITE
+	port "Node.JS API" as api_njs $NJS
+	port "VS Code API" as api_vsc $VSC
+
+	component "notepadd-core" as core {
+		component "serializer" as core_ser
+		component "deserializer" as core_de
+	}
+
+	component "vite-plugin-vscode" as vpv
+	vpv -(0- api_njs $NJS
+	vpv -(0- api_vite $VITE
+
+	component "vscode-notepadd" as vsc {
+		component "vite.config" as vsc_vite
+		vsc_vite -(0- vpv
+		vsc_vite -(0- api_njs $NJS
+		vsc_vite -0- api_vite $VITE
+
+		component "serializer" as vsc_serde
+		vsc_serde -(0- core_ser
+		vsc_serde -(0- core_de
+		vsc_serde -0- api_vsc $VSC
+
+		component "controller" as vsc_ctrl
+		vsc_ctrl -0- api_vsc $VSC
+	}
+}
+
+component "VS Code" as ext_vsc
+ext_vsc -0- api_vsc $VSC
+ext_vsc -0- api_njs $NJS
+
+component "Node.JS" as ext_njs
+ext_njs -0- api_njs $NJS
+
+component "Vite" as ext_vite
+ext_vite -0- api_vite $VITE
+@enduml
