@@ -17,7 +17,7 @@ export function vscode<T extends PackageJson = PackageJson>({
 	copyPaths = [],
 }: ViteVsCodeOptions<T> = {}): Plugin {
 	return {
-		name: 'package-json',
+		name: 'vscode',
 		config(config, env) {
 			return {
 				resolve: {
