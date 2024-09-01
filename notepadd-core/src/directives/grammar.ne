@@ -42,7 +42,7 @@ abs_date_time_period -> abs_date_time_instant %for rel_date_time {%
 abs_date_time_period -> abs_date_time_instant %until abs_date_time_instant {%
 	_.builder(_.AbsoluteDateTimePeriodWithEndNode)
 %}
-abs_date_time_period -> abs_date %wholeDay {% _.builder(_.AbsoluteDateTimePeriodWholeDayNode) %}
+abs_date_time_period -> abs_date %whole %days {% _.builder(_.AbsoluteDateTimePeriodWholeDayNode) %}
 
 abs_date_time_maybe_recurring_instant -> abs_date_time_instant:? %every rel_date_time (
 	%until abs_date_time_instant
@@ -75,7 +75,7 @@ abs_time -> unsigned_integer %colon unsigned_integer offset:? {%
 	_.builder(_.AbsoluteTimeExactNode)
 %}
 abs_time -> abs_time_of_day offset:? {% _.builder(_.AbsoluteTimeStaticNode) %}
-abs_time -> %thisTime {% _.builder(_.AbsoluteTimeContextualNode) %}
+abs_time -> %this %time {% _.builder(_.AbsoluteTimeContextualNode) %}
 
 abs_time_of_day -> %midnight {% _.builder(_.AbsoluteTimeOfDayNode) %}
 abs_time_of_day -> %noon {% _.builder(_.AbsoluteTimeOfDayNode) %}
