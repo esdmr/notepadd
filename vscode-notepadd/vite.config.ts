@@ -31,7 +31,12 @@ export default defineConfig((env) => ({
 					delete json.devDependenciesMeta;
 				},
 			],
-			copyPaths: ['../README.md', '../LICENSE.txt'],
+			copyPaths: {
+				// eslint-disable-next-line @typescript-eslint/naming-convention
+				'README.md': '../README.md',
+				// eslint-disable-next-line @typescript-eslint/naming-convention
+				'LICENSE.txt': '../LICENSE.txt',
+			},
 		}),
 	],
 }));

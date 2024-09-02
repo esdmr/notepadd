@@ -59,6 +59,11 @@ const builtinMimeTypeOfLangIds: Record<string, string> = {
 	svg: 'image/svg+xml',
 	markdown: 'text/markdown',
 	plaintext: 'text/plain',
+	json: 'application/json',
+	error: 'application/vnd.code.notebook.error',
+	stderr: 'application/vnd.code.notebook.stderr',
+	stdout: 'application/vnd.code.notebook.stdout',
+	notepadd: 'application/x-notepadd+json',
 };
 
 export function getMimeTypeOfLangId(langId: string) {

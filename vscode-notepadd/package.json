@@ -30,6 +30,13 @@
 					}
 				]
 			}
+		],
+		"languages": [
+			{
+				"id": "notepadd",
+				"aliases": ["NotePADD directive"],
+				"mimetypes": ["application/x-notepadd+json"]
+			}
 		]
 	},
 	"activationEvents": [

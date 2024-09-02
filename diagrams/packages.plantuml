@@ -11,15 +11,21 @@ component "notepadd" as np {
 	component "notepadd-core" as core {
 		component "serializer" as core_ser
 		component "deserializer" as core_de
+		component "directives" as core_dir
 	}
 
 	component "vite-plugin-vscode" as vpv
 	vpv -(0- api_njs $NJS
 	vpv -(0- api_vite $VITE
 
+	component "vite-plugin-nearley" as vpn
+	vpn -(0- api_njs $NJS
+	vpn -(0- api_vite $VITE
+
 	component "vscode-notepadd" as vsc {
 		component "vite.config" as vsc_vite
 		vsc_vite -(0- vpv
+		vsc_vite -(0- vpn
 		vsc_vite -(0- api_njs $NJS
 		vsc_vite -0- api_vite $VITE
 
@@ -29,6 +35,7 @@ component "notepadd" as np {
 		vsc_serde -0- api_vsc $VSC
 
 		component "controller" as vsc_ctrl
+		vsc_ctrl -(0- core_dir
 		vsc_ctrl -0- api_vsc $VSC
 	}
 }

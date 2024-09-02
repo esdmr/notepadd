@@ -1,20 +1,73 @@
 import assert from 'node:assert';
 import {readFile} from 'node:fs/promises';
 import {builtinModules} from 'node:module';
-import {basename} from 'node:path';
 import type {PackageJson} from 'type-fest';
-import {normalizePath, type Plugin} from 'vite';
+import {normalizePath, type Plugin, type Rollup} from 'vite';
+import type {IRelaxedExtensionManifest} from './types.ts';
 
-export type ViteVsCodeOptions<T extends PackageJson = PackageJson> = {
-	readonly packageJsonTransformers?:
-		| ReadonlyArray<(json: T) => T | void | Promise<T | void>>
-		| undefined;
-	readonly copyPaths?: string[] | undefined;
-};
+export type VsCodePackageJson = PackageJson & IRelaxedExtensionManifest;
 
-export function vscode<T extends PackageJson = PackageJson>({
+export type ViteVsCodeOptions<T extends VsCodePackageJson = VsCodePackageJson> =
+	{
+		readonly packageJsonTransformers?:
+			| ReadonlyArray<(json: T) => T | void | Promise<T | void>>
+			| undefined;
+		readonly copyPaths?: Record<string, string> | undefined;
+	};
+
+async function resolveAndNormalize(
+	context: Rollup.PluginContext,
+	...rest: Parameters<Rollup.PluginContext['resolve']>
+) {
+	const resolved = await context.resolve(...rest);
+	assert(resolved, `Cannot resolve ${JSON.stringify(rest[0])}`);
+	const normalizedId = normalizePath(resolved.id);
+	return {...resolved, normalizedId};
+}
+
+function findChunkForId(
+	bundle: Rollup.OutputBundle,
+	resolution: {normalizedId: string},
+) {
+	const chunk = Object.values(bundle).find(
+		(chunk) =>
+			chunk.type === 'chunk' &&
+			chunk.isEntry &&
+			chunk.facadeModuleId &&
+			normalizePath(chunk.facadeModuleId) === resolution.normalizedId,
+	);
+
+	assert(
+		chunk,
+		`Cannot find entry for ${JSON.stringify(resolution.normalizedId)}`,
+	);
+
+	return chunk;
+}
+
+async function resolveAndEmit(
+	context: Rollup.PluginContext,
+	destination: string,
+	source: string,
+	transformer: (
+		text: string,
+		resolution: Awaited<ReturnType<typeof resolveAndNormalize>>,
+	) => string | Promise<string> = (text) => text,
+) {
+	const resolution = await resolveAndNormalize(context, source);
+	const string = await readFile(resolution.id, 'utf8');
+
+	return context.emitFile({
+		type: 'asset',
+		originalFileName: resolution.id,
+		fileName: destination,
+		source: await transformer(string, resolution),
+	});
+}
+
+export function vscode<T extends VsCodePackageJson = VsCodePackageJson>({
 	packageJsonTransformers = [],
-	copyPaths = [],
+	copyPaths = {},
 }: ViteVsCodeOptions<T> = {}): Plugin {
 	return {
 		name: 'vscode',
@@ -34,6 +87,7 @@ export function vscode<T extends PackageJson = PackageJson>({
 					rollupOptions: {
 						external: [
 							'vscode',
+							...builtinModules,
 							...builtinModules.map((i) => `node:${i}`),
 						],
 					},
@@ -43,58 +97,29 @@ export function vscode<T extends PackageJson = PackageJson>({
 			};
 		},
 		async generateBundle(options, bundle) {
-			const resolvedEntry = await this.resolve('.');
-			assert(resolvedEntry);
-			const normalizedEntry = normalizePath(resolvedEntry.id);
+			const entryResolution = await resolveAndNormalize(this, '.');
+			const entryChunk = findChunkForId(bundle, entryResolution);
 
-			const chunk = Object.values(bundle).find(
-				(chunk) =>
-					chunk.type === 'chunk' &&
-					chunk.isEntry &&
-					chunk.facadeModuleId &&
-					normalizePath(chunk.facadeModuleId) === normalizedEntry,
-			);
-
-			assert(chunk, 'Cannot find entry');
-
-			const resolvedJson = await this.resolve(
+			await resolveAndEmit(
+				this,
+				'package.json',
 				'./package.json',
-				undefined,
+				async (text) => {
+					let packageJson = JSON.parse(text) as T;
+					packageJson.main = entryChunk.fileName;
+
+					for (const f of packageJsonTransformers) {
+						// eslint-disable-next-line no-await-in-loop
+						packageJson = (await f(packageJson)) ?? packageJson;
+					}
+
+					return JSON.stringify(packageJson, undefined, '\t');
+				},
 			);
 
-			assert(resolvedJson, 'Cannot resolve package.json');
-
-			const packageString = await readFile(resolvedJson.id, 'utf8');
-			let packageJson = JSON.parse(packageString) as T;
-
-			packageJson.main = chunk.fileName;
-
-			for (const f of packageJsonTransformers) {
+			for (const [destination, source] of Object.entries(copyPaths)) {
 				// eslint-disable-next-line no-await-in-loop
-				packageJson = (await f(packageJson)) ?? packageJson;
-			}
-
-			this.emitFile({
-				type: 'asset',
-				originalFileName: resolvedJson.id,
-				fileName: 'package.json',
-				source: JSON.stringify(packageJson, undefined, '\t'),
-			});
-
-			for (const path of copyPaths) {
-				// eslint-disable-next-line no-await-in-loop
-				const resolved = await this.resolve(path, undefined);
-				assert(resolved, 'Cannot resolve package.json');
-
-				// eslint-disable-next-line no-await-in-loop
-				const string = await readFile(resolved.id, 'utf8');
-
-				this.emitFile({
-					type: 'asset',
-					originalFileName: resolved.id,
-					fileName: basename(resolved.id),
-					source: string,
-				});
+				await resolveAndEmit(this, destination, source);
 			}
 		},
 	};
