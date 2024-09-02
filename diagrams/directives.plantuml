@@ -32,7 +32,7 @@ abs_date_time_maybe_recurring_instant = [abs_date_time_instant (* defaults to no
 abs_date_time_instant = [abs_date (* defaults to next time, either today or tomorrow *)], abs_time | rel_date_time (* relative to now *) | "now" (* shorthand for today this time *);
 
 abs_date = [calendar (* default in config, falls back to iso *), "-"], unsigned_integer, "-", unsigned_integer, "-", unsigned_integer | "today" | "tomorrow";
-calendar = "gregory" | "islamic" (* Uses Um al-Qura calendar: [u-ca=islamic-umalqura] *) | "persian" | ? \[u-ca=[\w-]+\] ?;
+calendar = "gregory" | "islamic" (* Uses Um al-Qura calendar: islamic-umalqura *) | "persian" | ? [\w_]+ ? (* "_" is replaced with "-" *);
 abs_time = unsigned_integer, ":", unsigned_integer, [offset (* defaults to local *)] | abs_time_of_day, [offset (* defaults to local *)] | "this time";
 abs_time_of_day = "midnight" (* 00:00 *) | "noon" (* 12:00 *) | "morning" (* configurable, defaults to 8:00 *) | "afternoon" (* configurable, defaults to 13:00 *) | "evening" (* configurable, defaults to 18:00 *);
 
