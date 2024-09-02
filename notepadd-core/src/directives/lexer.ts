@@ -35,10 +35,10 @@ export const lexer = nearley.lexer.compile({
 	plus: /\+/u,
 	digits: /[0-9]+/u,
 	commentLine: {
-		match: /\n\s+[^\n]*/u,
+		match: /(?:\n\s|;)[^\n]*/u,
 		lineBreaks: true,
 		value(x) {
-			return /\n\s+([^\n]*)/u.exec(x)![1]!;
+			return /(?:\n\s|;)([^\n]*)/u.exec(x)![1]!;
 		},
 	},
 	_newLine: {

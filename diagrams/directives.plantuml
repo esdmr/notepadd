@@ -59,6 +59,6 @@ plus_minus = ? [+-] ?;
 
 comment = {comment_line}-;
 comment_line = comment_start, {comment_char};
-comment_start = (? \n ?), (? (indentation) ?);
+comment_start = (? \n ?), (? \s ?) | ";";
 comment_char = ? [^\n] ?;
 @endebnf
