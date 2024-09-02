@@ -1,6 +1,6 @@
 import {type ExtensionContext} from 'vscode';
-import {setupController} from './notebook/controller.ts';
-import {setupSerializer} from './notebook/serializer.ts';
+import {setupController} from './notebook/notepadd.controller.ts';
+import {setupSerializer} from './notebook/notepadd.serializer.ts';
 
 export async function activate(context: ExtensionContext) {
 	setupSerializer(context);
