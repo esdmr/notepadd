@@ -34,8 +34,7 @@
 		"languages": [
 			{
 				"id": "notepadd",
-				"aliases": ["NotePADD directive"],
-				"mimetypes": ["application/x-notepadd+json"]
+				"aliases": ["NotePADD directive"]
 			}
 		]
 	},
