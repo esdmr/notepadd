@@ -3,9 +3,9 @@ import {readFile} from 'node:fs/promises';
 import {builtinModules} from 'node:module';
 import type {PackageJson} from 'type-fest';
 import {normalizePath, type Plugin, type Rollup} from 'vite';
-import type {IRelaxedExtensionManifest} from './types.ts';
+import type {ExtensionManifest} from './types.ts';
 
-export type VsCodePackageJson = PackageJson & IRelaxedExtensionManifest;
+export type VsCodePackageJson = PackageJson & ExtensionManifest;
 
 export type ViteVsCodeOptions<T extends VsCodePackageJson = VsCodePackageJson> =
 	{
