@@ -27,7 +27,7 @@ import {
 	getMarkdownLangOfMimeType,
 	isBinary,
 	isUriSafe,
-	mapObject,
+	mapRecord,
 } from './utils.ts';
 
 function toOutputUri(mimeType: string, body: Uint8Array | string) {
@@ -86,7 +86,7 @@ function toOutputHtml(
 }
 
 function serializeMetadata(metadata: NotePaddMetadata | undefined) {
-	return mapObject(filterNullishValues(metadata ?? {}), ([k, v]) => [
+	return mapRecord(filterNullishValues(metadata ?? {}), ([k, v]) => [
 		k,
 		JSON.stringify(v),
 	]);

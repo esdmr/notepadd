@@ -14,7 +14,31 @@ export function filterNullishValues<K extends PropertyKey, V>(
 	) as Record<K, V>;
 }
 
-export function mapObject<
+export function filterRecord<
+	K1 extends PropertyKey,
+	V1,
+	K2 extends K1,
+	V2 extends V1,
+>(
+	object: Record<K1, V1>,
+	predicate: (entry: [K1, V1]) => entry is [K2, V2],
+): Record<K2, V2>;
+
+export function filterRecord<K extends PropertyKey, V>(
+	object: Record<K, V>,
+	predicate: (entry: [K, V]) => unknown,
+): Record<K, V>;
+
+export function filterRecord(
+	object: Record<PropertyKey, unknown>,
+	predicate: (entry: [PropertyKey, unknown]) => unknown,
+) {
+	return Object.fromEntries(
+		Object.entries(object).filter((i) => predicate(i)),
+	);
+}
+
+export function mapRecord<
 	K1 extends PropertyKey,
 	V1,
 	K2 extends PropertyKey,
@@ -76,7 +100,7 @@ export function getMimeTypeOfMarkdownLang(mdLang: string | null | undefined) {
 	return mime ?? getMimeTypeOfLangId(langId);
 }
 
-const builtinLangIdOfMimeTypes = mapObject(
+const builtinLangIdOfMimeTypes = mapRecord(
 	builtinMimeTypeOfLangIds,
 	([k, v]) => [v, k],
 );

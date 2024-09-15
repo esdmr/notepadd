@@ -18,7 +18,7 @@ import {
 	getLastCell,
 	getLastOutput,
 	getMimeTypeOfMarkdownLang,
-	mapObject,
+	mapRecord,
 } from './utils.ts';
 
 function addOutput(
@@ -145,7 +145,7 @@ function deserializeMetadata(
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	attributes: Record<string, string | null | undefined> | null | undefined,
 ) {
-	return mapObject(filterNullishValues(attributes ?? {}), ([k, v]) => [
+	return mapRecord(filterNullishValues(attributes ?? {}), ([k, v]) => [
 		k,
 		JSON.parse(v) as JsonValue,
 	]);
