@@ -2,7 +2,7 @@ import * as nearley from '@esdmr/nearley';
 
 export const lexer = nearley.lexer.compile({
 	identifier: {
-		match: /[a-z_]+/u,
+		match: /[a-zA-Z_]+/,
 		type: nearley.lexer.keywords({
 			alarm: 'alarm',
 			timer: 'timer',
@@ -30,22 +30,28 @@ export const lexer = nearley.lexer.compile({
 			seconds: ['seconds', 'second', 'secs', 'sec', 's'],
 		}),
 	},
-	dash: /-/u,
-	colon: /:/u,
-	plus: /\+/u,
-	digits: /[0-9]+/u,
+	timeZoneIdentifier: {
+		match: /\[[\w/+-]+]/,
+		value(x) {
+			return x.slice(1, -1);
+		},
+	},
+	dash: /-/,
+	colon: /:/,
+	plus: /\+/,
+	digits: /\d+/,
 	commentLine: {
-		match: /(?:\n\s|;)[^\n]*/u,
+		match: /(?:\n\s|;)[^\n]*/,
 		lineBreaks: true,
 		value(x) {
-			return /(?:\n\s|;)([^\n]*)/u.exec(x)![1]!;
+			return x.slice(1).trim();
 		},
 	},
 	_newLine: {
-		match: /\n/u,
+		match: /\n/,
 		lineBreaks: true,
 	},
-	_whitespace: /(?!\n)\s/u,
+	_whitespace: /(?!\n)\s/,
 });
 
 const oldNext = lexer.next;

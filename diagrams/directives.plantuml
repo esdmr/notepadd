@@ -1,64 +1,217 @@
 @startebnf directives
-!procedure at_least_one_ordered($str)
-!$a = %splitstr($str, "/")
-!$i = 0
-!$j = 0
-!$n = %size($a)
-!while $i < $n
-!if $i > 0
-|
-!endif
-$a[$i]
-!$j = $i + 1
-!while $j < $n
-,[$a[$j]]
-!$j = $j + 1
-!endwhile
-!$i = $i + 1
-!endwhile
-!endprocedure
 
-directive = alarm (* starts immediately after exec *) | timer (* shows a start/pause/reset button *) | event (* like alarm, but for a period *);
+directive =
+	alarm (* starts immediately after exec *) |
+	timer (* shows a start/pause/reset button *) |
+	event (* like alarm, but for a period *);
 
 (* directives *)
-alarm = "alarm", abs_date_time_maybe_recurring_instant, [comment];
-timer = "timer", rel_date_time, [comment];
-event = "event", abs_date_time_maybe_recurring_period, [comment];
+
+alarm =
+	"alarm",
+	(instant_recurring | instant | duration),
+	[comment];
+
+timer =
+	"timer",
+	duration,
+	[comment];
+
+event =
+	"event",
+	(period_recurring | period),
+	[comment];
 
 (* date time *)
-abs_date_time_maybe_recurring_period = abs_date_time_period, "every", rel_date_time (* relative to start of period, must be longer than its duration *), ["until", abs_date_time_instant (* defaults to never, relative to start of period *)] | abs_date_time_period (* runs once *);
-abs_date_time_period = abs_date_time_instant, "for", rel_date_time | abs_date_time_instant, "until", abs_date_time_instant (* relative to start of period *) | abs_date, "whole day";
-abs_date_time_maybe_recurring_instant = [abs_date_time_instant (* defaults to now *)], "every", rel_date_time, ["until", abs_date_time_instant (* defaults to never, relative to start of period *)] | abs_date_time_instant (* runs once *);
-abs_date_time_instant = [abs_date (* defaults to next time, either today or tomorrow *)], abs_time | rel_date_time (* relative to now *) | "now" (* shorthand for today this time *);
 
-abs_date = [calendar (* default in config, falls back to iso *), "-"], unsigned_integer, "-", unsigned_integer, "-", unsigned_integer | "today" | "tomorrow";
-calendar = "gregory" | "islamic" (* Uses Um al-Qura calendar: islamic-umalqura *) | "persian" | ? [a-zA-Z_]+ ? (* "_" is replaced with "-" *);
-abs_time = unsigned_integer, ":", unsigned_integer, [offset (* defaults to local *)] | abs_time_of_day, [offset (* defaults to local *)] | "this time";
-abs_time_of_day = "midnight" (* 00:00 *) | "noon" (* 12:00 *) | "morning" (* configurable, defaults to 8:00 *) | "afternoon" (* configurable, defaults to 13:00 *) | "evening" (* configurable, defaults to 18:00 *);
+period_recurring =
+	period,
+	"every", duration (* relative to start of period, must be longer than its duration *),
+	["until", instant (* defaults to never *)];
 
-offset = plus_minus, unsigned_integer, ":", unsigned_integer | "Z";
+period =
+	period_with_duration |
+	period_with_end |
+	period_whole_day;
 
-rel_date_time = at_least_one_ordered("rel_date / rel_time");
+period_with_duration =
+	instant,
+	"for", duration (* relative to start of period *);
 
-rel_date = at_least_one_ordered("signed_integer, rel_date_years / signed_integer, rel_date_months / signed_integer, rel_date_days");
-rel_date_years = "years" | "year" | "yrs" | "yr" | "y";
-rel_date_months = "months" | "month" | "mos" | "mo";
-rel_date_days = "days" | "day" | "dys" | "dy" | "d";
+period_with_end =
+	instant,
+	"until", instant;
 
-rel_time = at_least_one_ordered("signed_integer, rel_time_hours / signed_integer, rel_time_minutes / signed_integer, rel_time_seconds");
-rel_time_hours = "hours" | "hour" | "hrs" | "hr" | "h";
-rel_time_minutes = "minutes" | "minute" | "mins" | "min" | "m";
-rel_time_seconds = "seconds" | "second" | "secs" | "sec" | "s";
+period_whole_day =
+	plain_date,
+	"whole day",
+	[time_zone (* defaults to local *)];
+
+instant_recurring =
+	[instant (* defaults to now *)],
+	"every", duration,
+	["until", instant (* defaults to never *)];
+
+instant =
+	instant_literal |
+	instant_later |
+	instant_now;
+
+instant_literal =
+	plain_date,
+	plain_time,
+	[time_zone (* defaults to local *)];
+
+instant_later =
+	plain_time (* next occurence, either today or tomorrow *),
+	[time_zone (* defaults to local *)];
+
+instant_now =
+	"now" (* shorthand for today this time *),
+	[time_zone (* defaults to local *)];
+
+plain_date =
+	plain_date_literal |
+	plain_date_keyword;
+
+plain_date_literal =
+	[calendar (* default in config, falls back to iso *), "-"],
+	unsigned_integer, "-",
+	unsigned_integer, "-",
+	unsigned_integer;
+
+plain_date_keyword =
+	"today" |
+	"tomorrow";
+
+calendar =
+	"gregory" |
+	"islamic" (* Uses Um al-Qura calendar: islamic-umalqura *) |
+	"persian" |
+	{? [a-zA-Z] ?}-, {"-", {? [a-zA-Z] ?}-};
+
+plain_time =
+	plain_time_literal |
+	plain_time_of_day |
+	plain_time_now;
+
+plain_time_literal =
+	unsigned_integer, ":",
+	unsigned_integer;
+
+plain_time_of_day =
+	"midnight" (* 00:00 *) |
+	"noon" (* 12:00 *) |
+	"morning" (* configurable, defaults to 8:00 *) |
+	"afternoon" (* configurable, defaults to 13:00 *) |
+	"evening" (* configurable, defaults to 18:00 *);
+
+plain_time_now =
+	"this time";
+
+time_zone =
+	time_zone_identifier |
+	offset (* will not adjust for DST or other time zone changes. *);
+
+time_zone_identifier =
+	"[",
+	{? [a-zA-Z0-9_/+-] ?}-,
+	"]";
+
+offset =
+	offset_local |
+	offset_keyword;
+
+offset_local =
+	number_sign,
+	unsigned_integer, ":",
+	unsigned_integer;
+
+offset_keyword =
+	"z" |
+	"Z";
+
+duration =
+	duration_date, [duration_time] |
+	duration_time;
+
+duration_date =
+	signed_integer, duration_years,
+	[signed_integer, duration_months],
+	[signed_integer, duration_days] |
+	signed_integer, duration_months,
+	[signed_integer, duration_days] |
+	signed_integer, duration_days;
+
+duration_years =
+	"years" |
+	"year" |
+	"yrs" |
+	"yr" |
+	"y";
+
+duration_months =
+	"months" |
+	"month" |
+	"mos" |
+	"mo";
+
+duration_days =
+	"days" |
+	"day" |
+	"dys" |
+	"dy" |
+	"d";
+
+duration_time =
+	signed_integer, duration_hours,
+	[signed_integer, duration_minutes],
+	[signed_integer, duration_seconds] |
+	signed_integer, duration_minutes,
+	[signed_integer, duration_seconds] |
+	signed_integer, duration_seconds;
+
+duration_hours =
+	"hours" |
+	"hour" |
+	"hrs" |
+	"hr" |
+	"h";
+
+duration_minutes =
+	"minutes" |
+	"minute" |
+	"mins" |
+	"min" |
+	"m";
+
+duration_seconds =
+	"seconds" |
+	"second" |
+	"secs" |
+	"sec" |
+	"s";
 
 (* primitives *)
-decimal = signed_integer, ".", unsigned_integer;
-signed_integer = [plus_minus], unsigned_integer;
-unsigned_integer = {digit}-;
-digit = ? [0-9] ?;
-plus_minus = ? [+-] ?;
+signed_integer =
+	[number_sign],
+	unsigned_integer;
 
-comment = {comment_line}-;
-comment_line = comment_start, {comment_char};
-comment_start = (? \n ?), (? \s ?) | ";";
-comment_char = ? [^\n] ?;
+unsigned_integer =
+	{? [0-9] ?}-;
+
+number_sign =
+	"+" |
+	"-";
+
+comment =
+	{comment_line}-;
+
+comment_line =
+	(
+		? \n ?, ? \s ? |
+		";"
+	),
+	{? [^\n] ?};
+
 @endebnf

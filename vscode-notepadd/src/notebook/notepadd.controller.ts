@@ -58,13 +58,24 @@ class NotePaddController implements Partial<NotebookController> {
 
 			try {
 				if (cell.document.languageId === 'notepadd') {
+					// TODO: Optionally enable AST debug via config.
+					const directive = parseDirective(
+						cell.document.getText(),
+					).toDirective(
+						undefined,
+						import.meta.env.MODE !== 'production' ||
+							import.meta.env.DEV,
+					);
+
 					// eslint-disable-next-line no-await-in-loop
 					await execution.replaceOutput(
 						new NotebookCellOutput([
 							NotebookCellOutputItem.json(
-								parseDirective(cell.document.getText()),
+								directive,
 								'application/x-notepadd+json',
 							),
+							// TODO: Remove after implementing the renderer and service.
+							NotebookCellOutputItem.json(directive),
 						]),
 					);
 

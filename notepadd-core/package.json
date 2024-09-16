@@ -16,6 +16,7 @@
 		"remark-gfm": "4.0.0",
 		"remark-math": "6.0.0",
 		"srcset": "5.0.1",
+		"temporal-polyfill": "0.2.5",
 		"uint8array-extras": "1.4.0",
 		"whatwg-mimetype": "4.0.0",
 		"yaml": "2.5.0"
