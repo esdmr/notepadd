@@ -377,35 +377,6 @@ export function oneShotAlarmFrom(json: JsonValue) {
 	);
 }
 
-export class RelativeAlarm {
-	readonly _type = 'RelativeAlarm';
-
-	constructor(
-		readonly when: Temporal.Duration,
-		readonly comment: string[],
-	) {}
-}
-
-export function relativeAlarmFrom(json: JsonValue) {
-	if (
-		typeof json !== 'object' ||
-		!json ||
-		!('_type' in json) ||
-		json._type !== 'RelativeAlarm' ||
-		typeof json.when !== 'string' ||
-		Array.isArray(json.comment)
-	) {
-		throw new Error(
-			`Cannot deserialize a relative alarm from JSON: ${JSON.stringify(json)}`,
-		);
-	}
-
-	return new RelativeAlarm(
-		Temporal.Duration.from(json.when),
-		(json.comment as unknown[]).map(String),
-	);
-}
-
 export class Timer {
 	readonly _type = 'Timer';
 
@@ -501,7 +472,6 @@ export class Directive {
 		readonly directive:
 			| RecurringAlarm
 			| OneShotAlarm
-			| RelativeAlarm
 			| Timer
 			| RecurringEvent
 			| OneShotEvent,
@@ -534,11 +504,6 @@ export function directiveFrom(json: JsonValue) {
 
 		case 'OneShotAlarm': {
 			directive = oneShotAlarmFrom(json.directive);
-			break;
-		}
-
-		case 'RelativeAlarm': {
-			directive = relativeAlarmFrom(json.directive);
 			break;
 		}
 

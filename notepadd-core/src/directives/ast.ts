@@ -9,7 +9,6 @@ import {
 	RecurringEvent,
 	RecurringInstant,
 	RecurringPeriod,
-	RelativeAlarm,
 	Timer,
 } from './types.ts';
 
@@ -77,7 +76,7 @@ export class AlarmNode extends SyntaxNode<
 		}
 
 		if (this.when instanceof DurationNode) {
-			return new RelativeAlarm(this.when.toDuration(), comment);
+			return new OneShotAlarm(now.add(this.when.toDuration()), comment);
 		}
 
 		throw new TypeError(
