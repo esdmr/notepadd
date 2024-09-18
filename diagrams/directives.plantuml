@@ -111,23 +111,20 @@ plain_time_now =
 
 time_zone =
 	time_zone_identifier |
-	offset (* will not adjust for DST or other time zone changes. *);
+	time_zone_offset (* will not adjust for DST or other time zone changes. *) |
+	time_zone_utc;
 
 time_zone_identifier =
 	"[",
 	{? [a-zA-Z0-9_/+-] ?}-,
 	"]";
 
-offset =
-	offset_local |
-	offset_keyword;
-
-offset_local =
+time_zone_offset =
 	number_sign,
 	unsigned_integer, ":",
 	unsigned_integer;
 
-offset_keyword =
+time_zone_utc =
 	"z" |
 	"Z";
 

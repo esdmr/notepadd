@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import MIMEType from 'whatwg-mimetype';
+import {Temporal} from 'temporal-polyfill';
 import type {NotePadd, NotePaddCell, NotePaddOutput} from './types.ts';
 
 export function isNullish(value: unknown): value is null | undefined {
@@ -180,4 +181,45 @@ export function isUriSafe(body: Uint8Array | string) {
 
 export function isBinary(body: Uint8Array | string) {
 	return typeof body === 'string' ? body.includes('\0') : body.includes(0);
+}
+
+export function getSmallestDurationUnit(duration: Temporal.Duration) {
+	if (duration.nanoseconds !== 0) return 'nanoseconds';
+	if (duration.microseconds !== 0) return 'microseconds';
+	if (duration.milliseconds !== 0) return 'milliseconds';
+	if (duration.seconds !== 0) return 'seconds';
+	if (duration.minutes !== 0) return 'minutes';
+	if (duration.hours !== 0) return 'hours';
+	if (duration.days !== 0) return 'days';
+	if (duration.weeks !== 0) return 'weeks';
+	if (duration.months !== 0) return 'months';
+	return 'years';
+}
+
+export function multiplyDuration(
+	duration: Temporal.Duration,
+	coefficient: number,
+) {
+	return coefficient === 1
+		? duration
+		: new Temporal.Duration(
+				duration.years * coefficient,
+				duration.months * coefficient,
+				duration.weeks * coefficient,
+				duration.days * coefficient,
+				duration.hours * coefficient,
+				duration.minutes * coefficient,
+				duration.seconds * coefficient,
+				duration.milliseconds * coefficient,
+				duration.microseconds * coefficient,
+				duration.nanoseconds * coefficient,
+			);
+}
+
+export function minDuration(
+	one: Temporal.Duration,
+	two: Temporal.Duration,
+	relativeTo: Temporal.ZonedDateTime,
+) {
+	return Temporal.Duration.compare(one, two, {relativeTo}) < 0 ? one : two;
 }

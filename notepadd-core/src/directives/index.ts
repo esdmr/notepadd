@@ -1,6 +1,6 @@
 import {Parser} from '@esdmr/nearley';
 import grammar from './grammar.ne';
-import type {DirectiveNode} from './ast.ts';
+import type {DirectiveNode} from './rules/directive/ast.ts';
 
 export function parseDirective(text: string): DirectiveNode {
 	const parser = new Parser(grammar);
