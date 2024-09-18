@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import MIMEType from 'whatwg-mimetype';
 import {Temporal} from 'temporal-polyfill';
-import type {NotePadd, NotePaddCell, NotePaddOutput} from './types.ts';
 
 export function isNullish(value: unknown): value is null | undefined {
 	return value === null || value === undefined;
@@ -50,85 +48,7 @@ export function mapRecord<
 	) as Record<K2, V2>;
 }
 
-export function getLastCell(context: NotePadd) {
-	const lastCell = context.cells.at(-1);
-	if (lastCell) return lastCell;
-
-	const dummyCell: NotePaddCell = {
-		type: 'markup',
-		lang: 'markdown',
-		source: '',
-	};
-
-	context.cells.push(dummyCell);
-	return dummyCell;
-}
-
-export function getLastOutput(context: NotePadd) {
-	const lastCell = getLastCell(context);
-	lastCell.outputs ??= [];
-
-	const lastOutput = lastCell.outputs.at(-1);
-	if (lastOutput) return lastOutput;
-
-	const dummyOutput: NotePaddOutput = {
-		items: {},
-	};
-
-	lastCell.outputs.push(dummyOutput);
-	return dummyOutput;
-}
-
-const builtinMimeTypeOfLangIds: Record<string, string> = {
-	html: 'text/html',
-	svg: 'image/svg+xml',
-	markdown: 'text/markdown',
-	plaintext: 'text/plain',
-	json: 'application/json',
-	error: 'application/vnd.code.notebook.error',
-	stderr: 'application/vnd.code.notebook.stderr',
-	stdout: 'application/vnd.code.notebook.stdout',
-	notepadd: 'application/x-notepadd+json',
-};
-
-export function getMimeTypeOfLangId(langId: string) {
-	return builtinMimeTypeOfLangIds[langId] ?? `text/x-${langId}`;
-}
-
-export function getMimeTypeOfMarkdownLang(mdLang: string | null | undefined) {
-	const [langId = 'plaintext', mime] = mdLang?.split(' ', 2) ?? [];
-
-	return mime ?? getMimeTypeOfLangId(langId);
-}
-
-const builtinLangIdOfMimeTypes = mapRecord(
-	builtinMimeTypeOfLangIds,
-	([k, v]) => [v, k],
-);
-
-const mimeSubTypeLangIdRegExp = /^(?:x[-.]|vnd[-.])?(?:[^+]+\+)*([^+]+)$/;
-
-export function getLangIdOfMimeType(mime: string) {
-	const mimeType = new MIMEType(mime);
-
-	return (
-		builtinLangIdOfMimeTypes[mimeType.essence] ??
-		mimeSubTypeLangIdRegExp.exec(mimeType.subtype)?.[1] ??
-		mimeType.subtype
-	);
-}
-
-export function getMarkdownLangOfMimeType(mime: string) {
-	const langId = getLangIdOfMimeType(mime);
-
-	return getMimeTypeOfLangId(langId) === mime ? langId : `${langId} ${mime}`;
-}
-
-export function codePointOf(ch: string) {
-	return ch.codePointAt(0)!;
-}
-
-export const uriSafeChars = new Set([
+const uriSafeChars = new Set([
 	// From RFC 2396:
 	//     uric = reserved | unreserved | escaped
 	//     unreserved = alphanum | mark
@@ -136,36 +56,36 @@ export const uriSafeChars = new Set([
 	//     alpha = lowalpha | upalpha
 
 	// `reserved`:
-	codePointOf(';'),
-	codePointOf('/'),
-	codePointOf('?'),
-	codePointOf(':'),
-	codePointOf('@'),
-	codePointOf('&'),
-	codePointOf('='),
-	codePointOf('+'),
-	codePointOf('$'),
-	codePointOf(','),
+	';'.codePointAt(0)!,
+	'/'.codePointAt(0)!,
+	'?'.codePointAt(0)!,
+	':'.codePointAt(0)!,
+	'@'.codePointAt(0)!,
+	'&'.codePointAt(0)!,
+	'='.codePointAt(0)!,
+	'+'.codePointAt(0)!,
+	'$'.codePointAt(0)!,
+	','.codePointAt(0)!,
 
 	// `lowalpha`:
-	...Array.from({length: 26}, (_, i) => i + codePointOf('a')),
+	...Array.from({length: 26}, (_, i) => i + 'a'.codePointAt(0)!),
 
 	// `upalpha`:
-	...Array.from({length: 26}, (_, i) => i + codePointOf('A')),
+	...Array.from({length: 26}, (_, i) => i + 'A'.codePointAt(0)!),
 
 	// `digit`:
-	...Array.from({length: 10}, (_, i) => i + codePointOf('0')),
+	...Array.from({length: 10}, (_, i) => i + '0'.codePointAt(0)!),
 
 	// `mark`:
-	codePointOf('-'),
-	codePointOf('_'),
-	codePointOf('.'),
-	codePointOf('!'),
-	codePointOf('~'),
-	codePointOf('*'),
-	codePointOf("'"),
-	codePointOf('('),
-	codePointOf(')'),
+	'-'.codePointAt(0)!,
+	'_'.codePointAt(0)!,
+	'.'.codePointAt(0)!,
+	'!'.codePointAt(0)!,
+	'~'.codePointAt(0)!,
+	'*'.codePointAt(0)!,
+	"'".codePointAt(0)!,
+	'('.codePointAt(0)!,
+	')'.codePointAt(0)!,
 ]);
 
 /**

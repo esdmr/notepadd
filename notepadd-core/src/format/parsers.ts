@@ -16,7 +16,3 @@ export const markdown = remark()
 export const html = rehype()
 	.use(rehypeSanitize, {strip: ['script', 'style']})
 	.freeze();
-
-export const cellDirective = 'cell';
-export const executionDirective = 'execution';
-export const outputDirective = 'output';

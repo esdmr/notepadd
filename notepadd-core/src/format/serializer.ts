@@ -9,26 +9,16 @@ import {
 } from 'uint8array-extras';
 import MIMEType from 'whatwg-mimetype';
 import * as yaml from 'yaml';
-import {
-	cellDirective,
-	executionDirective,
-	html,
-	markdown,
-	outputDirective,
-} from './parsers.ts';
+import {filterNullishValues, isBinary, isUriSafe, mapRecord} from '../utils.ts';
+import {html, markdown} from './parsers.ts';
+import {cellDirective, executionDirective, outputDirective} from './shared.ts';
 import type {
 	NotePadd,
 	NotePaddCell,
 	NotePaddMetadata,
 	NotePaddOutput,
 } from './types.ts';
-import {
-	filterNullishValues,
-	getMarkdownLangOfMimeType,
-	isBinary,
-	isUriSafe,
-	mapRecord,
-} from './utils.ts';
+import {getMarkdownLangOfMimeType} from './mime.ts';
 
 function toOutputUri(mimeType: string, body: Uint8Array | string) {
 	if (isUriSafe(body)) {

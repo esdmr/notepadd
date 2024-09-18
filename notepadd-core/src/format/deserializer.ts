@@ -5,21 +5,16 @@ import {parseSrcset} from 'srcset';
 import type {JsonValue} from 'type-fest';
 import {stringToUint8Array} from 'uint8array-extras';
 import * as yaml from 'yaml';
+import {filterNullishValues, mapRecord} from '../utils.ts';
 import {
-	cellDirective,
-	executionDirective,
-	html,
-	markdown,
-	outputDirective,
-} from './parsers.ts';
-import type {NotePadd, NotePaddMetadata} from './types.ts';
-import {
-	filterNullishValues,
 	getLastCell,
 	getLastOutput,
-	getMimeTypeOfMarkdownLang,
-	mapRecord,
-} from './utils.ts';
+	type NotePadd,
+	type NotePaddMetadata,
+} from './types.ts';
+import {html, markdown} from './parsers.ts';
+import {cellDirective, executionDirective, outputDirective} from './shared.ts';
+import {getMimeTypeOfMarkdownLang} from './mime.ts';
 
 function addOutput(
 	context: NotePadd,
