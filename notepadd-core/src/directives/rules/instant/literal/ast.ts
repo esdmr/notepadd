@@ -14,9 +14,13 @@ export class InstantLiteralNode
 	readonly timeZone = this._children[2];
 
 	toInstant(now: Temporal.ZonedDateTime) {
+		if (this.timeZone) {
+			now = now.withTimeZone(this.timeZone.toTimeZone());
+		}
+
 		return this.date.toPlainDate(now.toPlainDate()).toZonedDateTime({
 			plainTime: this.time.toPlainTime(now.toPlainTime()),
-			timeZone: this.timeZone?.toTimeZone() ?? now.timeZoneId,
+			timeZone: now.timeZoneId,
 		});
 	}
 }
