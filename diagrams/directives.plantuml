@@ -133,12 +133,12 @@ duration =
 	duration_time;
 
 duration_date =
-	signed_integer, duration_years,
-	[signed_integer, duration_months],
-	[signed_integer, duration_days] |
-	signed_integer, duration_months,
-	[signed_integer, duration_days] |
-	signed_integer, duration_days;
+	unsigned_integer, duration_years,
+	[unsigned_integer, duration_months],
+	[unsigned_integer, duration_days] |
+	unsigned_integer, duration_months,
+	[unsigned_integer, duration_days] |
+	unsigned_integer, duration_days;
 
 duration_years =
 	"years" |
@@ -161,12 +161,12 @@ duration_days =
 	"d";
 
 duration_time =
-	signed_integer, duration_hours,
-	[signed_integer, duration_minutes],
-	[signed_integer, duration_seconds] |
-	signed_integer, duration_minutes,
-	[signed_integer, duration_seconds] |
-	signed_integer, duration_seconds;
+	unsigned_integer, duration_hours,
+	[unsigned_integer, duration_minutes],
+	[unsigned_integer, duration_seconds] |
+	unsigned_integer, duration_minutes,
+	[unsigned_integer, duration_seconds] |
+	unsigned_integer, duration_seconds;
 
 duration_hours =
 	"hours" |

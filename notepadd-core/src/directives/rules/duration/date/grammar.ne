@@ -4,8 +4,8 @@
 
 duration_date ->
 	at_least_one_ordered_three[
-		signed_integer %years {% nearley.id %},
-		signed_integer %months {% nearley.id %},
-		signed_integer %days {% nearley.id %}
+		unsigned_integer %years {% nearley.id %},
+		unsigned_integer %months {% nearley.id %},
+		unsigned_integer %days {% nearley.id %}
 	]
 	{% $(DurationDateNode) %}

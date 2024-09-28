@@ -40,17 +40,6 @@ export class RecurringPeriod {
 				`Recurring period ends (${end.toString()}) before it starts (${first.start.toString()})`,
 			);
 		}
-
-		if (
-			Temporal.ZonedDateTime.compare(
-				first.start.add(interval),
-				first.start,
-			) <= 0
-		) {
-			throw new RangeError(
-				`Recurring period has a non-positive interval (${interval.toString()})`,
-			);
-		}
 	}
 
 	getInstance(now: Temporal.ZonedDateTime) {

@@ -38,12 +38,6 @@ export class RecurringInstant {
 				`Recurring instant ends (${end.toString()}) before it starts (${first.toString()})`,
 			);
 		}
-
-		if (Temporal.ZonedDateTime.compare(first.add(interval), first) <= 0) {
-			throw new RangeError(
-				`Recurring instant has a non-positive interval (${interval.toString()})`,
-			);
-		}
 	}
 
 	getInstance(now: Temporal.ZonedDateTime) {
