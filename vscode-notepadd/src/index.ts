@@ -1,3 +1,5 @@
+/* eslint-disable import/no-unassigned-import */
+import 'vite/client';
 import {type ExtensionContext} from 'vscode';
 import {setupController} from './notebook/notepadd.controller.ts';
 import {setupSerializer} from './notebook/notepadd.serializer.ts';
