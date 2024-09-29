@@ -61,7 +61,6 @@ class NotePaddController implements Partial<NotebookController> {
 					// TODO: Optionally enable AST debug via config.
 					const directive = parseDirective(
 						cell.document.getText(),
-					).toDirective(
 						undefined,
 						import.meta.env.MODE !== 'production' ||
 							import.meta.env.DEV,

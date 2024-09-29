@@ -1,8 +1,13 @@
 import {Parser} from '@esdmr/nearley';
+import type {Temporal} from 'temporal-polyfill';
 import grammar from './grammar.ne';
 import type {DirectiveNode} from './rules/directive/ast.ts';
 
-export function parseDirective(text: string): DirectiveNode {
+export function parseDirective(
+	text: string,
+	now?: Temporal.ZonedDateTime,
+	showAst?: boolean,
+) {
 	const parser = new Parser(grammar);
 
 	parser.feed(text);
@@ -18,7 +23,7 @@ export function parseDirective(text: string): DirectiveNode {
 		});
 	}
 
-	return results[0]!;
+	return results[0]!.toDirective(now, showAst);
 }
 
 export * from './rules/types.ts';
