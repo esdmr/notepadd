@@ -72,3 +72,7 @@ export class Directive {
 		readonly ast?: DirectiveNode | JsonValue,
 	) {}
 }
+
+export * from './timer/types.ts';
+export * from './alarm/types.ts';
+export * from './event/types.ts';

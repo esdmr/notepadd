@@ -20,3 +20,5 @@ export function parseDirective(text: string): DirectiveNode {
 
 	return results[0]!;
 }
+
+export * from './rules/types.ts';
