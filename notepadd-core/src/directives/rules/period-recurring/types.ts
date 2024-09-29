@@ -42,6 +42,10 @@ export class RecurringPeriod {
 		}
 	}
 
+	toString() {
+		return `R/${this.first.toString()}/${this.interval.toString()}/${this.end?.toString()}`;
+	}
+
 	getInstance(now: Temporal.ZonedDateTime) {
 		const recurringInstant = new RecurringInstant(
 			this.first.start,

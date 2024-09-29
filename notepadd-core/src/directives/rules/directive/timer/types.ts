@@ -28,4 +28,8 @@ export class Timer {
 		readonly when: Temporal.Duration,
 		readonly comment: string[],
 	) {}
+
+	toString() {
+		return `${this.when.toString()};${this.comment.join('\n')}`;
+	}
 }

@@ -40,6 +40,10 @@ export class RecurringInstant {
 		}
 	}
 
+	toString() {
+		return `R/${this.first.toString()}/${this.interval.toString()}/${this.end?.toString()}`;
+	}
+
 	getInstance(now: Temporal.ZonedDateTime) {
 		const guessedInstant = this.estimateInstancePrecise(now);
 

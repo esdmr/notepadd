@@ -29,6 +29,10 @@ export class OneShotAlarm {
 		readonly when: Temporal.ZonedDateTime,
 		readonly comment: string[],
 	) {}
+
+	toString() {
+		return `${this.when.toString()};${this.comment.join('\n')}`;
+	}
 }
 
 export class RecurringAlarm {
@@ -58,4 +62,8 @@ export class RecurringAlarm {
 		readonly when: RecurringInstant,
 		readonly comment: string[],
 	) {}
+
+	toString() {
+		return `${this.when.toString()};${this.comment.join('\n')}`;
+	}
 }

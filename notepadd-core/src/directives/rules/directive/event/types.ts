@@ -30,6 +30,10 @@ export class OneShotEvent {
 		readonly when: Period,
 		readonly comment: string[],
 	) {}
+
+	toString() {
+		return `${this.when.toString()};${this.comment.join('\n')}`;
+	}
 }
 
 export class RecurringEvent {
@@ -59,4 +63,8 @@ export class RecurringEvent {
 		readonly when: RecurringPeriod,
 		readonly comment: string[],
 	) {}
+
+	toString() {
+		return `${this.when.toString()};${this.comment.join('\n')}`;
+	}
 }

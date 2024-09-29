@@ -71,6 +71,10 @@ export class Directive {
 		readonly directive: DirectiveChild,
 		readonly ast?: DirectiveNode | JsonValue,
 	) {}
+
+	toString() {
+		return this.directive.toString();
+	}
 }
 
 export * from './timer/types.ts';

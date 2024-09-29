@@ -39,6 +39,10 @@ export class Period {
 		}
 	}
 
+	toString() {
+		return `P/${this.start.toString()}/${this.endOrDuration.toString()}`;
+	}
+
 	getEnd() {
 		return this.endOrDuration instanceof Temporal.ZonedDateTime
 			? this.endOrDuration
