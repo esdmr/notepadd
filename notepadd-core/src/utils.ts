@@ -120,20 +120,21 @@ export function multiplyDuration(
 	duration: Temporal.Duration,
 	coefficient: number,
 ) {
-	return coefficient === 1
-		? duration
-		: new Temporal.Duration(
-				duration.years * coefficient,
-				duration.months * coefficient,
-				duration.weeks * coefficient,
-				duration.days * coefficient,
-				duration.hours * coefficient,
-				duration.minutes * coefficient,
-				duration.seconds * coefficient,
-				duration.milliseconds * coefficient,
-				duration.microseconds * coefficient,
-				duration.nanoseconds * coefficient,
-			);
+	if (coefficient === 1) return duration;
+	if (coefficient === -1) return duration.negated();
+
+	return new Temporal.Duration(
+		duration.years * coefficient,
+		duration.months * coefficient,
+		duration.weeks * coefficient,
+		duration.days * coefficient,
+		duration.hours * coefficient,
+		duration.minutes * coefficient,
+		duration.seconds * coefficient,
+		duration.milliseconds * coefficient,
+		duration.microseconds * coefficient,
+		duration.nanoseconds * coefficient,
+	);
 }
 
 export function minDuration(
