@@ -19,7 +19,7 @@ If omitted, the recurrence will never end.
 It might not be aligned to the interval, in which case the previous instance will be the last one.
 It must not be before the start of recurrence.
 ----
-<latex>T\colon \mathrm{dur}</latex>
+<latex>T\colon \mathrm{dur}^+</latex>
 Defines the interval between each instance.
 ----
 <latex>t_{i}\colon \mathrm{zdt} = t_0 + iT \pod{i\colon \mathbb{Z}}</latex>
@@ -36,7 +36,7 @@ The error direction of instant <i>t</i> from now.
 It is positive if after, negative if before, or zero if at the current time.
 Adjustments should happen in the opposite direction of this.
 ----
-<latex>u(T\colon \mathrm{dur})\colon \mathrm{unit}</latex>
+<latex>u\colon \mathrm{dur} \to \mathrm{unit}</latex>
 The smallest unit of a duration.
 This is used as a baseline to calculate the integral value of a duration.
 ----
@@ -44,7 +44,7 @@ This is used as a baseline to calculate the integral value of a duration.
 Compares the given instance to the recurrence bounds.
 Note that this only checks the boundary, not the alignment to the interval.
 ----
-<latex>\frac{T}{u} \kern{-11mu}-\kern{-8mu}|\;t\colon \mathbb{R}\\\frac{T}{u(T)} \kern{-11mu}-\kern{-8mu}|\;t\colon \mathbb{Z}</latex>
+<latex>\frac{T}{u} \kern{-11mu}-\kern{-8mu}|\;t\colon \mathbb{R}\pod{T \colon \mathrm{dur},\, u \colon \mathrm{unit},\, t \colon \mathrm{zdt}}\\\frac{T}{u(T)} \kern{-11mu}-\kern{-8mu}|\;t\colon \mathbb{Z}</latex>
 Division of duration <i>T</i> by <i>u</i> units, at instant <i>t</i>.
 This gives a numeric value of duration <i>T</i>, which is accurate if and only if either the duration is date-independent, or the result is only used at the instant <i>t</i>.
 In other words, if duration <i>T</i> is an arbitrary interval, the result is only accurate for the first instance.
@@ -72,10 +72,10 @@ group edge case
 end group
 
 group estimate imprecise
-	:<latex>\Delta t_1\colon \mathbb{Z} = \frac{T}{u(T)} \kern{-11mu}-\kern{-8mu}|\;t_0</latex>
+	:<latex>\Delta t_1\colon \mathbb{Z}^+ = \frac{T}{u(T)} \kern{-11mu}-\kern{-8mu}|\;t_0</latex>
 	Duration which elapses between the first two instances, i.e., the interval, converted to a numeric value (specifically, an integer).
 	----
-	<latex>\Delta t_{\mathrm{now}}\colon \mathbb{R} = \frac{t_{\mathrm{now}} - t_0}{u(T)} \kern{-11mu}-\kern{-8mu}|\;t_0</latex>
+	<latex>\Delta t_{\mathrm{now}}\colon \mathbb{R}^+ \cup \{0\} = \frac{t_{\mathrm{now}} - t_0}{u(T)} \kern{-11mu}-\kern{-8mu}|\;t_0</latex>
 	Duration which has elapsed between the first instance and the current time, converted to a numeric value.
 	Since the current time is almost always unaligned, this is unlikely to be an integer.
 	----
@@ -89,7 +89,7 @@ group estimate precise
 	The currently guessed instance.
 	This is aligned to the interval, but might be out-of-bounds.;
 	if (<latex>e(t_{\hat \imath})</latex>) then
-		:<latex>T_{\mathrm{step}}\colon \mathrm{dur} = -e(t_{\hat \imath})T</latex>
+		:<latex>T_{\mathrm{step}}\colon \mathrm{dur}^- \cup \mathrm{dur}^+ = -e(t_{\hat \imath})T</latex>
 		The adjustment duration.
 		Adjustment is opposite to the direction of error, so this must be negative.
 		Since this is an integer multiple of the interval, it keeps the guessed instance aligned.;

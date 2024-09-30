@@ -38,6 +38,10 @@ export class RecurringInstant {
 				`Recurring instant ends (${end.toString()}) before it starts (${first.toString()})`,
 			);
 		}
+
+		if (interval.blank) {
+			throw new RangeError('Recurring instant has a zero interval');
+		}
 	}
 
 	toString() {

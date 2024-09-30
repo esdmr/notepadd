@@ -43,6 +43,10 @@ export class RecurringPeriod {
 			);
 		}
 
+		if (interval.blank) {
+			throw new RangeError('Recurring period has a zero interval');
+		}
+
 		this._recurringInstant = new RecurringInstant(
 			this.first.start,
 			this.interval,
