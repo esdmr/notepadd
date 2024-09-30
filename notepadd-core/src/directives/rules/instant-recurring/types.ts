@@ -76,6 +76,11 @@ export class RecurringInstant {
 		return this._checkBounds(next) === 0 ? next : undefined;
 	}
 
+	getNextInstance(instance: Temporal.ZonedDateTime) {
+		const next = instance.add(this.interval);
+		return this._checkBounds(next) === 0 ? next : undefined;
+	}
+
 	private _checkBounds(instant: Temporal.ZonedDateTime) {
 		return Temporal.ZonedDateTime.compare(instant, this.first) < 0
 			? -1
