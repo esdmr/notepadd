@@ -29,6 +29,8 @@ export class RecurringPeriod {
 	}
 
 	readonly _type = 'RecurringPeriod';
+	private readonly _recurringInstant;
+	private readonly _periodDuration;
 
 	constructor(
 		readonly first: Period,
@@ -40,6 +42,23 @@ export class RecurringPeriod {
 				`Recurring period ends (${end.toString()}) before it starts (${first.start.toString()})`,
 			);
 		}
+
+		this._recurringInstant = new RecurringInstant(
+			this.first.start,
+			this.interval,
+			this.end,
+		);
+
+		this._periodDuration = this.first.getDuration();
+	}
+
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	toJSON() {
+		return {
+			...this,
+			_recurringInstant: undefined,
+			_periodDuration: undefined,
+		};
 	}
 
 	toString() {
@@ -47,28 +66,26 @@ export class RecurringPeriod {
 	}
 
 	getInstance(now: Temporal.ZonedDateTime) {
-		const recurringInstant = new RecurringInstant(
-			this.first.start,
-			this.interval,
-			this.end,
+		const next = this._recurringInstant.getInstance(now);
+
+		return (
+			next &&
+			new Period(
+				next,
+				minDuration(this._periodDuration, this.interval, next),
+			)
 		);
+	}
 
-		const {previous, next} = recurringInstant.getInstance(now);
-		const periodDuration = this.first.getDuration();
+	getNextInstance(instance: Period) {
+		const next = this._recurringInstant.getNextInstance(instance.start);
 
-		return {
-			previous:
-				previous &&
-				new Period(
-					previous,
-					minDuration(periodDuration, this.interval, previous),
-				),
-			next:
-				next &&
-				new Period(
-					next,
-					minDuration(periodDuration, this.interval, next),
-				),
-		};
+		return (
+			next &&
+			new Period(
+				next,
+				minDuration(this._periodDuration, this.interval, next),
+			)
+		);
 	}
 }
