@@ -1,0 +1,126 @@
+@startuml getRecurringInstance
+<style>
+element {
+  MaximumWidth 300
+}
+</style>
+
+split
+-[hidden]->
+
+:= Definitions
+----
+<latex>t_0\colon \mathrm{zdt}</latex>
+Defines the start of recurrence (inclusive).
+----
+<latex>t_{\mathrm{end}}\colon \mathrm{zdt}\cup \{\varnothing\}</latex>
+Defines the end of recurrence (inclusive).
+If omitted, the recurrence will never end.
+It might not be aligned to the interval, in which case the previous instance will be the last one.
+It must not be before the start of recurrence.
+----
+<latex>T\colon \mathrm{dur}</latex>
+Defines the interval between each instance.
+----
+<latex>t_{i}\colon \mathrm{zdt} = t_0 + iT \pod{i\colon \mathbb{Z}}</latex>
+The <i>i</i>-th instance.
+This is aligned to the interval but might be out-of-bounds.
+----
+<latex>t_{\mathrm{now}}\colon \mathrm{zdt}</latex>
+The current time.
+This is either now, or some checkpoint in the past.
+Using a checkpoint is recommended to avoid missing instances.
+----
+<latex>e(t\colon \mathrm{zdt}) = \operatorname{sign}(t - t_{\mathrm{now}})</latex>
+The error direction of instant <i>t</i> from now.
+It is positive if after, negative if before, or zero if at the current time.
+Adjustments should happen in the opposite direction of this.
+----
+<latex>u(T\colon \mathrm{dur})\colon \mathrm{unit}</latex>
+The smallest unit of a duration.
+This is used as a baseline to calculate the integral value of a duration.
+----
+<latex>p(t\colon \mathrm{zdt}) = \begin{cases}-1 \quad& t < t_0\\0 \quad& t_{\mathrm{end}} = \varnothing \land t_0 \le t\\0 \quad& t_{\mathrm{end}} \ne \varnothing \land t_0 \le t \le t_{\mathrm{end}}\\1 \quad& t_{\mathrm{end}} \ne \varnothing \land t_{\mathrm{end}} < t\end{cases}</latex>
+Compares the given instance to the recurrence bounds.
+Note that this only checks the boundary, not the alignment to the interval.
+----
+<latex>\frac{T}{u} \kern{-11mu}-\kern{-8mu}|\;t\colon \mathbb{R}\\\frac{T}{u(T)} \kern{-11mu}-\kern{-8mu}|\;t\colon \mathbb{Z}</latex>
+Division of duration <i>T</i> by <i>u</i> units, at instant <i>t</i>.
+This gives a numeric value of duration <i>T</i>, which is accurate if and only if either the duration is date-independent, or the result is only used at the instant <i>t</i>.
+In other words, if duration <i>T</i> is an arbitrary interval, the result is only accurate for the first instance.
+If unit <i>u</i> is the smallest unit of duration <i>T</i>, the result would be integral.
+----
+= End of Definitions;
+detach
+
+split again
+-[hidden]->
+start
+
+group edge case
+	if (<latex>p(t_{\mathrm{now}})</latex>) then (<latex>= -1</latex>)
+		:<latex>t_{\mathrm{next}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow t_0</latex>
+		Recurrence has not started yet.
+		This means that the following algorithm would likely estimate some instance from before the start and then filter it at the bounds checking, yielding no instance.;
+		stop
+	elseif (<latex>p(t_{\mathrm{now}})</latex>) then (<latex>= 1</latex>)
+		:<latex>t_{\mathrm{next}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow \varnothing</latex>
+		Recurrence is finished already.
+		The following algorithm should yield a correct result, but this fast path would speed handling old directives up.;
+		stop
+	endif
+end group
+
+group estimate imprecise
+	:<latex>\Delta t_1\colon \mathbb{Z} = \frac{T}{u(T)} \kern{-11mu}-\kern{-8mu}|\;t_0</latex>
+	Duration which elapses between the first two instances, i.e., the interval, converted to a numeric value (specifically, an integer).
+	----
+	<latex>\Delta t_{\mathrm{now}}\colon \mathbb{R} = \frac{t_{\mathrm{now}} - t_0}{u(T)} \kern{-11mu}-\kern{-8mu}|\;t_0</latex>
+	Duration which has elapsed between the first instance and the current time, converted to a numeric value.
+	Since the current time is almost always unaligned, this is unlikely to be an integer.
+	----
+	<latex>\hat \imath\colon \mathbb{Z} = \left\lfloor \frac{\Delta t_{\mathrm{now}}}{\Delta t_1} \right\rfloor = \left\lfloor \frac{t_{\mathrm{now}} - t_0}{T} \kern{-11mu}-\kern{-8mu}|\;t_0 \right\rfloor</latex>
+	Estimated index of instance before the current time.
+	Since the division is relative to the first instance only, this might not be accurate.;
+end group
+
+group estimate precise
+	:<latex>\bar t\colon \mathrm{zdt} \mathrel\leftarrow t_{\hat \imath}</latex>
+	The currently guessed instance.
+	This is aligned to the interval, but might be out-of-bounds.;
+	if (<latex>e(t_{\hat \imath})</latex>) then
+		:<latex>T_{\mathrm{step}}\colon \mathrm{dur} = -e(t_{\hat \imath})T</latex>
+		The adjustment duration.
+		Adjustment is opposite to the direction of error, so this must be negative.
+		Since this is an integer multiple of the interval, it keeps the guessed instance aligned.;
+		repeat
+			:<latex>\bar t \mathrel\leftarrow \bar t + T_{\mathrm{step}}</latex>
+			Guessed instance is kept aligned, because the adjustment duration is aligned.;
+		repeat while (<latex>e(\bar t)</latex>) is (<latex>= e(t_{\hat \imath})</latex>)
+	else (<latex>= 0</latex>)
+	endif
+	:The guessed instance should now be immediately before, at, or immediately after the current time.;
+end group
+
+group reorder
+	if (<latex>\bar t</latex>) is (<latex>\gt t_{\mathrm{now}}</latex>) then
+		:<latex>t_{\mathrm{next}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow \bar t</latex>
+		The guessed instance was after the current time, so it is the next instance.;
+	else (<latex>\le t_{\mathrm{now}}</latex>)
+		:<latex>t_{\mathrm{next}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow \bar t + T</latex>
+		The guessed instance was before or at the current time, so it is the previous instance.;
+	endif
+end group
+
+group bounds check
+	if (<latex>p(t_{\mathrm{next}})</latex>) then
+		:<latex>t_{\mathrm{next}} \mathrel\leftarrow \varnothing</latex>
+		Next instance was out-of-bounds, so it should be null instead.;
+	else (<latex>= 0</latex>)
+	endif
+end group
+
+stop
+end split
+
+@enduml
