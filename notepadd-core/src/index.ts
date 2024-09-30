@@ -1,7 +1,7 @@
-/* eslint-disable import/no-unassigned-import */
-import 'remark';
-import 'mdast-util-directive';
-import 'mdast-util-math';
+/* eslint-disable @typescript-eslint/triple-slash-reference */
+/// <reference types="remark" />
+/// <reference types="mdast-util-directive" />
+/// <reference types="mdast-util-math" />
 
 export * from './format/index.ts';
 export * from './directives/index.ts';
