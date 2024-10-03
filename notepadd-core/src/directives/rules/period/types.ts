@@ -1,14 +1,15 @@
 import {Temporal} from 'temporal-polyfill';
-import type {JsonValue} from 'type-fest';
 
 export class Period {
-	static from(json: JsonValue) {
+	static from(json: unknown) {
 		if (
 			typeof json !== 'object' ||
 			!json ||
 			!('_type' in json) ||
 			json._type !== 'Period' ||
+			!('start' in json) ||
 			typeof json.start !== 'string' ||
+			!('endOrDuration' in json) ||
 			typeof json.endOrDuration !== 'string'
 		) {
 			throw new Error(

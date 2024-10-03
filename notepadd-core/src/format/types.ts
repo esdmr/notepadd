@@ -1,5 +1,3 @@
-import type {Jsonifiable} from 'type-fest';
-
 export type NotePadd = {
 	cells: NotePaddCell[];
 	metadata?: NotePaddMetadata;
@@ -31,7 +29,7 @@ export type NotePaddOutput = {
 };
 
 export type NotePaddOutputItems = Record<string, Uint8Array>;
-export type NotePaddMetadata = Record<string, Jsonifiable | undefined>;
+export type NotePaddMetadata = Record<string, unknown>;
 
 export function getLastCell(context: NotePadd) {
 	const lastCell = context.cells.at(-1);

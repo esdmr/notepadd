@@ -1,8 +1,6 @@
-import type {JsonValue} from 'type-fest';
-import type {DirectiveNode} from './ast.ts';
+import {OneShotAlarm, RecurringAlarm} from './alarm/types.ts';
+import {OneShotEvent, RecurringEvent} from './event/types.ts';
 import {Timer} from './timer/types.ts';
-import {RecurringAlarm, OneShotAlarm} from './alarm/types.ts';
-import {RecurringEvent, OneShotEvent} from './event/types.ts';
 
 export type DirectiveChild =
 	| RecurringAlarm
@@ -12,12 +10,13 @@ export type DirectiveChild =
 	| OneShotEvent;
 
 export class Directive {
-	static from(json: JsonValue) {
+	static from(json: unknown) {
 		if (
 			typeof json !== 'object' ||
 			!json ||
 			!('_type' in json) ||
 			json._type !== 'Directive' ||
+			!('directive' in json) ||
 			typeof json.directive !== 'object' ||
 			!json.directive ||
 			!('_type' in json.directive)
@@ -62,14 +61,14 @@ export class Directive {
 			}
 		}
 
-		return new Directive(directive, json.ast);
+		return new Directive(directive, 'ast' in json ? json.ast : undefined);
 	}
 
 	readonly _type = 'Directive';
 
 	constructor(
 		readonly directive: DirectiveChild,
-		readonly ast?: DirectiveNode | JsonValue,
+		readonly ast?: unknown,
 	) {}
 
 	toString() {
@@ -77,6 +76,6 @@ export class Directive {
 	}
 }
 
-export * from './timer/types.ts';
 export * from './alarm/types.ts';
 export * from './event/types.ts';
+export * from './timer/types.ts';

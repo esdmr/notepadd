@@ -1,14 +1,15 @@
 import {Temporal} from 'temporal-polyfill';
-import type {JsonValue} from 'type-fest';
 
 export class Timer {
-	static from(json: JsonValue) {
+	static from(json: unknown) {
 		if (
 			typeof json !== 'object' ||
 			!json ||
 			!('_type' in json) ||
 			json._type !== 'Timer' ||
+			!('when' in json) ||
 			typeof json.when !== 'string' ||
+			!('comment' in json) ||
 			Array.isArray(json.comment)
 		) {
 			throw new Error(

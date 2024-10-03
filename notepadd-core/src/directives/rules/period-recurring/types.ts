@@ -1,17 +1,18 @@
 import {Temporal} from 'temporal-polyfill';
-import type {JsonValue} from 'type-fest';
 import {minDuration} from '../../../utils.ts';
 import {Period} from '../period/types.ts';
 import {RecurringInstant} from '../instant-recurring/types.ts';
 
 export class RecurringPeriod {
-	static from(json: JsonValue) {
+	static from(json: unknown) {
 		if (
 			typeof json !== 'object' ||
 			!json ||
 			!('_type' in json) ||
 			json._type !== 'RecurringPeriod' ||
+			!('first' in json) ||
 			json.first === undefined ||
+			!('interval' in json) ||
 			typeof json.interval !== 'string'
 		) {
 			throw new Error(
@@ -22,7 +23,7 @@ export class RecurringPeriod {
 		return new RecurringPeriod(
 			Period.from(json.first),
 			Temporal.Duration.from(json.interval),
-			typeof json.end === 'string'
+			'end' in json && typeof json.end === 'string'
 				? Temporal.ZonedDateTime.from(json.end)
 				: undefined,
 		);

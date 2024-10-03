@@ -1,15 +1,16 @@
 import {Temporal} from 'temporal-polyfill';
-import type {JsonValue} from 'type-fest';
 import {RecurringInstant} from '../../instant-recurring/types.ts';
 
 export class OneShotAlarm {
-	static from(json: JsonValue) {
+	static from(json: unknown) {
 		if (
 			typeof json !== 'object' ||
 			!json ||
 			!('_type' in json) ||
 			json._type !== 'OneShotAlarm' ||
+			!('when' in json) ||
 			typeof json.when !== 'string' ||
+			!('comment' in json) ||
 			Array.isArray(json.comment)
 		) {
 			throw new Error(
@@ -36,13 +37,15 @@ export class OneShotAlarm {
 }
 
 export class RecurringAlarm {
-	static from(json: JsonValue) {
+	static from(json: unknown) {
 		if (
 			typeof json !== 'object' ||
 			!json ||
 			!('_type' in json) ||
 			json._type !== 'RecurringAlarm' ||
+			!('when' in json) ||
 			json.when === undefined ||
+			!('comment' in json) ||
 			Array.isArray(json.comment)
 		) {
 			throw new Error(

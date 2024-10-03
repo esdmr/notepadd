@@ -1,15 +1,16 @@
 import {Temporal} from 'temporal-polyfill';
-import type {JsonValue} from 'type-fest';
 import {getSmallestDurationUnit, multiplyDuration} from '../../../utils.ts';
 
 export class RecurringInstant {
-	static from(json: JsonValue) {
+	static from(json: unknown) {
 		if (
 			typeof json !== 'object' ||
 			!json ||
 			!('_type' in json) ||
 			json._type !== 'RecurringInstant' ||
+			!('first' in json) ||
 			typeof json.first !== 'string' ||
+			!('interval' in json) ||
 			typeof json.interval !== 'string'
 		) {
 			throw new Error(
@@ -20,7 +21,7 @@ export class RecurringInstant {
 		return new RecurringInstant(
 			Temporal.ZonedDateTime.from(json.first),
 			Temporal.Duration.from(json.interval),
-			typeof json.end === 'string'
+			'end' in json && typeof json.end === 'string'
 				? Temporal.ZonedDateTime.from(json.end)
 				: undefined,
 		);

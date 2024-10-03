@@ -1,16 +1,17 @@
-import type {JsonValue} from 'type-fest';
 import {RecurringPeriod} from '../../period-recurring/types.ts';
 import {Period} from '../../period/types.ts';
 
 export class OneShotEvent {
-	static from(json: JsonValue) {
+	static from(json: unknown) {
 		if (
 			typeof json !== 'object' ||
 			!json ||
 			!('_type' in json) ||
 			json._type !== 'OneShotEvent' ||
+			!('when' in json) ||
 			typeof json.when !== 'object' ||
 			json.when === undefined ||
+			!('comment' in json) ||
 			Array.isArray(json.comment)
 		) {
 			throw new Error(
@@ -37,13 +38,15 @@ export class OneShotEvent {
 }
 
 export class RecurringEvent {
-	static from(json: JsonValue) {
+	static from(json: unknown) {
 		if (
 			typeof json !== 'object' ||
 			!json ||
 			!('_type' in json) ||
 			json._type !== 'RecurringEvent' ||
+			!('when' in json) ||
 			json.when === undefined ||
+			!('comment' in json) ||
 			Array.isArray(json.comment)
 		) {
 			throw new Error(

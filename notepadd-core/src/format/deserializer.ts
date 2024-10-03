@@ -2,7 +2,6 @@ import parseDataUrl from 'data-urls';
 import type * as hast from 'hast';
 import type * as mdast from 'mdast';
 import {parseSrcset} from 'srcset';
-import type {JsonValue} from 'type-fest';
 import {stringToUint8Array} from 'uint8array-extras';
 import * as yaml from 'yaml';
 import {filterNullishValues, mapRecord} from '../utils.ts';
@@ -142,7 +141,7 @@ function deserializeMetadata(
 ) {
 	return mapRecord(filterNullishValues(attributes ?? {}), ([k, v]) => [
 		k,
-		JSON.parse(v) as JsonValue,
+		JSON.parse(v) as unknown,
 	]);
 }
 
