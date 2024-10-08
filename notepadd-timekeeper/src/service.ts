@@ -67,14 +67,15 @@ process.on('message', async (value) => {
 // short delay. If the delay between two callback calls surpass a threshold
 // (twice the delay here), we will reset the timeouts.
 const wakeUpDetectionInterval = 30_000;
-let lastTime = performance.now();
+let lastTime = Date.now();
 
 setInterval(async () => {
-	const time = performance.now();
+	const time = Date.now();
+	const delta = time - lastTime;
 
-	if (time - lastTime > 2 * wakeUpDetectionInterval) {
+	if (delta >= 2 * wakeUpDetectionInterval || delta <= wakeUpDetectionInterval / 2) {
 		output.warn(
-			`System suspense detected (${time - lastTime} ms). Resetting all timeouts.`,
+			`System suspense detected (${delta} ms). Resetting all timeouts.`,
 		);
 
 		await resetTimeouts();
