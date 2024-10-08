@@ -73,7 +73,10 @@ setInterval(async () => {
 	const time = Date.now();
 	const delta = time - lastTime;
 
-	if (delta >= 2 * wakeUpDetectionInterval || delta <= wakeUpDetectionInterval / 2) {
+	if (
+		delta >= 2 * wakeUpDetectionInterval ||
+		delta <= wakeUpDetectionInterval / 2
+	) {
 		output.warn(
 			`System suspense detected (${delta} ms). Resetting all timeouts.`,
 		);
