@@ -1,30 +1,53 @@
 import {Temporal} from 'temporal-polyfill';
+import {
+	getSmallestDurationUnit,
+	hasProperty,
+	hasTypeBrand,
+	isObject,
+	multiplyDuration,
+} from '../../../utils.ts';
 import {Instance} from '../directive/base.ts';
 
 export class RecurringInstant {
 	static from(json: unknown) {
-		if (
-			typeof json !== 'object' ||
-			!json ||
-			!('_type' in json) ||
-			json._type !== 'RecurringInstant' ||
-			!('first' in json) ||
-			typeof json.first !== 'string' ||
-			!('interval' in json) ||
-			typeof json.interval !== 'string'
-		) {
+		try {
+			if (!isObject(json)) {
+				throw new TypeError('Recurring instant is not an object');
+			}
+
+			if (
+				!hasTypeBrand(
+					json,
+					'RecurringInstant' satisfies RecurringInstant['_type'],
+				)
+			) {
+				throw new TypeError('Object is not a recurring instant');
+			}
+
+			if (!hasProperty(json, 'first') || typeof json.first !== 'string') {
+				throw new TypeError('First instant is invalid');
+			}
+
+			if (
+				!hasProperty(json, 'interval') ||
+				typeof json.interval !== 'string'
+			) {
+				throw new TypeError('Interval is invalid');
+			}
+
+			return new RecurringInstant(
+				Temporal.ZonedDateTime.from(json.first),
+				Temporal.Duration.from(json.interval),
+				'end' in json && typeof json.end === 'string'
+					? Temporal.ZonedDateTime.from(json.end)
+					: undefined,
+			);
+		} catch (error) {
 			throw new Error(
-				`Cannot deserialize a recurring instant from JSON: ${JSON.stringify(json)}`,
+				`Cannot deserialize a recurring instant from JSON: ${JSON.stringify(json, undefined, 2)}`,
+				{cause: error},
 			);
 		}
-
-		return new RecurringInstant(
-			Temporal.ZonedDateTime.from(json.first),
-			Temporal.Duration.from(json.interval),
-			'end' in json && typeof json.end === 'string'
-				? Temporal.ZonedDateTime.from(json.end)
-				: undefined,
-		);
 	}
 
 	readonly _type = 'RecurringInstant';

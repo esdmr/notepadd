@@ -24,7 +24,7 @@ export class InstantLaterNode
 
 		if (Temporal.ZonedDateTime.compare(later, now) < 0) {
 			throw new Error(
-				'Bug: Cannot find the given time within the next 24 hours',
+				`Bug: Cannot find the given time within the next 24 hours (since ${now.toString()}): ${JSON.stringify(this, undefined, 2)}`,
 			);
 		}
 

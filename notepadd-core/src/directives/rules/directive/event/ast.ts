@@ -31,7 +31,7 @@ export class EventNode
 		}
 
 		throw new TypeError(
-			`Bug: Unhandled event kind: [${typeof this.when} ${new Object(this.when).constructor.name}] ${String(this.when)}`,
+			`Bug: Unhandled event kind: ${JSON.stringify(this.when, undefined, 2)}`,
 		);
 	}
 }

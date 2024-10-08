@@ -1,27 +1,36 @@
 import {Temporal} from 'temporal-polyfill';
 import {Instance, type DirectiveChild} from '../base.ts';
+import {hasProperty, hasTypeBrand, isObject} from '../../../../utils.ts';
 
 export class Timer implements DirectiveChild {
 	static from(json: unknown) {
-		if (
-			typeof json !== 'object' ||
-			!json ||
-			!('_type' in json) ||
-			json._type !== 'Timer' ||
-			!('when' in json) ||
-			typeof json.when !== 'string' ||
-			!('comment' in json) ||
-			Array.isArray(json.comment)
-		) {
+		try {
+			if (!isObject(json)) {
+				throw new TypeError('Timer is not an object');
+			}
+
+			if (!hasTypeBrand(json, 'Timer' satisfies Timer['_type'])) {
+				throw new TypeError('Object is not a timer');
+			}
+
+			if (!hasProperty(json, 'when') || typeof json.when !== 'string') {
+				throw new TypeError('Timer is invalid');
+			}
+
+			if (!hasProperty(json, 'comment') || !Array.isArray(json.comment)) {
+				throw new TypeError('Comment is invalid');
+			}
+
+			return new Timer(
+				Temporal.Duration.from(json.when),
+				json.comment.map(String),
+			);
+		} catch (error) {
 			throw new Error(
-				`Cannot deserialize a timer from JSON: ${JSON.stringify(json)}`,
+				`Cannot deserialize a timer from JSON: ${JSON.stringify(json, undefined, 2)}`,
+				{cause: error},
 			);
 		}
-
-		return new Timer(
-			Temporal.Duration.from(json.when),
-			(json.comment as unknown[]).map(String),
-		);
 	}
 
 	readonly _type = 'Timer';

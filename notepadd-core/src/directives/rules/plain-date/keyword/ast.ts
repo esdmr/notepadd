@@ -20,7 +20,7 @@ export class PlainDateKeywordNode
 			}
 
 			default: {
-				throw new Error(
+				throw new RangeError(
 					`Bug: Unhandled date keyword: ${this.keyword}, ${this._children[0].value}`,
 				);
 			}

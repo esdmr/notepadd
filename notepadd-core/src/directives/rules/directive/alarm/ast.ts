@@ -40,7 +40,7 @@ export class AlarmNode
 		}
 
 		throw new TypeError(
-			`Bug: Unhandled alarm kind: [${typeof this.when} ${new Object(this.when).constructor.name}] ${String(this.when)}`,
+			`Bug: Unhandled alarm kind: ${JSON.stringify(this.when, undefined, 2)}`,
 		);
 	}
 }

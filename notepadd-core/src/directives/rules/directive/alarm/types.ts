@@ -1,28 +1,42 @@
 import {Temporal} from 'temporal-polyfill';
 import {RecurringInstant} from '../../instant-recurring/types.ts';
 import {Instance, type DirectiveChild} from '../base.ts';
+import {hasProperty, hasTypeBrand, isObject} from '../../../../utils.ts';
 
 export class OneShotAlarm implements DirectiveChild {
 	static from(json: unknown) {
-		if (
-			typeof json !== 'object' ||
-			!json ||
-			!('_type' in json) ||
-			json._type !== 'OneShotAlarm' ||
-			!('when' in json) ||
-			typeof json.when !== 'string' ||
-			!('comment' in json) ||
-			Array.isArray(json.comment)
-		) {
+		try {
+			if (!isObject(json)) {
+				throw new TypeError('One-shot alarm is not an object');
+			}
+
+			if (
+				!hasTypeBrand(
+					json,
+					'OneShotAlarm' satisfies OneShotAlarm['_type'],
+				)
+			) {
+				throw new TypeError('Object is not a one-shot alarm');
+			}
+
+			if (!hasProperty(json, 'when') || typeof json.when !== 'string') {
+				throw new TypeError('One-shot alarm is invalid');
+			}
+
+			if (!hasProperty(json, 'comment') || !Array.isArray(json.comment)) {
+				throw new TypeError('Comment is invalid');
+			}
+
+			return new OneShotAlarm(
+				Temporal.ZonedDateTime.from(json.when),
+				json.comment.map(String),
+			);
+		} catch (error) {
 			throw new Error(
-				`Cannot deserialize a one-shot alarm from JSON: ${JSON.stringify(json)}`,
+				`Cannot deserialize a one-shot alarm from JSON: ${JSON.stringify(json, undefined, 2)}`,
+				{cause: error},
 			);
 		}
-
-		return new OneShotAlarm(
-			Temporal.ZonedDateTime.from(json.when),
-			(json.comment as unknown[]).map(String),
-		);
 	}
 
 	readonly _type = 'OneShotAlarm';
@@ -49,25 +63,38 @@ export class OneShotAlarm implements DirectiveChild {
 
 export class RecurringAlarm implements DirectiveChild {
 	static from(json: unknown) {
-		if (
-			typeof json !== 'object' ||
-			!json ||
-			!('_type' in json) ||
-			json._type !== 'RecurringAlarm' ||
-			!('when' in json) ||
-			json.when === undefined ||
-			!('comment' in json) ||
-			Array.isArray(json.comment)
-		) {
+		try {
+			if (!isObject(json)) {
+				throw new TypeError('Recurring alarm is not an object');
+			}
+
+			if (
+				!hasTypeBrand(
+					json,
+					'RecurringAlarm' satisfies RecurringAlarm['_type'],
+				)
+			) {
+				throw new TypeError('Object is not a recurring alarm');
+			}
+
+			if (!hasProperty(json, 'when')) {
+				throw new TypeError('Recurring alarm is invalid');
+			}
+
+			if (!hasProperty(json, 'comment') || !Array.isArray(json.comment)) {
+				throw new TypeError('Comment is invalid');
+			}
+
+			return new RecurringAlarm(
+				RecurringInstant.from(json.when),
+				json.comment.map(String),
+			);
+		} catch (error) {
 			throw new Error(
-				`Cannot deserialize a recurring alarm from JSON: ${JSON.stringify(json)}`,
+				`Cannot deserialize a recurring alarm from JSON: ${JSON.stringify(json, undefined, 2)}`,
+				{cause: error},
 			);
 		}
-
-		return new RecurringAlarm(
-			RecurringInstant.from(json.when),
-			(json.comment as unknown[]).map(String),
-		);
 	}
 
 	readonly _type = 'RecurringAlarm';

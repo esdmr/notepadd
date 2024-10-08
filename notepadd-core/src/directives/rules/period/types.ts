@@ -1,29 +1,41 @@
 import {Temporal} from 'temporal-polyfill';
 import {Instance} from '../directive/base.ts';
+import {hasProperty, hasTypeBrand, isObject} from '../../../utils.ts';
 
 export class Period {
 	static from(json: unknown) {
-		if (
-			typeof json !== 'object' ||
-			!json ||
-			!('_type' in json) ||
-			json._type !== 'Period' ||
-			!('start' in json) ||
-			typeof json.start !== 'string' ||
-			!('endOrDuration' in json) ||
-			typeof json.endOrDuration !== 'string'
-		) {
+		try {
+			if (!isObject(json)) {
+				throw new TypeError('Period is not an object');
+			}
+
+			if (!hasTypeBrand(json, 'Period' satisfies Period['_type'])) {
+				throw new TypeError('Object is not a period');
+			}
+
+			if (!hasProperty(json, 'start') || typeof json.start !== 'string') {
+				throw new TypeError('Period start is invalid');
+			}
+
+			if (
+				!hasProperty(json, 'endOrDuration') ||
+				typeof json.endOrDuration !== 'string'
+			) {
+				throw new TypeError('Period end/duration is invalid');
+			}
+
+			return new Period(
+				Temporal.ZonedDateTime.from(json.start),
+				json.endOrDuration.startsWith('P')
+					? Temporal.Duration.from(json.endOrDuration)
+					: Temporal.ZonedDateTime.from(json.endOrDuration),
+			);
+		} catch (error) {
 			throw new Error(
-				`Cannot deserialize a period from JSON: ${JSON.stringify(json)}`,
+				`Cannot deserialize a period from JSON: ${JSON.stringify(json, undefined, 2)}`,
+				{cause: error},
 			);
 		}
-
-		return new Period(
-			Temporal.ZonedDateTime.from(json.start),
-			json.endOrDuration.startsWith('P')
-				? Temporal.Duration.from(json.endOrDuration)
-				: Temporal.ZonedDateTime.from(json.endOrDuration),
-		);
 	}
 
 	readonly _type = 'Period';

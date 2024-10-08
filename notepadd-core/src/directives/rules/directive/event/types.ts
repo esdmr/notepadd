@@ -2,29 +2,42 @@ import {type Temporal} from 'temporal-polyfill';
 import {RecurringPeriod} from '../../period-recurring/types.ts';
 import {Period} from '../../period/types.ts';
 import {type Instance, type DirectiveChild} from '../base.ts';
+import {hasProperty, hasTypeBrand, isObject} from '../../../../utils.ts';
 
 export class OneShotEvent implements DirectiveChild {
 	static from(json: unknown) {
-		if (
-			typeof json !== 'object' ||
-			!json ||
-			!('_type' in json) ||
-			json._type !== 'OneShotEvent' ||
-			!('when' in json) ||
-			typeof json.when !== 'object' ||
-			json.when === undefined ||
-			!('comment' in json) ||
-			Array.isArray(json.comment)
-		) {
+		try {
+			if (!isObject(json)) {
+				throw new TypeError('One-shot event is not an object');
+			}
+
+			if (
+				!hasTypeBrand(
+					json,
+					'OneShotEvent' satisfies OneShotEvent['_type'],
+				)
+			) {
+				throw new TypeError('Object is not a one-shot event');
+			}
+
+			if (!hasProperty(json, 'when')) {
+				throw new TypeError('One-shot event is invalid');
+			}
+
+			if (!hasProperty(json, 'comment') || !Array.isArray(json.comment)) {
+				throw new TypeError('Comment is invalid');
+			}
+
+			return new OneShotEvent(
+				Period.from(json.when),
+				json.comment.map(String),
+			);
+		} catch (error) {
 			throw new Error(
-				`Cannot deserialize a one-shot event from JSON: ${JSON.stringify(json)}`,
+				`Cannot deserialize a one-shot event from JSON: ${JSON.stringify(json, undefined, 2)}`,
+				{cause: error},
 			);
 		}
-
-		return new OneShotEvent(
-			Period.from(json.when),
-			(json.comment as unknown[]).map(String),
-		);
 	}
 
 	readonly _type = 'OneShotEvent';
@@ -49,25 +62,38 @@ export class OneShotEvent implements DirectiveChild {
 
 export class RecurringEvent implements DirectiveChild {
 	static from(json: unknown) {
-		if (
-			typeof json !== 'object' ||
-			!json ||
-			!('_type' in json) ||
-			json._type !== 'RecurringEvent' ||
-			!('when' in json) ||
-			json.when === undefined ||
-			!('comment' in json) ||
-			Array.isArray(json.comment)
-		) {
+		try {
+			if (!isObject(json)) {
+				throw new TypeError('Recurring event is not an object');
+			}
+
+			if (
+				!hasTypeBrand(
+					json,
+					'RecurringEvent' satisfies RecurringEvent['_type'],
+				)
+			) {
+				throw new TypeError('Object is not a recurring event');
+			}
+
+			if (!hasProperty(json, 'when')) {
+				throw new TypeError('Recurring event is invalid');
+			}
+
+			if (!hasProperty(json, 'comment') || !Array.isArray(json.comment)) {
+				throw new TypeError('Comment is invalid');
+			}
+
+			return new RecurringEvent(
+				RecurringPeriod.from(json.when),
+				json.comment.map(String),
+			);
+		} catch (error) {
 			throw new Error(
-				`Cannot deserialize a recurring event from JSON: ${JSON.stringify(json)}`,
+				`Cannot deserialize a recurring event from JSON: ${JSON.stringify(json, undefined, 2)}`,
+				{cause: error},
 			);
 		}
-
-		return new RecurringEvent(
-			RecurringPeriod.from(json.when),
-			(json.comment as unknown[]).map(String),
-		);
 	}
 
 	readonly _type = 'RecurringEvent';

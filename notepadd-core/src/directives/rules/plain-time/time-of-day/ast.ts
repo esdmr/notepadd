@@ -33,7 +33,7 @@ export class PlainTimeOfDayNode
 			}
 
 			default: {
-				throw new Error(
+				throw new RangeError(
 					`Bug: Unhandled time of day: ${this.timeOfDay}, ${this._children[0].value}`,
 				);
 			}

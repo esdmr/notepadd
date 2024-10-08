@@ -17,9 +17,9 @@ export function parseDirective(text: string, now?: Temporal.ZonedDateTime) {
 	if (results.length === 0) {
 		throw new Error('Failed to parse directives');
 	} else if (results.length > 1) {
-		throw new Error('Bug: Directives grammar has ambiguities', {
-			cause: results,
-		});
+		throw new Error(
+			`Bug: Directives grammar has ambiguities: ${JSON.stringify(results, undefined, 2)}`,
+		);
 	}
 
 	return {
