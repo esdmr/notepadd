@@ -1,0 +1,28 @@
+@startuml timekeeperTrigger
+<style>
+element {
+  MaximumWidth 200
+}
+</style>
+
+start
+
+if (next instance) then (null)
+	stop
+endif
+
+if (next instance) then (passed)
+	:Replace next instance with the one after;
+	if (next instance) then (passed)
+		:System time jumped. Recalculate the next instance from scratch;
+	endif
+	:Send Trigger message;
+endif
+
+if (next instance) then (not null)
+	:Set timeout, capped at some limit (max signed 32-bit integer);
+endif
+
+stop
+
+@enduml

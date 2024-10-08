@@ -1,6 +1,7 @@
 import {Temporal} from 'temporal-polyfill';
 import {SyntaxNode} from '../ast.ts';
-import {Directive, type DirectiveChild} from './types.ts';
+import {Directive} from './types.ts';
+import {type DirectiveChild} from './base.ts';
 
 export type DirectiveChildNode = {
 	toDirective(now: Temporal.ZonedDateTime): DirectiveChild;
@@ -9,12 +10,9 @@ export type DirectiveChildNode = {
 export class DirectiveNode extends SyntaxNode<[DirectiveChildNode]> {
 	readonly directive = this._children[0];
 
-	toDirective(now = Temporal.Now.zonedDateTime('iso8601'), showAst = false) {
+	toDirective(now = Temporal.Now.zonedDateTime('iso8601')) {
 		// TODO: Make time-zone configurable.
 
-		return new Directive(
-			this.directive.toDirective(now),
-			showAst ? this : undefined,
-		);
+		return new Directive(this.directive.toDirective(now));
 	}
 }

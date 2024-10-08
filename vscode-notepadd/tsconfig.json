@@ -17,7 +17,13 @@
 			"path": "../vite-plugin-vscode",
 		},
 		{
+			"path": "../vite-plugin-child-process",
+		},
+		{
 			"path": "../notepadd-core",
+		},
+		{
+			"path": "../notepadd-timekeeper",
 		},
 	],
 }

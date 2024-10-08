@@ -88,6 +88,37 @@ importers:
         specifier: 4.25.0
         version: 4.25.0
 
+  notepadd-timekeeper:
+    dependencies:
+      notepadd-core:
+        specifier: workspace:*
+        version: link:../notepadd-core
+      temporal-polyfill:
+        specifier: 0.2.5
+        version: 0.2.5
+      uint8array-extras:
+        specifier: 1.4.0
+        version: 1.4.0
+    devDependencies:
+      '@types/node':
+        specifier: 20.16.1
+        version: 20.16.1
+      type-fest:
+        specifier: 4.25.0
+        version: 4.25.0
+
+  vite-plugin-child-process:
+    devDependencies:
+      '@types/node':
+        specifier: 20.16.1
+        version: 20.16.1
+      type-fest:
+        specifier: 4.25.0
+        version: 4.25.0
+      vite:
+        specifier: 5.4.1
+        version: 5.4.1(@types/node@20.16.1)
+
   vite-plugin-nearley:
     devDependencies:
       '@esdmr/nearley':
@@ -117,9 +148,18 @@ importers:
       '@esdmr/nearley':
         specifier: 3.0.3
         version: 3.0.3
+      execa:
+        specifier: 9.3.1
+        version: 9.3.1
       notepadd-core:
         specifier: workspace:*
         version: link:../notepadd-core
+      notepadd-timekeeper:
+        specifier: workspace:*
+        version: link:../notepadd-timekeeper
+      uint8array-extras:
+        specifier: 1.4.0
+        version: 1.4.0
     devDependencies:
       '@types/node':
         specifier: 20.16.1
@@ -133,6 +173,9 @@ importers:
       vite:
         specifier: 5.4.1
         version: 5.4.1(@types/node@20.16.1)
+      vite-plugin-child-process:
+        specifier: workspace:*
+        version: link:../vite-plugin-child-process
       vite-plugin-inspect:
         specifier: 0.8.5
         version: 0.8.5(rollup@4.21.0)(vite@5.4.1(@types/node@20.16.1))

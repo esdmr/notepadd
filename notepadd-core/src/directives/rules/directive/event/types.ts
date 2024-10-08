@@ -1,7 +1,9 @@
+import {type Temporal} from 'temporal-polyfill';
 import {RecurringPeriod} from '../../period-recurring/types.ts';
 import {Period} from '../../period/types.ts';
+import {type Instance, type DirectiveChild} from '../base.ts';
 
-export class OneShotEvent {
+export class OneShotEvent implements DirectiveChild {
 	static from(json: unknown) {
 		if (
 			typeof json !== 'object' ||
@@ -32,12 +34,20 @@ export class OneShotEvent {
 		readonly comment: string[],
 	) {}
 
+	getInstance(now: Temporal.ZonedDateTime) {
+		return this.when.getInstance(now);
+	}
+
+	getNextInstance(instance: Instance) {
+		return this.when.getNextInstance(instance);
+	}
+
 	toString() {
 		return `${this.when.toString()};${this.comment.join('\n')}`;
 	}
 }
 
-export class RecurringEvent {
+export class RecurringEvent implements DirectiveChild {
 	static from(json: unknown) {
 		if (
 			typeof json !== 'object' ||
@@ -66,6 +76,14 @@ export class RecurringEvent {
 		readonly when: RecurringPeriod,
 		readonly comment: string[],
 	) {}
+
+	getInstance(now: Temporal.ZonedDateTime) {
+		return this.when.getInstance(now);
+	}
+
+	getNextInstance(instance: Instance) {
+		return this.when.getNextInstance(instance);
+	}
 
 	toString() {
 		return `${this.when.toString()};${this.comment.join('\n')}`;

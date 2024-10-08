@@ -1,0 +1,123 @@
+@startuml ipc
+!pragma teoz true
+skinparam style strictuml
+box "Extension Host" #fee
+	participant "Extension" as ext
+	participant "Bookkeeper" as book
+end box
+box "Service Process" #efe
+	participant "Timekeeper" as time
+end box
+box "Renderer Isolate" #eef
+	participant "Dashboard" as dsh
+end box
+
+== Activation ==
+[-> ext ++ : Activate
+ext -> book --++ : Activate
+
+[<<- book : Search
+[-->> book : Discovered
+loop foreach
+	[<<- book : Read
+	[-->> book : Content
+	[<- book : Watch
+end
+
+book -> time ++ : Spawn
+time ->> book ++ : Discover
+book ->> time : Update
+opt dashboard is open
+	book ->> dsh -- : Update
+end
+
+== Add ==
+[->> book ++ : Added
+
+loop foreach
+	[<<- book : Read
+	[-->> book : Content
+	[<- book : Watch
+end
+
+book ->> time : Update
+
+opt dashboard is open
+	book ->> dsh -- : Update
+end
+
+== Update ==
+[->> book ++ : Updated
+
+loop foreach
+	[<<- book : Read
+	[-->> book : Content
+end
+
+book ->> time : Update
+
+opt dashboard is open
+	book ->> dsh -- : Update
+end
+
+== Delete ==
+[->> book ++ : Deleted
+
+loop foreach
+	[<- book : Stop Watching
+end
+
+book ->> time : Update
+
+opt dashboard is open
+	book ->> dsh -- : Update
+end
+
+== Directive Trigger ==
+time ->> book ++ : Trigger
+
+alt dashboard is open
+	book ->> dsh : Trigger
+else else
+	[<<- book -- : Message
+end
+
+== Restart ==
+
+[->> ext ++ : Restart
+ext -> book --++ : Restart
+opt dashboard is open
+	book ->> dsh : Stale
+end
+book ->> time : Terminate
+deactivate time
+
+book -> time --++ : Spawn
+time ->> book ++ : Discover
+book ->> time : Update
+opt dashboard is open
+	book ->> dsh -- : Update
+end
+
+== Deactivation ==
+{ext_deactivate_start} [->> ext ++ : Deactivate
+ext -> book ++ : Deactivate
+
+book ->> time : Terminate
+deactivate time
+
+opt dashboard is open
+	book ->> dsh : Stale
+end
+
+loop foreach
+	[<- book : Stop watching
+end
+
+book --> ext -- : Done
+deactivate book
+
+{ext_deactivate_end} [<-- ext -- : Done
+{ext_deactivate_start} <-> {ext_deactivate_end} : <5s
+
+@enduml

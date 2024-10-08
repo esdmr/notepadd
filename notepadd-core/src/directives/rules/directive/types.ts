@@ -1,13 +1,9 @@
 import {OneShotAlarm, RecurringAlarm} from './alarm/types.ts';
 import {OneShotEvent, RecurringEvent} from './event/types.ts';
 import {Timer} from './timer/types.ts';
+import type {DirectiveChild, Instance} from './base.ts';
 
-export type DirectiveChild =
-	| RecurringAlarm
-	| OneShotAlarm
-	| Timer
-	| RecurringEvent
-	| OneShotEvent;
+export * from './base.ts';
 
 export class Directive {
 	static from(json: unknown) {
@@ -66,10 +62,15 @@ export class Directive {
 
 	readonly _type = 'Directive';
 
-	constructor(
-		readonly directive: DirectiveChild,
-		readonly ast?: unknown,
-	) {}
+	constructor(readonly directive: DirectiveChild) {}
+
+	getInstance(now: Temporal.ZonedDateTime) {
+		return this.directive.getInstance(now);
+	}
+
+	getNextInstance(instance: Instance) {
+		return this.directive.getNextInstance(instance);
+	}
 
 	toString() {
 		return this.directive.toString();

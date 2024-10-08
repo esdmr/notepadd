@@ -1,0 +1,19 @@
+{
+	"name": "notepadd-timekeeper",
+	"version": "0.1.0",
+	"private": true,
+	"exports": {
+		".": "./src/index.ts",
+		"./service": "./src/service.ts"
+	},
+	"devDependencies": {
+		"@types/node": "20.16.1",
+		"type-fest": "4.25.0"
+	},
+	"packageManager": "pnpm@9.7.1",
+	"dependencies": {
+		"notepadd-core": "workspace:*",
+		"temporal-polyfill": "0.2.5",
+		"uint8array-extras": "1.4.0"
+	}
+}

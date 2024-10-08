@@ -1,7 +1,8 @@
 import {Temporal} from 'temporal-polyfill';
 import {RecurringInstant} from '../../instant-recurring/types.ts';
+import {Instance, type DirectiveChild} from '../base.ts';
 
-export class OneShotAlarm {
+export class OneShotAlarm implements DirectiveChild {
 	static from(json: unknown) {
 		if (
 			typeof json !== 'object' ||
@@ -31,12 +32,22 @@ export class OneShotAlarm {
 		readonly comment: string[],
 	) {}
 
+	getInstance(now: Temporal.ZonedDateTime) {
+		return Temporal.ZonedDateTime.compare(now, this.when) < 0
+			? new Instance(undefined, this.when)
+			: new Instance(this.when, undefined);
+	}
+
+	getNextInstance(instance: Instance) {
+		return new Instance(this.when, undefined);
+	}
+
 	toString() {
 		return `${this.when.toString()};${this.comment.join('\n')}`;
 	}
 }
 
-export class RecurringAlarm {
+export class RecurringAlarm implements DirectiveChild {
 	static from(json: unknown) {
 		if (
 			typeof json !== 'object' ||
@@ -65,6 +76,14 @@ export class RecurringAlarm {
 		readonly when: RecurringInstant,
 		readonly comment: string[],
 	) {}
+
+	getInstance(now: Temporal.ZonedDateTime) {
+		return this.when.getInstance(now);
+	}
+
+	getNextInstance(instance: Instance) {
+		return this.when.getNextInstance(instance);
+	}
 
 	toString() {
 		return `${this.when.toString()};${this.comment.join('\n')}`;

@@ -253,7 +253,7 @@ function addCell(context: NotePadd, node: mdast.RootContent) {
 	});
 }
 
-export function deserializeNotePadd(content: Uint8Array): NotePadd {
+export function deserializeNotePadd(content: string | Uint8Array): NotePadd {
 	const context: NotePadd = {
 		cells: [],
 	};

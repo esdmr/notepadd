@@ -59,14 +59,9 @@ start
 
 group edge case
 	if (<latex>p(t_{\mathrm{now}})</latex>) then (<latex>= -1</latex>)
-		:<latex>t_{\mathrm{next}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow t_0</latex>
+		:<latex>t_{\mathrm{prev}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow \varnothing\\t_{\mathrm{next}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow t_0</latex>
 		Recurrence has not started yet.
 		This means that the following algorithm would likely estimate some instance from before the start and then filter it at the bounds checking, yielding no instance.;
-		stop
-	elseif (<latex>p(t_{\mathrm{now}})</latex>) then (<latex>= 1</latex>)
-		:<latex>t_{\mathrm{next}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow \varnothing</latex>
-		Recurrence is finished already.
-		The following algorithm should yield a correct result, but this fast path would speed handling old directives up.;
 		stop
 	endif
 end group
@@ -104,20 +99,28 @@ end group
 
 group reorder
 	if (<latex>\bar t</latex>) is (<latex>\gt t_{\mathrm{now}}</latex>) then
-		:<latex>t_{\mathrm{next}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow \bar t</latex>
+		:<latex>t_{\mathrm{prev}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow \bar t - T\\t_{\mathrm{next}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow \bar t</latex>
 		The guessed instance was after the current time, so it is the next instance.;
 	else (<latex>\le t_{\mathrm{now}}</latex>)
-		:<latex>t_{\mathrm{next}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow \bar t + T</latex>
+		:<latex>t_{\mathrm{prev}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow \bar t\\t_{\mathrm{next}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow \bar t + T</latex>
 		The guessed instance was before or at the current time, so it is the previous instance.;
 	endif
 end group
 
 group bounds check
-	if (<latex>p(t_{\mathrm{next}})</latex>) then
-		:<latex>t_{\mathrm{next}} \mathrel\leftarrow \varnothing</latex>
-		Next instance was out-of-bounds, so it should be null instead.;
-	else (<latex>= 0</latex>)
-	endif
+	split
+		if (<latex>p(t_{\mathrm{next}})</latex>) then
+			:<latex>t_{\mathrm{prev}} \mathrel\leftarrow \varnothing</latex>
+			Previous instance was out-of-bounds, so it should be null instead.;
+		else (<latex>= 0</latex>)
+		endif
+	split again
+		if (<latex>p(t_{\mathrm{next}})</latex>) then
+			:<latex>t_{\mathrm{next}} \mathrel\leftarrow \varnothing</latex>
+			Next instance was out-of-bounds, so it should be null instead.;
+		else (<latex>= 0</latex>)
+		endif
+	end split
 end group
 
 stop

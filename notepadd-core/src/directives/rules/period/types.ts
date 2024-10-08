@@ -1,4 +1,5 @@
 import {Temporal} from 'temporal-polyfill';
+import {Instance} from '../directive/base.ts';
 
 export class Period {
 	static from(json: unknown) {
@@ -64,5 +65,27 @@ export class Period {
 		const isAfterEnd = Temporal.ZonedDateTime.compare(end, instance) <= 0;
 
 		return isBeforeStart ? -1 : isAfterEnd ? 1 : 0;
+	}
+
+	getInstance(now: Temporal.ZonedDateTime) {
+		switch (this.checkBounds(now)) {
+			case -1: {
+				return new Instance(undefined, this.start, 'low');
+			}
+
+			case 0: {
+				return new Instance(this.start, this.getEnd(), 'high');
+			}
+
+			case 1: {
+				return new Instance(this.getEnd(), undefined, 'low');
+			}
+		}
+	}
+
+	getNextInstance(instance: Instance) {
+		return instance.currentState === 'low'
+			? new Instance(this.start, this.getEnd(), 'high')
+			: new Instance(this.getEnd(), undefined, 'low');
 	}
 }

@@ -5,6 +5,33 @@ export function isNullish(value: unknown): value is null | undefined {
 	return value === null || value === undefined;
 }
 
+export function isObject(value: unknown): value is object {
+	return typeof value === 'object' && value !== null;
+}
+
+export function hasProperty<T extends object, K extends keyof any>(
+	object: T,
+	key: K,
+): object is T & {[k in K]: unknown} {
+	return key in object;
+}
+
+export function hasTypeBrand<T extends object, V extends string>(
+	object: T,
+	type: V,
+): object is T & {_type: V} {
+	return hasProperty(object, '_type') && object._type === type;
+}
+
+export function includes<T>(
+	collection: readonly T[] | ReadonlySet<T> | ReadonlyMap<T, unknown>,
+	value: unknown,
+): value is T {
+	return 'includes' in collection
+		? collection.includes(value as T)
+		: collection.has(value as T);
+}
+
 export function filterNullishValues<K extends PropertyKey, V>(
 	object: Record<K, V | null | undefined>,
 ) {

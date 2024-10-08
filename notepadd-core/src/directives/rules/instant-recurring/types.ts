@@ -1,5 +1,5 @@
 import {Temporal} from 'temporal-polyfill';
-import {getSmallestDurationUnit, multiplyDuration} from '../../../utils.ts';
+import {Instance} from '../directive/base.ts';
 
 export class RecurringInstant {
 	static from(json: unknown) {
@@ -50,40 +50,41 @@ export class RecurringInstant {
 	}
 
 	getInstance(now: Temporal.ZonedDateTime) {
-		switch (this._checkBounds(now)) {
-			case -1: {
-				// Edge case for before recurrence starts, because the following
-				// algorithm would likely estimate some instance from before the
-				// start and then filter it at the bounds checking, yielding no
-				// instance.
-				return this.first;
-			}
-
-			case 0: {
-				break;
-			}
-
-			case 1: {
-				// Fast path for when the recurrence has already ended.
-				return undefined;
-			}
+		if (this._checkBounds(now) < 0) {
+			// Edge case for before recurrence starts, because the following
+			// algorithm would likely estimate some instance from before the
+			// start and then filter it at the bounds checking, yielding no
+			// instance.
+			return new Instance(undefined, this.first);
 		}
 
 		const guessedInstant = this._estimateInstancePrecise(now);
 
 		// The guessed instance might be before or after now. We will
 		// distinguish it and calculate the other.
+		const previous =
+			Temporal.ZonedDateTime.compare(now, guessedInstant) < 0
+				? guessedInstant.subtract(this.interval)
+				: guessedInstant;
+
 		const next =
 			Temporal.ZonedDateTime.compare(now, guessedInstant) < 0
 				? guessedInstant
 				: guessedInstant.add(this.interval);
 
-		return this._checkBounds(next) === 0 ? next : undefined;
+		return new Instance(
+			this._checkBounds(previous) === 0 ? previous : undefined,
+			this._checkBounds(next) === 0 ? next : undefined,
+		);
 	}
 
-	getNextInstance(instance: Temporal.ZonedDateTime) {
-		const next = instance.add(this.interval);
-		return this._checkBounds(next) === 0 ? next : undefined;
+	getNextInstance(instance: Instance) {
+		const next = instance.next?.add(this.interval);
+
+		return new Instance(
+			instance.next,
+			next && this._checkBounds(next) === 0 ? next : undefined,
+		);
 	}
 
 	private _checkBounds(instant: Temporal.ZonedDateTime) {

@@ -1,5 +1,7 @@
 packages:
   - notepadd-core
+  - notepadd-timekeeper
+  - vite-plugin-child-process
   - vite-plugin-nearley
   - vite-plugin-vscode
   - vscode-notepadd

@@ -2,12 +2,11 @@ import {Parser} from '@esdmr/nearley';
 import type {Temporal} from 'temporal-polyfill';
 import grammar from './grammar.ne';
 import type {DirectiveNode} from './rules/directive/ast.ts';
+import {Directive} from './rules/types.ts';
 
-export function parseDirective(
-	text: string,
-	now?: Temporal.ZonedDateTime,
-	showAst?: boolean,
-) {
+export const directiveMimeType = 'application/x-notepadd+json';
+
+export function parseDirective(text: string, now?: Temporal.ZonedDateTime) {
 	const parser = new Parser(grammar);
 
 	parser.feed(text);
@@ -23,7 +22,14 @@ export function parseDirective(
 		});
 	}
 
-	return results[0]!.toDirective(now, showAst);
+	return {
+		directive: results[0]!.toDirective(now),
+		ast: results[0]! as unknown,
+	};
+}
+
+export function deserializeDirective(source: string) {
+	return Directive.from(JSON.parse(source));
 }
 
 export * from './rules/types.ts';

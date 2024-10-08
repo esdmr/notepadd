@@ -34,22 +34,46 @@
 		"languages": [
 			{
 				"id": "notepadd",
-				"aliases": ["NotePADD Directive"]
+				"aliases": [
+					"NotePADD Directive"
+				]
+			}
+		],
+		"commands": [
+			{
+				"command": "notepadd.restartTimekeeper",
+				"title": "Restart Timekeeper",
+				"category": "NotePADD"
+			},
+			{
+				"command": "notepadd.startTimekeeper",
+				"title": "Start Timekeeper",
+				"category": "NotePADD"
+			},
+			{
+				"command": "notepadd.stopTimekeeper",
+				"title": "Stop Timekeeper",
+				"category": "NotePADD"
 			}
 		]
 	},
 	"activationEvents": [
-		"onNotebook:notepadd"
+		"onNotebook:notepadd",
+		"workspaceContains:**/*.md"
 	],
 	"dependencies": {
 		"@esdmr/nearley": "3.0.3",
-		"notepadd-core": "workspace:*"
+		"execa": "9.3.1",
+		"notepadd-core": "workspace:*",
+		"notepadd-timekeeper": "workspace:*",
+		"uint8array-extras": "1.4.0"
 	},
 	"devDependencies": {
 		"@types/node": "20.16.1",
 		"@types/vscode": "1.91.0",
 		"@vscode/vsce": "3.0.0",
 		"vite": "5.4.1",
+		"vite-plugin-child-process": "workspace:*",
 		"vite-plugin-inspect": "0.8.5",
 		"vite-plugin-nearley": "workspace:*",
 		"vite-plugin-vscode": "workspace:*"

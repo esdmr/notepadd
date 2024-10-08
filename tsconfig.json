@@ -23,6 +23,12 @@
 			"path": "./notepadd-core/tsconfig.json"
 		},
 		{
+			"path": "./notepadd-timekeeper/tsconfig.json"
+		},
+		{
+			"path": "./vite-plugin-child-process/tsconfig.json"
+		},
+		{
 			"path": "./vite-plugin-nearley/tsconfig.json"
 		},
 		{

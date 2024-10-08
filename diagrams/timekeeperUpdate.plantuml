@@ -1,0 +1,36 @@
+@startuml timekeeperUpdate
+<style>
+element {
+  MaximumWidth 200
+}
+</style>
+
+start
+
+while (any file left?)
+	if (deleted?) then (yes)
+		:Delete all directives of file;
+	else (no)
+		:Parse updated file;
+
+		:Collect all directive sources;
+
+		:Parse the directives and calculate their hashes. Use Source-to-Directive map as a cache.;
+
+		if (file has older cache?) then (yes)
+			:Delete old directives;
+
+			:Set new directives up;
+		else (no)
+			:Set all directives of file up;
+		endif
+
+		:Save Source-to-Directive and Hash-to-Directive maps;
+	endif
+
+	backward :next file;
+end while
+
+stop
+
+@enduml

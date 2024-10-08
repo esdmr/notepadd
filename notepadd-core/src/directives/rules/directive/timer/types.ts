@@ -1,6 +1,7 @@
 import {Temporal} from 'temporal-polyfill';
+import {Instance, type DirectiveChild} from '../base.ts';
 
-export class Timer {
+export class Timer implements DirectiveChild {
 	static from(json: unknown) {
 		if (
 			typeof json !== 'object' ||
@@ -29,6 +30,14 @@ export class Timer {
 		readonly when: Temporal.Duration,
 		readonly comment: string[],
 	) {}
+
+	getInstance(now: Temporal.ZonedDateTime) {
+		return new Instance(undefined, undefined);
+	}
+
+	getNextInstance(instance: Instance) {
+		return instance;
+	}
 
 	toString() {
 		return `${this.when.toString()};${this.comment.join('\n')}`;

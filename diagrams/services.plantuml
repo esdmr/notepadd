@@ -1,0 +1,29 @@
+@startuml services
+
+node "Extension Host" as host <<process>> {
+	artifact "Extension" as extension
+	artifact "Bookkeeper Service (VS Code)" as bookkeeper
+	extension ..> bookkeeper
+}
+
+node "Renderer" as renderer <<process>> {
+	node "Notebook Output" as output <<isolate>> {
+		artifact "Directive Webview" as notebook
+	}
+
+	node "Webview" as webview <<isolate>> {
+		artifact "Dashboard Webview" as dashboard
+	}
+
+	node "Notifications" as notification <<component>>
+	node "Status bar" as status_bar <<component>>
+}
+
+node "Worker Process" as worker <<process>> {
+	artifact "Timekeeper Service" as timekeeper
+}
+
+host ---- renderer : VS Code API
+host ---- worker : Node.JS IPC
+
+@enduml

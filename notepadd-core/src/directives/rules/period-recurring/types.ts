@@ -2,6 +2,7 @@ import {Temporal} from 'temporal-polyfill';
 import {minDuration} from '../../../utils.ts';
 import {Period} from '../period/types.ts';
 import {RecurringInstant} from '../instant-recurring/types.ts';
+import {Instance} from '../directive/base.ts';
 
 export class RecurringPeriod {
 	static from(json: unknown) {
@@ -71,26 +72,54 @@ export class RecurringPeriod {
 	}
 
 	getInstance(now: Temporal.ZonedDateTime) {
-		const next = this._recurringInstant.getInstance(now);
+		const instance = this._recurringInstant.getInstance(now);
 
-		return (
-			next &&
-			new Period(
-				next,
-				minDuration(this._periodDuration, this.interval, next),
-			)
+		if (!instance.previous) {
+			return new Instance(undefined, instance.next, 'low');
+		}
+
+		const previous = new Period(
+			instance.previous,
+			minDuration(this._periodDuration, this.interval, instance.previous),
 		);
+
+		switch (previous.checkBounds(now)) {
+			case -1: {
+				throw new RangeError(
+					`Bug: Current time (${now.toString()}) is before the start of the previous period (${previous.toString()}): ${this.toString()}`,
+				);
+			}
+
+			case 0: {
+				return new Instance(previous.start, previous.getEnd(), 'high');
+			}
+
+			case 1: {
+				return new Instance(previous.getEnd(), instance.next, 'low');
+			}
+		}
 	}
 
-	getNextInstance(instance: Period) {
-		const next = this._recurringInstant.getNextInstance(instance.start);
+	getNextInstance(instance: Instance) {
+		if (!instance.next) return new Instance(undefined, undefined, 'low');
 
-		return (
-			next &&
-			new Period(
-				next,
-				minDuration(this._periodDuration, this.interval, next),
-			)
-		);
+		if (instance.currentState === 'low') {
+			const nextStart = instance.next;
+			const nextEnd = new Period(
+				nextStart,
+				minDuration(this._periodDuration, this.interval, nextStart),
+			).getEnd();
+
+			return new Instance(nextStart, nextEnd, 'high');
+		}
+
+		const previousStart = instance.previous;
+		const previousEnd = instance.next;
+
+		const nextStart = this._recurringInstant.getNextInstance(
+			new Instance(undefined, previousStart),
+		).next;
+
+		return new Instance(previousEnd, nextStart, 'low');
 	}
 }

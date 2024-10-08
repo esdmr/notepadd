@@ -9,7 +9,7 @@ import {
 	type NotebookController,
 	type NotebookDocument,
 } from 'vscode';
-import {parseDirective} from 'notepadd-core';
+import {directiveMimeType, parseDirective} from 'notepadd-core';
 import {version} from '../../package.json';
 
 class NotePaddController implements Partial<NotebookController> {
@@ -59,11 +59,9 @@ class NotePaddController implements Partial<NotebookController> {
 			try {
 				if (cell.document.languageId === 'notepadd') {
 					// TODO: Optionally enable AST debug via config.
-					const directive = parseDirective(
+					const {directive, ast} = parseDirective(
 						cell.document.getText(),
 						undefined,
-						import.meta.env.MODE !== 'production' ||
-							import.meta.env.DEV,
 					);
 
 					// eslint-disable-next-line no-await-in-loop
@@ -71,10 +69,13 @@ class NotePaddController implements Partial<NotebookController> {
 						new NotebookCellOutput([
 							NotebookCellOutputItem.json(
 								directive,
-								'application/x-notepadd+json',
+								directiveMimeType,
 							),
 							// TODO: Remove after implementing the renderer and service.
-							NotebookCellOutputItem.json(directive),
+							NotebookCellOutputItem.json({
+								directive,
+								ast,
+							}),
 						]),
 					);
 
