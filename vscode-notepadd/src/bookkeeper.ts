@@ -40,7 +40,7 @@ function hashUri(uri: Uri) {
 	return `${uri.scheme}:${uri.fsPath}`;
 }
 
-class Bookkeeper implements Disposable {
+export class Bookkeeper implements Disposable {
 	private readonly _status = window.createStatusBarItem(
 		StatusBarAlignment.Left,
 	);
@@ -88,6 +88,8 @@ class Bookkeeper implements Disposable {
 			this._bookkeeperInitializing = false;
 			this._updateStatus();
 		}
+
+		this.startTimekeeper();
 	}
 
 	startTimekeeper() {
@@ -371,11 +373,4 @@ class Bookkeeper implements Disposable {
 		this._status.command = command;
 		this._status.show();
 	}
-}
-
-export async function setupBookkeeper(context: ExtensionContext) {
-	const bookkeeper = new Bookkeeper();
-	context.subscriptions.push(bookkeeper);
-	await bookkeeper.initialize();
-	bookkeeper.startTimekeeper();
 }

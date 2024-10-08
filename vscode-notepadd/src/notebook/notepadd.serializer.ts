@@ -13,9 +13,19 @@ import {
 	workspace,
 	type ExtensionContext,
 	type NotebookSerializer,
+	type Disposable,
 } from 'vscode';
 
-class NotePaddSerializer implements NotebookSerializer {
+export class NotePaddSerializer implements NotebookSerializer, Disposable {
+	private readonly _registry = workspace.registerNotebookSerializer(
+		'notepadd',
+		new NotePaddSerializer(),
+	);
+
+	dispose() {
+		this._registry.dispose();
+	}
+
 	deserializeNotebook(content: Uint8Array) {
 		const data = deserializeNotePadd(content);
 
@@ -69,13 +79,4 @@ class NotePaddSerializer implements NotebookSerializer {
 			metadata: notebook.metadata,
 		});
 	}
-}
-
-export function setupSerializer(context: ExtensionContext) {
-	context.subscriptions.push(
-		workspace.registerNotebookSerializer(
-			'notepadd',
-			new NotePaddSerializer(),
-		),
-	);
 }

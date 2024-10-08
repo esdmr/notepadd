@@ -1,6 +1,5 @@
 import {inspect} from 'node:util';
 import {
-	languages,
 	NotebookCellOutput,
 	NotebookCellOutputItem,
 	notebooks,
@@ -8,43 +7,55 @@ import {
 	type NotebookCell,
 	type NotebookController,
 	type NotebookDocument,
+	type Disposable,
+	type NotebookCellExecution,
 } from 'vscode';
 import {directiveMimeType, parseDirective} from 'notepadd-core';
 import {version} from '../../package.json';
+import {output} from '../output.ts';
 
-class NotePaddController implements Partial<NotebookController> {
-	static readonly id = 'notepadd-arch';
-	static readonly notebookType = 'notepadd';
-	static readonly label = 'NotePADD Arch';
+export class NotePaddController implements Disposable {
+	private readonly _controller = notebooks.createNotebookController(
+		'notepadd-arch',
+		'notepadd',
+		'NotePADD Arch',
+		this.executeHandler.bind(this),
+	);
 
-	static async create() {
-		const controller = notebooks.createNotebookController(
-			this.id,
-			this.notebookType,
-			this.label,
+	constructor() {
+		this._controller.description = version;
+		this._controller.detail = 'Default NotePADD kernel';
+		this._controller.supportsExecutionOrder = false;
+		this._controller.supportedLanguages = ['notepadd'];
+	}
+
+	dispose() {
+		this._controller.dispose();
+	}
+
+	async executeDirective(
+		cell: NotebookCell,
+		execution: NotebookCellExecution,
+	) {
+		// TODO: Optionally enable AST debug via config.
+		const {directive, ast} = parseDirective(
+			cell.document.getText(),
+			undefined,
 		);
 
-		const langs = await languages.getLanguages();
-
-		Object.assign(controller, new this(langs));
-
-		return controller;
+		await execution.replaceOutput(
+			new NotebookCellOutput([
+				NotebookCellOutputItem.json(directive, directiveMimeType),
+				// TODO: Remove after implementing the renderer and service.
+				NotebookCellOutputItem.json({
+					directive,
+					ast,
+				}),
+			]),
+		);
 	}
 
-	readonly description = version;
-	readonly detail = 'Default NotePADD kernel';
-	readonly supportsExecutionOrder = false;
-	readonly supportedLanguages;
-
-	private constructor(langs: readonly string[] = []) {
-		this.supportedLanguages = [
-			'notepadd',
-			...langs.filter((i) => i === 'notepadd'),
-		];
-	}
-
-	readonly executeHandler = async function (
-		this: NotePaddController,
+	async executeHandler(
 		cells: NotebookCell[],
 		notebook: NotebookDocument,
 		controller: NotebookController,
@@ -56,27 +67,8 @@ class NotePaddController implements Partial<NotebookController> {
 
 			try {
 				if (cell.document.languageId === 'notepadd') {
-					// TODO: Optionally enable AST debug via config.
-					const {directive, ast} = parseDirective(
-						cell.document.getText(),
-						undefined,
-					);
-
 					// eslint-disable-next-line no-await-in-loop
-					await execution.replaceOutput(
-						new NotebookCellOutput([
-							NotebookCellOutputItem.json(
-								directive,
-								directiveMimeType,
-							),
-							// TODO: Remove after implementing the renderer and service.
-							NotebookCellOutputItem.json({
-								directive,
-								ast,
-							}),
-						]),
-					);
-
+					await this.executeDirective(cell, execution);
 					execution.end(true, Date.now());
 				} else {
 					// eslint-disable-next-line no-await-in-loop
@@ -84,6 +76,8 @@ class NotePaddController implements Partial<NotebookController> {
 					execution.end(undefined, Date.now());
 				}
 			} catch (error) {
+				output.error('[NotePADD/Arch/Controller]', error);
+
 				// eslint-disable-next-line no-await-in-loop
 				await execution.replaceOutput(
 					new NotebookCellOutput([
@@ -94,12 +88,13 @@ class NotePaddController implements Partial<NotebookController> {
 				);
 
 				execution.end(false, Date.now());
-				throw error;
 			}
 		}
-	};
+
+		await notebook.save();
+	}
 }
 
 export async function setupController(context: ExtensionContext) {
-	context.subscriptions.push(await NotePaddController.create());
+	context.subscriptions.push(new NotePaddController());
 }
