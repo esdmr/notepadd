@@ -33,9 +33,8 @@ class NotePaddController implements Partial<NotebookController> {
 
 	readonly description = version;
 	readonly detail = 'Default NotePADD kernel';
-	readonly supportsExecutionOrder = true;
+	readonly supportsExecutionOrder = false;
 	readonly supportedLanguages;
-	private _lastIndex = 0;
 
 	private constructor(langs: readonly string[] = []) {
 		this.supportedLanguages = [
@@ -53,7 +52,6 @@ class NotePaddController implements Partial<NotebookController> {
 		for (const cell of cells) {
 			const execution = controller.createNotebookCellExecution(cell);
 
-			execution.executionOrder = this._lastIndex++;
 			execution.start(Date.now());
 
 			try {
