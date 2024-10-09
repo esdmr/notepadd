@@ -55,7 +55,64 @@
 				"title": "Stop Timekeeper",
 				"category": "NotePADD"
 			}
-		]
+		],
+		"configuration": {
+			"title": "NotePADD",
+			"properties": {
+				"notepadd.plantuml.java": {
+					"type": "string",
+					"scope": "machine-overridable",
+					"default": "java",
+					"description": "Java runtime location"
+				},
+				"notepadd.plantuml.jar": {
+					"type": "string",
+					"scope": "machine-overridable",
+					"default": "",
+					"description": "plantuml.jar location"
+				},
+				"notepadd.plantuml.server": {
+					"type": "string",
+					"scope": "machine-overridable",
+					"default": "",
+					"description": "PlantUML server location"
+				},
+				"notepadd.plantuml.renderer": {
+					"type": "string",
+					"scope": "machine-overridable",
+					"default": "Local",
+					"enum": [
+						"Local",
+						"Server"
+					],
+					"enumDescriptions": [
+						"Using plantuml.jar locally",
+						"Via PlantUML server"
+					],
+					"description": "Select where should PlantUML diagrams be rendered"
+				},
+				"notepadd.plantuml.javaArguments": {
+					"type": "array",
+					"scope": "resource",
+					"items": {
+						"type": "string",
+						"minLength": 1
+					},
+					"default": [],
+					"description": "Arguments passed to Java"
+				},
+				"notepadd.plantuml.jarArguments": {
+					"type": "array",
+					"scope": "resource",
+					"items": {
+						"type": "string",
+						"minLength": 1
+					},
+					"default": [],
+					"description": "Arguments passed to plantuml.jar"
+				}
+			}
+		}
 	},
 	"activationEvents": [
 		"onNotebook:notepadd",

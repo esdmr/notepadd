@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import {Temporal} from 'temporal-polyfill';
+import { indexOf } from 'uint8array-extras';
 
 export function isNullish(value: unknown): value is null | undefined {
 	return value === null || value === undefined;
@@ -170,4 +171,26 @@ export function minDuration(
 	relativeTo: Temporal.ZonedDateTime,
 ) {
 	return Temporal.Duration.compare(one, two, {relativeTo}) < 0 ? one : two;
+}
+
+export function splitUint8Array(
+	buffer: Uint8Array,
+	substring: Uint8Array,
+	length = substring.length,
+) {
+	const parts = [];
+
+	while (buffer.length > 0) {
+		const index = indexOf(buffer, substring);
+
+		if (index === -1) {
+			parts.push(buffer);
+			break;
+		} else {
+			parts.push(buffer.subarray(0, index));
+			buffer = buffer.subarray(index + length);
+		}
+	}
+
+	return parts;
 }
