@@ -19,7 +19,7 @@ import {
 export class NotePaddSerializer implements NotebookSerializer, Disposable {
 	private readonly _registry = workspace.registerNotebookSerializer(
 		'notepadd',
-		new NotePaddSerializer(),
+		this,
 	);
 
 	dispose() {
