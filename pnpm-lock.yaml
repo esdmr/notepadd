@@ -85,8 +85,8 @@ importers:
         specifier: 3.0.0
         version: 3.0.0
       type-fest:
-        specifier: 4.25.0
-        version: 4.25.0
+        specifier: 4.26.1
+        version: 4.26.1
 
   notepadd-timekeeper:
     dependencies:
@@ -104,8 +104,8 @@ importers:
         specifier: 20.16.1
         version: 20.16.1
       type-fest:
-        specifier: 4.25.0
-        version: 4.25.0
+        specifier: 4.26.1
+        version: 4.26.1
 
   vite-plugin-child-process:
     devDependencies:
@@ -113,8 +113,8 @@ importers:
         specifier: 20.16.1
         version: 20.16.1
       type-fest:
-        specifier: 4.25.0
-        version: 4.25.0
+        specifier: 4.26.1
+        version: 4.26.1
       vite:
         specifier: 5.4.1
         version: 5.4.1(@types/node@20.16.1)
@@ -137,8 +137,8 @@ importers:
         specifier: 20.16.1
         version: 20.16.1
       type-fest:
-        specifier: 4.25.0
-        version: 4.25.0
+        specifier: 4.26.1
+        version: 4.26.1
       vite:
         specifier: 5.4.1
         version: 5.4.1(@types/node@20.16.1)
@@ -1366,6 +1366,7 @@ packages:
   eslint@8.57.0:
     resolution: {integrity: sha512-dZ6+mexnaTIbSBZWgou51U6OmzIhYM2VcNdtiTtI7qPNZm35Akpr0f6vtw3w1Kmn5PYo+tZVfh13WrhpS6oLqQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
 
   esm-utils@4.3.0:
@@ -2917,8 +2918,8 @@ packages:
     resolution: {integrity: sha512-RAH822pAdBgcNMAfWnCBU3CFZcfZ/i1eZjwFU/dsLKumyuuP3niueg2UAukXYF0E2AAoc82ZSSf9J0WQBinzHA==}
     engines: {node: '>=12.20'}
 
-  type-fest@4.25.0:
-    resolution: {integrity: sha512-bRkIGlXsnGBRBQRAY56UXBm//9qH4bmJfFvq83gSz41N282df+fjy8ofcEgc1sM8geNt5cl6mC2g9Fht1cs8Aw==}
+  type-fest@4.26.1:
+    resolution: {integrity: sha512-yOGpmOAL7CkKe/91I5O3gPICmJNLJ1G4zFYVAsRHg7M64biSnPtRj0WNQt++bRkjYOqjWXrhnUw1utzmVErAdg==}
     engines: {node: '>=16'}
 
   typed-array-buffer@1.0.2:
@@ -6397,7 +6398,7 @@ snapshots:
 
   type-fest@2.19.0: {}
 
-  type-fest@4.25.0: {}
+  type-fest@4.26.1: {}
 
   typed-array-buffer@1.0.2:
     dependencies:
