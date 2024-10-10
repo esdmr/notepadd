@@ -1,5 +1,4 @@
-import type { CancellationToken, Disposable } from 'vscode';
-
+import type {CancellationToken, Disposable} from 'vscode';
 
 export class TokenWrapper implements Disposable {
 	private readonly _controller = new AbortController();
@@ -21,7 +20,7 @@ export class TokenWrapper implements Disposable {
 		}
 	}
 
-	dispose () {
+	dispose() {
 		this._registry?.dispose();
 		this._registry = undefined;
 	}
