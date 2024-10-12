@@ -12,25 +12,25 @@ Starting --> Idling
 
 Resetting : \
 Send Update message\n\
-Update dashboard if open
+Update bridge if open
 Idling --> Resetting : Discover message
 Resetting --> Idling
 
 Processing : \
 Process FS change\n\
 Send Update message\n\
-Update dashboard if open
+Update bridge if open
 Idling --> Processing : FS changed
 Processing --> Idling
 
 Triggering : \
-Signal the dashboard if open\n\
+Signal the bridge if open\n\
 Show message if not
 Idling --> Triggering : Trigger message
 Triggering --> Idling
 
 Restarting : \
-Mark dashboard as stale if open\n\
+Mark bridge as stale if open\n\
 Terminate timekeeper\n\
 Spawn timekeeper
 Idling --> Restarting : Restart requested
@@ -38,7 +38,7 @@ Restarting --> Idling
 
 Stopping : \
 Terminate timekeeper\n\
-Mark dashboard as stale if open\n\
+Mark bridge as stale if open\n\
 Stop watching the files
 Idling --> Stopping : Deactivation requested
 Stopping --> [*]

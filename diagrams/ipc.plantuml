@@ -9,7 +9,7 @@ box "Service Process" #efe
 	participant "Timekeeper" as time
 end box
 box "Renderer Isolate" #eef
-	participant "Dashboard" as dsh
+	participant "Bridge" as br
 end box
 
 == Activation ==
@@ -27,8 +27,8 @@ end
 book -> time ++ : Spawn
 time ->> book ++ : Discover
 book ->> time : Update
-opt dashboard is open
-	book ->> dsh -- : Update
+opt bridge is open
+	book ->> br -- : Update
 end
 
 == Add ==
@@ -42,8 +42,8 @@ end
 
 book ->> time : Update
 
-opt dashboard is open
-	book ->> dsh -- : Update
+opt bridge is open
+	book ->> br -- : Update
 end
 
 == Update ==
@@ -56,8 +56,8 @@ end
 
 book ->> time : Update
 
-opt dashboard is open
-	book ->> dsh -- : Update
+opt bridge is open
+	book ->> br -- : Update
 end
 
 == Delete ==
@@ -69,15 +69,15 @@ end
 
 book ->> time : Update
 
-opt dashboard is open
-	book ->> dsh -- : Update
+opt bridge is open
+	book ->> br -- : Update
 end
 
 == Directive Trigger ==
 time ->> book ++ : Trigger
 
-alt dashboard is open
-	book ->> dsh : Trigger
+alt bridge is open
+	book ->> br : Trigger
 else else
 	[<<- book -- : Message
 end
@@ -86,8 +86,8 @@ end
 
 [->> ext ++ : Restart
 ext -> book --++ : Restart
-opt dashboard is open
-	book ->> dsh : Stale
+opt bridge is open
+	book ->> br : Stale
 end
 book ->> time : Terminate
 deactivate time
@@ -95,8 +95,8 @@ deactivate time
 book -> time --++ : Spawn
 time ->> book ++ : Discover
 book ->> time : Update
-opt dashboard is open
-	book ->> dsh -- : Update
+opt bridge is open
+	book ->> br -- : Update
 end
 
 == Deactivation ==
@@ -106,8 +106,8 @@ ext -> book ++ : Deactivate
 book ->> time : Terminate
 deactivate time
 
-opt dashboard is open
-	book ->> dsh : Stale
+opt bridge is open
+	book ->> br : Stale
 end
 
 loop foreach

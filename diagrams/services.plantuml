@@ -12,7 +12,7 @@ node "Renderer" as renderer <<process>> {
 	}
 
 	node "Webview" as webview <<isolate>> {
-		artifact "Dashboard Webview" as dashboard
+		artifact "Bridge Webview" as bridge
 	}
 
 	node "Notifications" as notification <<component>>
