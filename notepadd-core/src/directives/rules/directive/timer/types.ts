@@ -1,6 +1,7 @@
 import {Temporal} from 'temporal-polyfill';
 import {Instance, type DirectiveChild} from '../base.ts';
 import {hasProperty, hasTypeBrand, isObject} from '../../../../utils.ts';
+import type {Directive} from '../types.ts';
 
 export class Timer implements DirectiveChild {
 	static from(json: unknown) {
@@ -40,8 +41,8 @@ export class Timer implements DirectiveChild {
 		readonly comment: string[],
 	) {}
 
-	getInstance(now: Temporal.ZonedDateTime) {
-		return new Instance(undefined, undefined);
+	getInstance(now: Temporal.ZonedDateTime, directive: Directive) {
+		return new Instance(directive, undefined, undefined);
 	}
 
 	getNextInstance(instance: Instance) {

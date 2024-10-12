@@ -7,6 +7,7 @@ import {
 	multiplyDuration,
 } from '../../../utils.ts';
 import {Instance} from '../directive/base.ts';
+import type {Directive} from '../types.ts';
 
 export class RecurringInstant {
 	static from(json: unknown) {
@@ -72,13 +73,13 @@ export class RecurringInstant {
 		return `R/${this.first.toString()}/${this.interval.toString()}/${this.end?.toString()}`;
 	}
 
-	getInstance(now: Temporal.ZonedDateTime) {
+	getInstance(now: Temporal.ZonedDateTime, directive: Directive) {
 		if (this._checkBounds(now) < 0) {
 			// Edge case for before recurrence starts, because the following
 			// algorithm would likely estimate some instance from before the
 			// start and then filter it at the bounds checking, yielding no
 			// instance.
-			return new Instance(undefined, this.first);
+			return new Instance(directive, undefined, this.first);
 		}
 
 		const guessedInstant = this._estimateInstancePrecise(now);
@@ -96,6 +97,7 @@ export class RecurringInstant {
 				: guessedInstant.add(this.interval);
 
 		return new Instance(
+			directive,
 			this._checkBounds(previous) === 0 ? previous : undefined,
 			this._checkBounds(next) === 0 ? next : undefined,
 		);
@@ -105,6 +107,7 @@ export class RecurringInstant {
 		const next = instance.next?.add(this.interval);
 
 		return new Instance(
+			instance.directive,
 			instance.next,
 			next && this._checkBounds(next) === 0 ? next : undefined,
 		);

@@ -1,9 +1,8 @@
-import {Temporal} from 'temporal-polyfill';
 import {
-	Directive,
 	hasProperty,
 	hasTypeBrand,
-	Instance,
+	type Instance,
+	instanceFrom,
 	isObject,
 } from 'notepadd-core';
 
@@ -23,18 +22,11 @@ export class TriggerMessage {
 				throw new TypeError('Object is not a trigger message');
 			}
 
-			if (!hasProperty(json, 'directive')) {
-				throw new TypeError('Directive is invalid');
-			}
-
 			if (!hasProperty(json, 'instance')) {
 				throw new TypeError('Instance is invalid');
 			}
 
-			return new TriggerMessage(
-				Directive.from(json.directive),
-				Instance.from(json.instance),
-			);
+			return new TriggerMessage(instanceFrom(json.instance));
 		} catch (error) {
 			throw new Error(
 				`Cannot deserialize a trigger message from JSON: ${JSON.stringify(json, undefined, 2)}`,
@@ -45,8 +37,5 @@ export class TriggerMessage {
 
 	readonly _type = 'TriggerMessage';
 
-	constructor(
-		readonly directive: Directive,
-		readonly instance: Instance,
-	) {}
+	constructor(readonly instance: Instance) {}
 }

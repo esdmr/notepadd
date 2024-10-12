@@ -14,24 +14,20 @@ export async function onTimeout(this: DirectiveContext) {
 	const now = Temporal.Now.zonedDateTimeISO();
 
 	if (Temporal.ZonedDateTime.compare(this.instance.next, now) <= 0) {
-		this.instance = this.directive.getNextInstance(this.instance);
+		this.instance = this.instance.directive.getNextInstance(this.instance);
 
 		if (
 			this.instance.next &&
 			Temporal.ZonedDateTime.compare(this.instance.next, now) <= 0
 		) {
 			output.warn(
-				`Next instance is already in the past (${this.instance.next.toString()} ≤ ${now.toString()}). Recalculating instances. Some instances might be skipped by this. (${this.directive.toString()})`,
+				`Next instance is already in the past (${this.instance.next.toString()} ≤ ${now.toString()}). Recalculating instances. Some instances might be skipped by this. (${this.instance.directive.toString()})`,
 			);
 
-			this.instance = this.directive.getInstance(now);
+			this.instance = this.instance.directive.getInstance(now);
 		}
 
-		process.send!(
-			new TimekeeperMessage(
-				new TriggerMessage(this.directive, this.instance),
-			),
-		);
+		process.send!(new TimekeeperMessage(new TriggerMessage(this.instance)));
 	}
 
 	if (this.instance.next) {

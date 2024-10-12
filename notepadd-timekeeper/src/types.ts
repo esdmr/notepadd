@@ -15,10 +15,7 @@ export class DirectiveContext {
 	referenceCount = 1;
 	readonly onTimeout = onTimeout.bind(this);
 
-	constructor(
-		readonly directive: Directive,
-		now: Temporal.ZonedDateTime,
-	) {
+	constructor(directive: Directive, now: Temporal.ZonedDateTime) {
 		this.instance = directive.getInstance(now);
 	}
 }

@@ -1,6 +1,7 @@
 import {Temporal} from 'temporal-polyfill';
 import {Instance} from '../directive/base.ts';
 import {hasProperty, hasTypeBrand, isObject} from '../../../utils.ts';
+import type {Directive} from '../types.ts';
 
 export class Period {
 	static from(json: unknown) {
@@ -79,25 +80,35 @@ export class Period {
 		return isBeforeStart ? -1 : isAfterEnd ? 1 : 0;
 	}
 
-	getInstance(now: Temporal.ZonedDateTime) {
+	getInstance(now: Temporal.ZonedDateTime, directive: Directive) {
 		switch (this.checkBounds(now)) {
 			case -1: {
-				return new Instance(undefined, this.start, 'low');
+				return new Instance(directive, undefined, this.start, 'low');
 			}
 
 			case 0: {
-				return new Instance(this.start, this.getEnd(), 'high');
+				return new Instance(
+					directive,
+					this.start,
+					this.getEnd(),
+					'high',
+				);
 			}
 
 			case 1: {
-				return new Instance(this.getEnd(), undefined, 'low');
+				return new Instance(directive, this.getEnd(), undefined, 'low');
 			}
 		}
 	}
 
 	getNextInstance(instance: Instance) {
 		return instance.currentState === 'low'
-			? new Instance(this.start, this.getEnd(), 'high')
-			: new Instance(this.getEnd(), undefined, 'low');
+			? new Instance(
+					instance.directive,
+					this.start,
+					this.getEnd(),
+					'high',
+				)
+			: new Instance(instance.directive, this.getEnd(), undefined, 'low');
 	}
 }

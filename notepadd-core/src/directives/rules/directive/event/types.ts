@@ -3,6 +3,7 @@ import {RecurringPeriod} from '../../period-recurring/types.ts';
 import {Period} from '../../period/types.ts';
 import {type Instance, type DirectiveChild} from '../base.ts';
 import {hasProperty, hasTypeBrand, isObject} from '../../../../utils.ts';
+import type {Directive} from '../types.ts';
 
 export class OneShotEvent implements DirectiveChild {
 	static from(json: unknown) {
@@ -47,8 +48,8 @@ export class OneShotEvent implements DirectiveChild {
 		readonly comment: string[],
 	) {}
 
-	getInstance(now: Temporal.ZonedDateTime) {
-		return this.when.getInstance(now);
+	getInstance(now: Temporal.ZonedDateTime, directive: Directive) {
+		return this.when.getInstance(now, directive);
 	}
 
 	getNextInstance(instance: Instance) {
@@ -56,7 +57,7 @@ export class OneShotEvent implements DirectiveChild {
 	}
 
 	toString() {
-		return `${this.when.toString()};${this.comment.join('\n')}`;
+		return `event ${this.when.toString()}\n${this.comment.join('\n')}`;
 	}
 }
 
@@ -103,8 +104,8 @@ export class RecurringEvent implements DirectiveChild {
 		readonly comment: string[],
 	) {}
 
-	getInstance(now: Temporal.ZonedDateTime) {
-		return this.when.getInstance(now);
+	getInstance(now: Temporal.ZonedDateTime, directive: Directive) {
+		return this.when.getInstance(now, directive);
 	}
 
 	getNextInstance(instance: Instance) {
