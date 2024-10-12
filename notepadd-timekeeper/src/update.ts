@@ -23,24 +23,29 @@ export function updateFile(key: string, content: string): UpdateDelta {
 
 	const sources = new Map(
 		deserializeNotePadd(content)
-			.cells.flatMap((i) =>
-				i.outputs?.map((i) => i.items[directiveMimeType]),
-			)
-			.filter((i) => i !== undefined)
-			.map((i) => {
-				try {
-					const source = uint8ArrayToString(i);
+			.cells.flatMap((i, cellIndex) =>
+				i.outputs?.map((i) => {
+					try {
+						const output = i.items[directiveMimeType];
+						if (!output) return;
 
-					return [
-						source,
-						context?.sources.get(source) ??
-							deserializeDirective(source),
-					] as const;
-				} catch (error) {
-					output.error(error);
-					return undefined;
-				}
-			})
+						const text = uint8ArrayToString(output);
+
+						return [
+							text,
+							context?.sources.get(text) ??
+								deserializeDirective(
+									text,
+									key,
+									cellIndex,
+								),
+						] as const;
+					} catch (error) {
+						output.error(error);
+						return undefined;
+					}
+				}),
+			)
 			.filter((i) => i !== undefined),
 	);
 

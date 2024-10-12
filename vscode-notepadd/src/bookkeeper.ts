@@ -36,10 +36,6 @@ const execaOptions = {
 const filePattern = '**/*.md';
 const timekeeperUpdateDebounceDelay = 17;
 
-function hashUri(uri: Uri) {
-	return `${uri.scheme}:${uri.fsPath}`;
-}
-
 export class Bookkeeper implements Disposable {
 	private readonly _status = window.createStatusBarItem(
 		StatusBarAlignment.Left,
@@ -200,7 +196,7 @@ export class Bookkeeper implements Disposable {
 				// eslint-disable-next-line no-await-in-loop
 				const content = await workspace.fs.readFile(item);
 				const text = uint8ArrayToString(content);
-				this._bookkeeperCache.set(hashUri(item), text);
+				this._bookkeeperCache.set(item.toString(), text);
 			} catch (error) {
 				output.error('[NotePADD/Bookkeeper]', error);
 			}
@@ -227,16 +223,16 @@ export class Bookkeeper implements Disposable {
 	private async _updateFile(uri: Uri) {
 		const content = await workspace.fs.readFile(uri);
 		const text = uint8ArrayToString(content);
-		const hashed = hashUri(uri);
-		this._bookkeeperCache.set(hashed, text);
-		this._timekeeperQueue.set(hashed, text);
+		const key = uri.toString();
+		this._bookkeeperCache.set(key, text);
+		this._timekeeperQueue.set(key, text);
 		this._queueTimekeeperUpdate();
 	}
 
 	private _deleteFile(uri: Uri) {
-		const hashed = hashUri(uri);
-		this._bookkeeperCache.delete(hashed);
-		this._timekeeperQueue.set(hashed, '');
+		const key = uri.toString();
+		this._bookkeeperCache.delete(key);
+		this._timekeeperQueue.set(key, '');
 		this._queueTimekeeperUpdate();
 	}
 

@@ -61,7 +61,11 @@ export class Directive {
 				}
 			}
 
-			return new Directive(directive);
+			return new Directive(
+				directive,
+				hasProperty(json, 'uri') ? String(json.uri) : undefined,
+				hasProperty(json, 'cellIndex') ? Number(json.cellIndex) : undefined,
+			);
 		} catch (error) {
 			throw new Error(
 				`Cannot deserialize a directive from JSON: ${JSON.stringify(json, undefined, 2)}`,
@@ -72,7 +76,11 @@ export class Directive {
 
 	readonly _type = 'Directive';
 
-	constructor(readonly directive: DirectiveChild) {}
+	constructor(
+		readonly directive: DirectiveChild,
+		readonly key?: string,
+		readonly cellIndex?: number,
+	) {}
 
 	getInstance(now: Temporal.ZonedDateTime) {
 		return this.directive.getInstance(now, this);
