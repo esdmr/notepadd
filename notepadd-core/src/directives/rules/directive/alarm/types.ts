@@ -114,6 +114,6 @@ export class RecurringAlarm implements DirectiveChild {
 	}
 
 	toString() {
-		return `${this.when.toString()};${this.comment.join('\n')}`;
+		return `alarm ${this.when.toString()}\n${this.comment.join('\n')}`;
 	}
 }

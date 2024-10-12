@@ -113,6 +113,6 @@ export class RecurringEvent implements DirectiveChild {
 	}
 
 	toString() {
-		return `${this.when.toString()};${this.comment.join('\n')}`;
+		return `event ${this.when.toString()}\n${this.comment.join('\n')}`;
 	}
 }

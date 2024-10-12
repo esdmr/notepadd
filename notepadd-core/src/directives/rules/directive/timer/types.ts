@@ -50,6 +50,6 @@ export class Timer implements DirectiveChild {
 	}
 
 	toString() {
-		return `${this.when.toString()};${this.comment.join('\n')}`;
+		return `timer ${this.when.toString()}\n${this.comment.join('\n')}`;
 	}
 }
