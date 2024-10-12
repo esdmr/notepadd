@@ -4,6 +4,8 @@ import {LogMessage} from './log.ts';
 import {TerminateMessage} from './terminate.ts';
 import {TriggerMessage} from './trigger.ts';
 import {UpdateMessage} from './update.ts';
+import {ListMessage} from './list.ts';
+import {FetchMessage} from './fetch.ts';
 
 export * from './discovery.ts';
 export * from './trigger.ts';
@@ -12,7 +14,8 @@ export * from './update.ts';
 export type TimekeeperMessageChild =
 	| DiscoveryMessage
 	| TriggerMessage
-	| LogMessage;
+	| LogMessage
+	| ListMessage;
 
 export class TimekeeperMessage {
 	static from(json: unknown) {
@@ -56,6 +59,11 @@ export class TimekeeperMessage {
 					break;
 				}
 
+				case 'ListMessage' satisfies ListMessage['_type']: {
+					message = ListMessage.from(json.message);
+					break;
+				}
+
 				default: {
 					throw new TypeError(
 						`Unknown Timekeeper message: ${JSON.stringify(json.message, undefined, 2)}`,
@@ -77,7 +85,10 @@ export class TimekeeperMessage {
 	constructor(readonly message: TimekeeperMessageChild) {}
 }
 
-export type BookkeeperMessageChild = UpdateMessage | TerminateMessage;
+export type BookkeeperMessageChild =
+	| UpdateMessage
+	| TerminateMessage
+	| FetchMessage;
 
 export class BookkeeperMessage {
 	static from(json: unknown) {
@@ -113,6 +124,11 @@ export class BookkeeperMessage {
 
 				case 'TerminateMessage' satisfies TerminateMessage['_type']: {
 					message = TerminateMessage.from(json.message);
+					break;
+				}
+
+				case 'FetchMessage' satisfies FetchMessage['_type']: {
+					message = FetchMessage.from(json.message);
 					break;
 				}
 

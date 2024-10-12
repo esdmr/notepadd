@@ -34,11 +34,7 @@ export function updateFile(key: string, content: string): UpdateDelta {
 						return [
 							text,
 							context?.sources.get(text) ??
-								deserializeDirective(
-									text,
-									key,
-									cellIndex,
-								),
+								deserializeDirective(text, key, cellIndex),
 						] as const;
 					} catch (error) {
 						output.error(error);
@@ -117,4 +113,8 @@ export async function resetTimeouts() {
 		// eslint-disable-next-line no-await-in-loop
 		await directive.onTimeout();
 	}
+}
+
+export function getInstances() {
+	return Array.from(directives.values(), (i) => i.instance);
 }

@@ -8,8 +8,15 @@ import {
 	UpdateMessage,
 } from './messages/index.ts';
 import {output} from './output.ts';
-import {applyUpdateDelta, resetTimeouts, updateFile} from './update.ts';
+import {
+	applyUpdateDelta,
+	getInstances,
+	resetTimeouts,
+	updateFile,
+} from './update.ts';
 import {TerminateMessage} from './messages/terminate.ts';
+import {FetchMessage} from './messages/fetch.ts';
+import {ListMessage} from './messages/list.ts';
 
 if (!process.send) {
 	// Do not use `output` here. It requires an IPC channel to pass messages,
@@ -43,8 +50,15 @@ process.on('message', async (value) => {
 				output.error(error);
 			}
 		}
+
+		// In case bridge was already open, we might have missed the fetch
+		// message. Since bridge is not aware of these changes, we must initiate
+		// the update.
+		process.send!(new TimekeeperMessage(new ListMessage(getInstances())));
 	} else if (message instanceof TerminateMessage) {
 		process.exit(0);
+	} else if (message instanceof FetchMessage) {
+		process.send!(new TimekeeperMessage(new ListMessage(getInstances())));
 	} else {
 		throw new TypeError(
 			`Unknown bookkeeper message: ${JSON.stringify(message, undefined, 2)}`,

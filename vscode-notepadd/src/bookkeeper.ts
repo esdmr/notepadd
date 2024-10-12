@@ -24,6 +24,7 @@ import {
 import {uint8ArrayToString} from 'uint8array-extras';
 import {LogMessage} from '../../notepadd-timekeeper/src/messages/log.ts';
 import {TerminateMessage} from '../../notepadd-timekeeper/src/messages/terminate.ts';
+import {ListMessage} from '../../notepadd-timekeeper/src/messages/list.ts';
 import {output} from './output.ts';
 
 const execaOptions = {
@@ -129,6 +130,12 @@ export class Bookkeeper implements Disposable {
 				output[message.level](
 					'[NotePADD/Timekeeper/ipc]',
 					...message.items,
+				);
+			} else if (message instanceof ListMessage) {
+				// FIXME: Implement list message
+				output.debug(
+					'[NotePADD/Bookkeeper]',
+					'List message is not implemented.',
 				);
 			} else {
 				throw new TypeError(
