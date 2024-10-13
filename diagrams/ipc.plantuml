@@ -26,8 +26,10 @@ end
 
 book -> time ++ : Spawn
 time ->> book ++ : Discover
-book ->> time : Update
-opt bridge is open
+book ->> time -- : Update
+
+opt bridge is connected
+	time ->> book ++ : List
 	book ->> br -- : Update
 end
 
@@ -40,9 +42,10 @@ loop foreach
 	[<- book : Watch
 end
 
-book ->> time : Update
+book ->> time -- : Update
 
-opt bridge is open
+opt bridge is connected
+	time ->> book ++ : List
 	book ->> br -- : Update
 end
 
@@ -54,9 +57,10 @@ loop foreach
 	[-->> book : Content
 end
 
-book ->> time : Update
+book ->> time -- : Update
 
-opt bridge is open
+opt bridge is connected
+	time ->> book ++ : List
 	book ->> br -- : Update
 end
 
@@ -67,26 +71,34 @@ loop foreach
 	[<- book : Stop Watching
 end
 
-book ->> time : Update
+book ->> time -- : Update
 
-opt bridge is open
+opt bridge is connected
+	time ->> book ++ : List
 	book ->> br -- : Update
 end
 
+== Connect Bridge ==
+
+br ->> book ++ : Connect
+book ->> time -- : Fetch
+
+time ->> book ++ : List
+book ->> br -- : Update
+
 == Directive Trigger ==
 time ->> book ++ : Trigger
+[<<- book : Trigger
 
-alt bridge is open
-	book ->> br : Trigger
-else else
-	[<<- book -- : Message
+opt bridge is connected
+	book ->> br -- : Trigger
 end
 
 == Restart ==
 
 [->> ext ++ : Restart
 ext -> book --++ : Restart
-opt bridge is open
+opt bridge is connected
 	book ->> br : Stale
 end
 book ->> time : Terminate
@@ -94,8 +106,10 @@ deactivate time
 
 book -> time --++ : Spawn
 time ->> book ++ : Discover
-book ->> time : Update
-opt bridge is open
+book ->> time -- : Update
+
+opt bridge is connected
+	time ->> book ++ : List
 	book ->> br -- : Update
 end
 
@@ -106,8 +120,8 @@ ext -> book ++ : Deactivate
 book ->> time : Terminate
 deactivate time
 
-opt bridge is open
-	book ->> br : Stale
+opt bridge is connected
+	book ->> br : Disconnect
 end
 
 loop foreach
