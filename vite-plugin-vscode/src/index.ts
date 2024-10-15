@@ -5,6 +5,12 @@ import type {PackageJson} from 'type-fest';
 import {normalizePath, type Plugin, type Rollup} from 'vite';
 import type {ExtensionManifest} from './types.ts';
 
+type View = NonNullable<
+	NonNullable<
+		NonNullable<ExtensionManifest['contributes']>['views']
+	>['explorer']
+>[number];
+
 export type VsCodePackageJson = PackageJson & ExtensionManifest;
 
 export type ViteVsCodeOptions<T extends VsCodePackageJson = VsCodePackageJson> =
@@ -65,6 +71,33 @@ async function resolveAndEmit(
 	});
 }
 
+async function extractIcons(
+	context: Rollup.PluginContext,
+	contributes: NonNullable<VsCodePackageJson['contributes']>,
+) {
+	for (const viewContainer of new Set(
+		[
+			contributes.viewsContainers?.activitybar ?? [],
+			contributes.viewsContainers?.panel ?? [],
+		].flat(),
+	)) {
+		const fileName = `viewContainer.${viewContainer.id}.svg`;
+		await resolveAndEmit(context, fileName, viewContainer.icon);
+		viewContainer.icon = fileName;
+	}
+
+	for (const views of Object.values<View[]>(
+		(contributes.views as Record<string, View[]>) ?? {},
+	)) {
+		for (const view of views) {
+			if (!view.icon) return;
+			const fileName = `view.${view.id}.svg`;
+			await resolveAndEmit(context, fileName, view.icon);
+			view.icon = fileName;
+		}
+	}
+}
+
 export function vscode<T extends VsCodePackageJson = VsCodePackageJson>({
 	packageJsonTransformers = [],
 	copyPaths = {},
@@ -107,6 +140,10 @@ export function vscode<T extends VsCodePackageJson = VsCodePackageJson>({
 				async (text) => {
 					let packageJson = JSON.parse(text) as T;
 					packageJson.main = entryChunk.fileName;
+
+					if (packageJson.contributes) {
+						await extractIcons(this, packageJson.contributes);
+					}
 
 					for (const f of packageJsonTransformers) {
 						packageJson = (await f(packageJson)) ?? packageJson;

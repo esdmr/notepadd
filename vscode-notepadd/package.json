@@ -19,6 +19,9 @@
 	"publisher": "esdmr",
 	"type": "module",
 	"main": "src/index.ts",
+	"scripts": {
+		"vsce": "cd build && vsce"
+	},
 	"contributes": {
 		"notebooks": [
 			{
@@ -31,6 +34,25 @@
 				]
 			}
 		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "notepadd",
+					"title": "NotePADD Bridge",
+					"icon": "src/notepadd-icon.svg"
+				}
+			]
+		},
+		"views": {
+			"notepadd": [
+				{
+					"id": "notepadd-directives",
+					"contextualTitle": "NotePADD",
+					"name": "Directives",
+					"icon": "src/notepadd-icon.svg"
+				}
+			]
+		},
 		"languages": [
 			{
 				"id": "notepadd",
