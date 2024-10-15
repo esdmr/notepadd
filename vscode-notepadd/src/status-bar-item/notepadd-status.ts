@@ -1,12 +1,19 @@
 import { Disposable, MarkdownString, StatusBarAlignment, ThemeColor, window } from 'vscode';
-import { onStatusUpdated } from '../bus.ts';
+import { onStatusUpdated, type NotepaddStatus } from '../bus.ts';
 
 export function setupNotepaddStatus() {
 	const statusBarItem = window.createStatusBarItem(
 		StatusBarAlignment.Left,
 	);
 
+	let lastStatus: Required<NotepaddStatus> = {
+		bookkeeperHealth: 'unknown',
+		timekeeperHealth: 'unknown',
+	};
+
 	const handler = onStatusUpdated.event((status) => {
+		lastStatus = {...lastStatus, ...status};
+
 		const tooltip = new MarkdownString('', true);
 		tooltip.isTrusted = true;
 		tooltip.appendMarkdown('# NotePADD Service Status');
@@ -15,7 +22,7 @@ export function setupNotepaddStatus() {
 		let color: 'normal' | 'warning' | 'error' = 'normal';
 		let icon: 'inactive' | 'busy' | 'active' = 'inactive';
 
-		switch (status.bookkeeperHealth) {
+		switch (lastStatus.bookkeeperHealth) {
 			case 'active': {
 				tooltip.appendMarkdown('\n\nBookkeeper is $(play) **active**.');
 				break;
@@ -37,9 +44,17 @@ export function setupNotepaddStatus() {
 				color = 'error';
 				break;
 			}
+
+			case 'unknown': {
+				tooltip.appendMarkdown(
+					'\n\n$(loading~spin) *Awaiting status from Bookkeeper.*',
+				);
+				color = 'warning';
+				break;
+			}
 		}
 
-		switch (status.timekeeperHealth) {
+		switch (lastStatus.timekeeperHealth) {
 			case 'running': {
 				icon = 'active';
 				tooltip.appendMarkdown(
@@ -73,6 +88,13 @@ export function setupNotepaddStatus() {
 				if (color !== 'error') color = 'warning';
 				command = 'notepadd.startTimekeeper';
 				break;
+			}
+
+			case 'unknown': {
+				tooltip.appendMarkdown(
+					'\n\n$(loading~spin) *Awaiting status from Timekeeper.*',
+				);
+				if (color !== 'error') color = 'warning';
 			}
 		}
 

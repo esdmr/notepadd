@@ -20,11 +20,16 @@ export class UpdateMessage {
 				throw new TypeError('Changes are invalid');
 			}
 
+			if (!hasProperty(json, 'partial') || typeof json.partial !== 'boolean') {
+				throw new TypeError('Partial is invalid');
+			}
+
 			return new UpdateMessage(
 				mapRecord(json.changed as Record<string, unknown>, ([k, v]) => [
 					String(k),
 					String(v),
 				]),
+				json.partial,
 			);
 		} catch (error) {
 			throw new Error(
@@ -36,5 +41,8 @@ export class UpdateMessage {
 
 	readonly _type = 'UpdateMessage';
 
-	constructor(readonly changed: Record<string, string>) {}
+	constructor(
+		readonly changed: Record<string, string>,
+		readonly partial: boolean,
+	) {}
 }

@@ -7,7 +7,7 @@ import type {DirectiveContext} from './types.ts';
 
 const maxTimeoutDelay = 0x7f_ff_ff_ff;
 
-export async function onTimeout(this: DirectiveContext) {
+export function onTimeout(this: DirectiveContext) {
 	this.lastTimeout = undefined;
 	if (!this.instance.next) return;
 

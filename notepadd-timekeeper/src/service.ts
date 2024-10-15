@@ -1,22 +1,20 @@
 #!/usr/bin/env node
 import process from 'node:process';
-import {Temporal} from 'temporal-polyfill';
+import { FetchMessage } from './messages/fetch.ts';
 import {
 	BookkeeperMessage,
 	DiscoveryMessage,
 	TimekeeperMessage,
 	UpdateMessage,
 } from './messages/index.ts';
-import {output} from './output.ts';
+import { ListMessage } from './messages/list.ts';
+import { TerminateMessage } from './messages/terminate.ts';
+import { output } from './output.ts';
 import {
-	applyUpdateDelta,
 	getInstances,
-	resetTimeouts,
-	updateFile,
+	processUpdate,
+	resetTimeouts
 } from './update.ts';
-import {TerminateMessage} from './messages/terminate.ts';
-import {FetchMessage} from './messages/fetch.ts';
-import {ListMessage} from './messages/list.ts';
 
 if (!process.send) {
 	// Do not use `output` here. It requires an IPC channel to pass messages,
@@ -38,18 +36,7 @@ process.on('message', async (value) => {
 	const {message} = BookkeeperMessage.from(value);
 
 	if (message instanceof UpdateMessage) {
-		const now = Temporal.Now.zonedDateTimeISO();
-
-		for (const [key, content] of Object.entries(message.changed)) {
-			try {
-				const delta = updateFile(key, content);
-
-				// eslint-disable-next-line no-await-in-loop
-				await applyUpdateDelta(delta, now);
-			} catch (error) {
-				output.error(error);
-			}
-		}
+		processUpdate(message);
 
 		// In case bridge was already open, we might have missed the fetch
 		// message. Since bridge is not aware of these changes, we must initiate
