@@ -1,31 +1,29 @@
-import {createInterface} from 'node:readline';
-import {execaNode, type Options, type ResultPromise} from 'execa';
+import { execaNode, type Options, type ResultPromise } from 'execa';
+import { createInterface } from 'node:readline';
 import {
 	BookkeeperMessage,
 	DiscoveryMessage,
 	TimekeeperMessage,
 	TriggerMessage,
 	UpdateMessage,
-	type TimekeeperMessageChild,
 } from 'notepadd-timekeeper';
 import timekeeperPath from 'notepadd-timekeeper/service?child-process';
+import { uint8ArrayToString } from 'uint8array-extras';
 import {
-	type Disposable,
-	StatusBarAlignment,
-	window,
-	type ExtensionContext,
-	commands,
 	MarkdownString,
+	StatusBarAlignment,
 	ThemeColor,
+	window,
 	workspace,
 	type FileSystemWatcher,
-	type Uri,
+	type Uri
 } from 'vscode';
-import {uint8ArrayToString} from 'uint8array-extras';
-import {LogMessage} from '../../notepadd-timekeeper/src/messages/log.ts';
-import {TerminateMessage} from '../../notepadd-timekeeper/src/messages/terminate.ts';
-import {ListMessage} from '../../notepadd-timekeeper/src/messages/list.ts';
-import {output} from './output.ts';
+import { ListMessage } from '../../notepadd-timekeeper/src/messages/list.ts';
+import { LogMessage } from '../../notepadd-timekeeper/src/messages/log.ts';
+import { TerminateMessage } from '../../notepadd-timekeeper/src/messages/terminate.ts';
+import { onTimekeeperRestartRequested, onTimekeeperStartRequested, onTimekeeperStopRequested } from './bus.ts';
+import { output } from './output.ts';
+import { type AsyncDisposable } from './utils.ts';
 
 const execaOptions = {
 	ipc: true,
@@ -37,21 +35,20 @@ const execaOptions = {
 const filePattern = '**/*.md';
 const timekeeperUpdateDebounceDelay = 17;
 
-export class Bookkeeper implements Disposable {
+export class Bookkeeper implements AsyncDisposable {
 	private readonly _status = window.createStatusBarItem(
 		StatusBarAlignment.Left,
 	);
 
-	private readonly _commands = [
-		commands.registerCommand('notepadd.restartTimekeeper', async () => {
-			await this.stopTimekeeper();
+	private readonly _handlers = [
+		onTimekeeperRestartRequested.event(async () => {
+			return this.restartTimekeeper();
+		}),
+		onTimekeeperStartRequested.event(() => {
 			this.startTimekeeper();
 		}),
-		commands.registerCommand('notepadd.startTimekeeper', () => {
-			this.startTimekeeper();
-		}),
-		commands.registerCommand('notepadd.stopTimekeeper', async () => {
-			await this.stopTimekeeper();
+		onTimekeeperStopRequested.event(async () => {
+			return this.stopTimekeeper();
 		}),
 	] as const;
 
@@ -87,6 +84,7 @@ export class Bookkeeper implements Disposable {
 		}
 
 		this.startTimekeeper();
+		return this;
 	}
 
 	startTimekeeper() {
@@ -184,12 +182,17 @@ export class Bookkeeper implements Disposable {
 		clearTimeout(timeout);
 	}
 
-	dispose() {
-		for (const item of this._commands) {
+	async restartTimekeeper() {
+		await this.stopTimekeeper();
+		this.startTimekeeper();
+	}
+
+	async asyncDispose() {
+		for (const item of this._handlers) {
 			item.dispose();
 		}
 
-		void this.stopTimekeeper();
+		await this.stopTimekeeper();
 		this._bookkeeperWatcher?.dispose();
 		this._bookkeeperCache.clear();
 		this._status.dispose();

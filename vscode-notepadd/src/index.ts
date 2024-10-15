@@ -6,20 +6,30 @@ import {Bookkeeper} from './bookkeeper.ts';
 import {NotePaddController} from './notebook/notepadd.controller.ts';
 import {NotePaddSerializer} from './notebook/notepadd.serializer.ts';
 import {output} from './output.ts';
+import { setupRestartTimekeeperCommand } from './command/restart-timekeeper.ts';
+import { setupStartTimekeeperCommand } from './command/start-timekeeper.ts';
+import { setupStopTimekeeperCommand } from './command/stop-timekeeper.ts';
+import { type AsyncDisposable } from './utils.ts';
+
+const asyncSubscriptions: AsyncDisposable[] = [];
 
 export async function activate(context: ExtensionContext) {
-	const bookkeeper = new Bookkeeper();
-
 	context.subscriptions.push(
 		output,
+		setupRestartTimekeeperCommand(),
+		setupStartTimekeeperCommand(),
+		setupStopTimekeeperCommand(),
 		new NotePaddSerializer(),
 		new NotePaddController(),
-		bookkeeper,
 	);
 
-	await bookkeeper.initialize();
+	asyncSubscriptions.push(
+		await new Bookkeeper().initialize(),
+	);
 }
 
-export function deactivate() {
-	// Do nothing.
+export async function deactivate() {
+	for (const disposable of asyncSubscriptions) {
+		await disposable.asyncDispose();
+	}
 }

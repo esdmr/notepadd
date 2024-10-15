@@ -253,7 +253,3 @@ export class NotePaddController implements Disposable {
 		await notebook.save();
 	}
 }
-
-export async function setupController(context: ExtensionContext) {
-	context.subscriptions.push(new NotePaddController());
-}
