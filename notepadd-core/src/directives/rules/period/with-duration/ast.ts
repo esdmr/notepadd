@@ -16,7 +16,7 @@ export class PeriodWithDurationNode
 	toPeriod(now: Temporal.ZonedDateTime) {
 		return new Period(
 			this.start.toInstant(now),
-			Temporal.Duration.from({days: 1}),
+			this.duration.toDuration(),
 		);
 	}
 }
