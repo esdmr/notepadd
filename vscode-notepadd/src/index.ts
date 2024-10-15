@@ -10,6 +10,7 @@ import { setupRestartTimekeeperCommand } from './command/restart-timekeeper.ts';
 import { setupStartTimekeeperCommand } from './command/start-timekeeper.ts';
 import { setupStopTimekeeperCommand } from './command/stop-timekeeper.ts';
 import { type AsyncDisposable } from './utils.ts';
+import { setupNotepaddStatus } from './status-bar-item/notepadd-status.ts';
 
 const asyncSubscriptions: AsyncDisposable[] = [];
 
@@ -19,6 +20,7 @@ export async function activate(context: ExtensionContext) {
 		setupRestartTimekeeperCommand(),
 		setupStartTimekeeperCommand(),
 		setupStopTimekeeperCommand(),
+		setupNotepaddStatus(),
 		new NotePaddSerializer(),
 		new NotePaddController(),
 	);

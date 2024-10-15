@@ -21,7 +21,7 @@ import {
 import { ListMessage } from '../../notepadd-timekeeper/src/messages/list.ts';
 import { LogMessage } from '../../notepadd-timekeeper/src/messages/log.ts';
 import { TerminateMessage } from '../../notepadd-timekeeper/src/messages/terminate.ts';
-import { onTimekeeperRestartRequested, onTimekeeperStartRequested, onTimekeeperStopRequested } from './bus.ts';
+import { onStatusUpdated, onTimekeeperRestartRequested, onTimekeeperStartRequested, onTimekeeperStopRequested, type NotepaddStatus } from './bus.ts';
 import { output } from './output.ts';
 import { type AsyncDisposable } from './utils.ts';
 
@@ -36,10 +36,6 @@ const filePattern = '**/*.md';
 const timekeeperUpdateDebounceDelay = 17;
 
 export class Bookkeeper implements AsyncDisposable {
-	private readonly _status = window.createStatusBarItem(
-		StatusBarAlignment.Left,
-	);
-
 	private readonly _handlers = [
 		onTimekeeperRestartRequested.event(async () => {
 			return this.restartTimekeeper();
@@ -195,7 +191,6 @@ export class Bookkeeper implements AsyncDisposable {
 		await this.stopTimekeeper();
 		this._bookkeeperWatcher?.dispose();
 		this._bookkeeperCache.clear();
-		this._status.dispose();
 	}
 
 	private async _populateCache() {
@@ -269,114 +264,19 @@ export class Bookkeeper implements AsyncDisposable {
 	}
 
 	private _updateStatus() {
-		const tooltip = new MarkdownString('', true);
-		tooltip.isTrusted = true;
-		tooltip.appendMarkdown('# NotePADD Service Status');
-
-		let command: string | undefined;
-		let color: 'normal' | 'warning' | 'error' = 'normal';
-		let status: 'inactive' | 'busy' | 'active' = 'inactive';
+		let bookkeeperHealth: NotepaddStatus['bookkeeperHealth'];
 
 		if (this._bookkeeperWatcher) {
-			tooltip.appendMarkdown('\n\nBookkeeper is $(play) **active**.');
+			bookkeeperHealth = 'active';
 		} else if (this._bookkeeperInitializing) {
-			status = 'busy';
-			tooltip.appendMarkdown(
-				'\n\nBookkeeper is $(loading~spin) **starting**.',
-			);
-			color = 'warning';
+			bookkeeperHealth = 'starting';
 		} else {
-			tooltip.appendMarkdown(
-				'\n\nBookkeeper is $(error) **faulty**.\n\n[Restart Extension Host](command:workbench.action.restartExtensionHost)',
-			);
-			color = 'error';
+			bookkeeperHealth = 'error';
 		}
 
-		switch (this._timekeeperHealth) {
-			case 'running': {
-				status = 'active';
-				tooltip.appendMarkdown(
-					'\n\nTimekeeper is $(play) **running**.\n\n[Stop Timekeeper](command:notepadd.stopTimekeeper)\n\n[Restart Timekeeper](command:notepadd.restartTimekeeper)',
-				);
-				break;
-			}
-
-			case 'starting': {
-				status = 'busy';
-				tooltip.appendMarkdown(
-					'\n\nTimekeeper is $(loading~spin) **starting**.\n\n[Stop Timekeeper](command:notepadd.stopTimekeeper)\n\n[Restart Timekeeper](command:notepadd.restartTimekeeper)',
-				);
-				if (color !== 'error') color = 'warning';
-				break;
-			}
-
-			case 'error': {
-				tooltip.appendMarkdown(
-					'\n\nTimekeeper is $(error) **faulty**.\n\n[Start Timekeeper](command:notepadd.startTimekeeper)',
-				);
-				color = 'error';
-				command = 'notepadd.startTimekeeper';
-				break;
-			}
-
-			case 'stopped': {
-				tooltip.appendMarkdown(
-					'\n\nTimekeeper is $(circle-slash) **not running**.\n\n[Start Timekeeper](command:notepadd.startTimekeeper)',
-				);
-				if (color !== 'error') color = 'warning';
-				command = 'notepadd.startTimekeeper';
-				break;
-			}
-		}
-
-		switch (color) {
-			case 'normal': {
-				this._status.color = undefined;
-				this._status.backgroundColor = undefined;
-				break;
-			}
-
-			case 'warning': {
-				this._status.color = new ThemeColor(
-					'statusBarItem.warningForeground',
-				);
-				this._status.backgroundColor = new ThemeColor(
-					'statusBarItem.warningBackground',
-				);
-				break;
-			}
-
-			case 'error': {
-				this._status.color = new ThemeColor(
-					'statusBarItem.errorForeground',
-				);
-				this._status.backgroundColor = new ThemeColor(
-					'statusBarItem.errorBackground',
-				);
-				break;
-			}
-		}
-
-		switch (status) {
-			case 'inactive': {
-				this._status.text = '$(compass)';
-				break;
-			}
-
-			case 'busy': {
-				this._status.text = '$(compass-dot)';
-				break;
-			}
-
-			case 'active': {
-				this._status.text = '$(compass-active)';
-				break;
-			}
-		}
-
-		this._status.name = 'NotePADD Service Status';
-		this._status.tooltip = tooltip;
-		this._status.command = command;
-		this._status.show();
+		onStatusUpdated.fire({
+			timekeeperHealth: this._timekeeperHealth,
+			bookkeeperHealth,
+		});
 	}
 }
