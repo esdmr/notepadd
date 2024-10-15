@@ -1,8 +1,8 @@
 import {defineConfig} from 'vite';
 import inspect from 'vite-plugin-inspect';
+import {childProcess} from '../vite-plugin-child-process/src/index.ts';
 import {nearley} from '../vite-plugin-nearley/src/index.ts';
 import {vscode} from '../vite-plugin-vscode/src/index.ts';
-import {childProcess} from '../vite-plugin-child-process/src/index.ts';
 // Note: Vite does not build files in `node_modules`, so keep the path to vite
 // plugins relative.
 

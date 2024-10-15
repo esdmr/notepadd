@@ -1,10 +1,14 @@
-import { Disposable, MarkdownString, StatusBarAlignment, ThemeColor, window } from 'vscode';
-import { onStatusUpdated, type NotepaddStatus } from '../bus.ts';
+import {
+	Disposable,
+	MarkdownString,
+	StatusBarAlignment,
+	ThemeColor,
+	window,
+} from 'vscode';
+import {onStatusUpdated, type NotepaddStatus} from '../bus.ts';
 
 export function setupNotepaddStatus() {
-	const statusBarItem = window.createStatusBarItem(
-		StatusBarAlignment.Left,
-	);
+	const statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
 
 	let lastStatus: Required<NotepaddStatus> = {
 		bookkeeperHealth: 'unknown',
@@ -149,8 +153,5 @@ export function setupNotepaddStatus() {
 		statusBarItem.show();
 	});
 
-	return Disposable.from(
-		statusBarItem,
-		handler,
-	);
+	return Disposable.from(statusBarItem, handler);
 }

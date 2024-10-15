@@ -1,5 +1,5 @@
 import type {MooToken} from '@esdmr/nearley';
-import {Temporal} from 'temporal-polyfill';
+import {type Temporal} from 'temporal-polyfill';
 import {Period} from '../types.ts';
 import {SyntaxNode} from '../../ast.ts';
 import type {InstantNode} from '../../instant/ast.ts';

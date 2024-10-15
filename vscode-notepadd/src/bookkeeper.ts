@@ -1,12 +1,14 @@
-import { uint8ArrayToString } from 'uint8array-extras';
+import {uint8ArrayToString} from 'uint8array-extras';
+import {workspace, type FileSystemWatcher, type Uri} from 'vscode';
 import {
-	workspace,
-	type FileSystemWatcher,
-	type Uri
-} from 'vscode';
-import { onBookkeeperCached, onBookkeeperUpdated, onStatusUpdated, onTimekeeperStarted, type NotepaddStatus } from './bus.ts';
-import { output } from './output.ts';
-import { type AsyncDisposable } from './utils.ts';
+	onBookkeeperCached,
+	onBookkeeperUpdated,
+	onStatusUpdated,
+	onTimekeeperStarted,
+	type NotepaddStatus,
+} from './bus.ts';
+import {output} from './output.ts';
+import {type AsyncDisposable} from './utils.ts';
 
 const filePattern = '**/*.md';
 
@@ -58,7 +60,6 @@ export class Bookkeeper implements AsyncDisposable {
 
 		for (const item of files) {
 			try {
-				// eslint-disable-next-line no-await-in-loop
 				const content = await workspace.fs.readFile(item);
 				const text = uint8ArrayToString(content);
 				this._cache.set(item.toString(), text);
@@ -69,8 +70,7 @@ export class Bookkeeper implements AsyncDisposable {
 	}
 
 	private async _setupWatcher() {
-		this._watcher =
-			workspace.createFileSystemWatcher(filePattern);
+		this._watcher = workspace.createFileSystemWatcher(filePattern);
 
 		this._watcher.onDidCreate((uri) => {
 			void this._updateFile(uri);

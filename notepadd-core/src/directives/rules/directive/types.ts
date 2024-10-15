@@ -64,7 +64,9 @@ export class Directive {
 			return new Directive(
 				directive,
 				hasProperty(json, 'uri') ? String(json.uri) : undefined,
-				hasProperty(json, 'cellIndex') ? Number(json.cellIndex) : undefined,
+				hasProperty(json, 'cellIndex')
+					? Number(json.cellIndex)
+					: undefined,
 			);
 		} catch (error) {
 			throw new Error(

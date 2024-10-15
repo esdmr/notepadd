@@ -20,7 +20,10 @@ export class UpdateMessage {
 				throw new TypeError('Changes are invalid');
 			}
 
-			if (!hasProperty(json, 'partial') || typeof json.partial !== 'boolean') {
+			if (
+				!hasProperty(json, 'partial') ||
+				typeof json.partial !== 'boolean'
+			) {
 				throw new TypeError('Partial is invalid');
 			}
 

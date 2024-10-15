@@ -109,7 +109,6 @@ export function vscode<T extends VsCodePackageJson = VsCodePackageJson>({
 					packageJson.main = entryChunk.fileName;
 
 					for (const f of packageJsonTransformers) {
-						// eslint-disable-next-line no-await-in-loop
 						packageJson = (await f(packageJson)) ?? packageJson;
 					}
 
@@ -118,7 +117,6 @@ export function vscode<T extends VsCodePackageJson = VsCodePackageJson>({
 			);
 
 			for (const [destination, source] of Object.entries(copyPaths)) {
-				// eslint-disable-next-line no-await-in-loop
 				await resolveAndEmit(this, destination, source);
 			}
 		},

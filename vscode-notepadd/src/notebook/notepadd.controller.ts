@@ -224,20 +224,16 @@ export class NotePaddController implements Disposable {
 
 			try {
 				if (cell.document.languageId === 'notepadd') {
-					// eslint-disable-next-line no-await-in-loop
 					await this.executeDirective(cell, execution);
 				} else if (cell.document.languageId === 'plantuml') {
-					// eslint-disable-next-line no-await-in-loop
 					await this.executePlantUml(cell, execution);
 				} else {
-					// eslint-disable-next-line no-await-in-loop
 					await execution.clearOutput();
 					execution.end(undefined, Date.now());
 				}
 			} catch (error) {
 				output.error('[NotePADD/Arch]', error);
 
-				// eslint-disable-next-line no-await-in-loop
 				await execution.replaceOutput(
 					new NotebookCellOutput([
 						error instanceof Error

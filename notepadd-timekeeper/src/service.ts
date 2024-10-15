@@ -1,20 +1,16 @@
 #!/usr/bin/env node
 import process from 'node:process';
-import { FetchMessage } from './messages/fetch.ts';
+import {FetchMessage} from './messages/fetch.ts';
 import {
 	BookkeeperMessage,
 	DiscoveryMessage,
 	TimekeeperMessage,
 	UpdateMessage,
 } from './messages/index.ts';
-import { ListMessage } from './messages/list.ts';
-import { TerminateMessage } from './messages/terminate.ts';
-import { output } from './output.ts';
-import {
-	getInstances,
-	processUpdate,
-	resetTimeouts
-} from './update.ts';
+import {ListMessage} from './messages/list.ts';
+import {TerminateMessage} from './messages/terminate.ts';
+import {output} from './output.ts';
+import {getInstances, processUpdate, resetTimeouts} from './update.ts';
 
 if (!process.send) {
 	// Do not use `output` here. It requires an IPC channel to pass messages,
@@ -70,7 +66,7 @@ process.on('message', async (value) => {
 const wakeUpDetectionInterval = 30_000;
 let lastTime = Date.now();
 
-setInterval(async () => {
+setInterval(() => {
 	const time = Date.now();
 	const delta = time - lastTime;
 
@@ -82,7 +78,7 @@ setInterval(async () => {
 			`System suspense detected (${delta} ms). Resetting all timeouts.`,
 		);
 
-		await resetTimeouts();
+		resetTimeouts();
 	}
 
 	lastTime = time;

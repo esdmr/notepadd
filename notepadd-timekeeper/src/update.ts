@@ -8,7 +8,7 @@ import {uint8ArrayToString} from 'uint8array-extras';
 import {Temporal} from 'temporal-polyfill';
 import {output} from './output.ts';
 import {DirectiveContext, FileContext, UpdateDelta} from './types.ts';
-import type { UpdateMessage } from './messages/update.ts';
+import type {UpdateMessage} from './messages/update.ts';
 
 const files = new Map<string, FileContext>();
 const directives = new Map<string, DirectiveContext>();
@@ -73,10 +73,7 @@ function updateFile(key: string, content: string): UpdateDelta {
 	return new UpdateDelta(deleted, added);
 }
 
-function applyUpdateDelta(
-	delta: UpdateDelta,
-	now: Temporal.ZonedDateTime,
-) {
+function applyUpdateDelta(delta: UpdateDelta, now: Temporal.ZonedDateTime) {
 	for (const [hash] of delta.deleted) {
 		const context = directives.get(hash);
 		if (!context) continue;

@@ -1,5 +1,5 @@
-import { execaNode, type Options, type ResultPromise } from 'execa';
-import { createInterface } from 'node:readline';
+import {createInterface} from 'node:readline';
+import {execaNode, type Options, type ResultPromise} from 'execa';
 import {
 	BookkeeperMessage,
 	DiscoveryMessage,
@@ -8,12 +8,21 @@ import {
 	UpdateMessage,
 } from 'notepadd-timekeeper';
 import timekeeperPath from 'notepadd-timekeeper/service?child-process';
-import { ListMessage } from '../../notepadd-timekeeper/src/messages/list.ts';
-import { LogMessage } from '../../notepadd-timekeeper/src/messages/log.ts';
-import { TerminateMessage } from '../../notepadd-timekeeper/src/messages/terminate.ts';
-import { onBookkeeperCached, onBookkeeperUpdated, onStatusUpdated, onTimekeeperRestartRequested, onTimekeeperStarted, onTimekeeperStartRequested, onTimekeeperStopRequested, type NotepaddStatus } from './bus.ts';
-import { output } from './output.ts';
-import { type AsyncDisposable } from './utils.ts';
+import {ListMessage} from '../../notepadd-timekeeper/src/messages/list.ts';
+import {LogMessage} from '../../notepadd-timekeeper/src/messages/log.ts';
+import {TerminateMessage} from '../../notepadd-timekeeper/src/messages/terminate.ts';
+import {
+	onBookkeeperCached,
+	onBookkeeperUpdated,
+	onStatusUpdated,
+	onTimekeeperRestartRequested,
+	onTimekeeperStarted,
+	onTimekeeperStartRequested,
+	onTimekeeperStopRequested,
+	type NotepaddStatus,
+} from './bus.ts';
+import {output} from './output.ts';
+import {type AsyncDisposable} from './utils.ts';
 
 const execaOptions = {
 	ipc: true,
@@ -40,10 +49,7 @@ export class Bookkeeper implements AsyncDisposable {
 
 			this._process?.send(
 				new BookkeeperMessage(
-					new UpdateMessage(
-						Object.fromEntries(cache),
-						false,
-					),
+					new UpdateMessage(Object.fromEntries(cache), false),
 				),
 			);
 		}),
@@ -180,10 +186,7 @@ export class Bookkeeper implements AsyncDisposable {
 
 			this._process.send(
 				new BookkeeperMessage(
-					new UpdateMessage(
-						Object.fromEntries(this._queue),
-						true,
-					),
+					new UpdateMessage(Object.fromEntries(this._queue), true),
 				),
 			);
 
