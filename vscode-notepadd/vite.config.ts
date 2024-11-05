@@ -10,6 +10,7 @@ export default defineConfig((env) => ({
 	cacheDir: 'node_modules/.cache/vite',
 	build: {
 		outDir: 'build',
+		reportCompressedSize: false,
 	},
 	plugins: [
 		inspect({
