@@ -22,6 +22,5 @@ export class Instance {
 export type DirectiveChild = {
 	getInstance(now: Temporal.ZonedDateTime, directive: Directive): Instance;
 	getNextInstance(instance: Instance): Instance;
-	getLabel(): string | undefined;
 	toString(): string;
 };

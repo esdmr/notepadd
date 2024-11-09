@@ -4,10 +4,10 @@
 
 directive ->
 	timer
+	comment:?
 	{% $(DirectiveNode) %}
 
 timer ->
 	%timer
 	duration
-	comment:?
 	{% $(TimerNode) %}

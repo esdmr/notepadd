@@ -26,6 +26,29 @@ export class Directive {
 				throw new TypeError(`Directive child is not valid`);
 			}
 
+			let comment;
+
+			if (hasProperty(json, 'comment')) {
+				if (!Array.isArray(json.comment)) {
+					throw new TypeError('Comment is invalid');
+				}
+
+				comment = json.comment;
+			} else {
+				// FIXME: Kept for backwards-compatibility. Remove the else branch
+				// before MVP.
+
+				if (
+					!hasProperty(json.directive, 'comment') ||
+					!Array.isArray(json.directive.comment)
+				) {
+					throw new TypeError('Comment is invalid');
+				}
+
+				comment = json.directive.comment;
+				comment[0] = `[Needs Migration] ${String(comment[0] ?? '')}`;
+			}
+
 			let directive;
 
 			switch (json.directive._type) {
@@ -63,6 +86,7 @@ export class Directive {
 
 			return new Directive(
 				directive,
+				comment.map(String),
 				hasProperty(json, 'fileUrl') ? String(json.fileUrl) : undefined,
 			);
 		} catch (error) {
@@ -77,8 +101,13 @@ export class Directive {
 
 	constructor(
 		readonly directive: DirectiveChild,
+		readonly comment: string[] = [],
 		readonly fileUrl?: string,
 	) {}
+
+	withFileUrl(fileUrl?: string) {
+		return new Directive(this.directive, this.comment, fileUrl);
+	}
 
 	getInstance(now: Temporal.ZonedDateTime) {
 		return this.directive.getInstance(now, this);
@@ -88,12 +117,12 @@ export class Directive {
 		return this.directive.getNextInstance(instance);
 	}
 
-	getLabel(): string | undefined {
-		return this.directive.getLabel();
+	getLabel() {
+		return this.comment[0];
 	}
 
 	toString() {
-		return this.directive.toString();
+		return `${this.directive.toString()}\n${this.comment.join('\n')}`;
 	}
 }
 

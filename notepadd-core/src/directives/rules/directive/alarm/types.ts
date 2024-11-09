@@ -24,14 +24,7 @@ export class OneShotAlarm implements DirectiveChild {
 				throw new TypeError('One-shot alarm is invalid');
 			}
 
-			if (!hasProperty(json, 'comment') || !Array.isArray(json.comment)) {
-				throw new TypeError('Comment is invalid');
-			}
-
-			return new OneShotAlarm(
-				Temporal.ZonedDateTime.from(json.when),
-				json.comment.map(String),
-			);
+			return new OneShotAlarm(Temporal.ZonedDateTime.from(json.when));
 		} catch (error) {
 			throw new Error(
 				`Cannot deserialize a one-shot alarm from JSON: ${JSON.stringify(json, undefined, 2)}`,
@@ -42,10 +35,7 @@ export class OneShotAlarm implements DirectiveChild {
 
 	readonly _type = 'OneShotAlarm';
 
-	constructor(
-		readonly when: Temporal.ZonedDateTime,
-		readonly comment: string[],
-	) {}
+	constructor(readonly when: Temporal.ZonedDateTime) {}
 
 	getInstance(now: Temporal.ZonedDateTime, directive: Directive) {
 		return Temporal.ZonedDateTime.compare(now, this.when) < 0
@@ -57,12 +47,8 @@ export class OneShotAlarm implements DirectiveChild {
 		return new Instance(instance.directive, this.when, undefined);
 	}
 
-	getLabel(): string | undefined {
-		return this.comment[0];
-	}
-
 	toString() {
-		return `alarm ${this.when.toString()}\n${this.comment.join('\n')}`;
+		return `alarm ${this.when.toString()}`;
 	}
 }
 
@@ -86,14 +72,7 @@ export class RecurringAlarm implements DirectiveChild {
 				throw new TypeError('Recurring alarm is invalid');
 			}
 
-			if (!hasProperty(json, 'comment') || !Array.isArray(json.comment)) {
-				throw new TypeError('Comment is invalid');
-			}
-
-			return new RecurringAlarm(
-				RecurringInstant.from(json.when),
-				json.comment.map(String),
-			);
+			return new RecurringAlarm(RecurringInstant.from(json.when));
 		} catch (error) {
 			throw new Error(
 				`Cannot deserialize a recurring alarm from JSON: ${JSON.stringify(json, undefined, 2)}`,
@@ -104,10 +83,7 @@ export class RecurringAlarm implements DirectiveChild {
 
 	readonly _type = 'RecurringAlarm';
 
-	constructor(
-		readonly when: RecurringInstant,
-		readonly comment: string[],
-	) {}
+	constructor(readonly when: RecurringInstant) {}
 
 	getInstance(now: Temporal.ZonedDateTime, directive: Directive) {
 		return this.when.getInstance(now, directive);
@@ -117,11 +93,7 @@ export class RecurringAlarm implements DirectiveChild {
 		return this.when.getNextInstance(instance);
 	}
 
-	getLabel(): string | undefined {
-		return this.comment[0];
-	}
-
 	toString() {
-		return `alarm ${this.when.toString()}\n${this.comment.join('\n')}`;
+		return `alarm ${this.when.toString()}`;
 	}
 }

@@ -25,14 +25,7 @@ export class OneShotEvent implements DirectiveChild {
 				throw new TypeError('One-shot event is invalid');
 			}
 
-			if (!hasProperty(json, 'comment') || !Array.isArray(json.comment)) {
-				throw new TypeError('Comment is invalid');
-			}
-
-			return new OneShotEvent(
-				Period.from(json.when),
-				json.comment.map(String),
-			);
+			return new OneShotEvent(Period.from(json.when));
 		} catch (error) {
 			throw new Error(
 				`Cannot deserialize a one-shot event from JSON: ${JSON.stringify(json, undefined, 2)}`,
@@ -43,10 +36,7 @@ export class OneShotEvent implements DirectiveChild {
 
 	readonly _type = 'OneShotEvent';
 
-	constructor(
-		readonly when: Period,
-		readonly comment: string[],
-	) {}
+	constructor(readonly when: Period) {}
 
 	getInstance(now: Temporal.ZonedDateTime, directive: Directive) {
 		return this.when.getInstance(now, directive);
@@ -56,12 +46,8 @@ export class OneShotEvent implements DirectiveChild {
 		return this.when.getNextInstance(instance);
 	}
 
-	getLabel(): string | undefined {
-		return this.comment[0];
-	}
-
 	toString() {
-		return `event ${this.when.toString()}\n${this.comment.join('\n')}`;
+		return `event ${this.when.toString()}`;
 	}
 }
 
@@ -85,14 +71,7 @@ export class RecurringEvent implements DirectiveChild {
 				throw new TypeError('Recurring event is invalid');
 			}
 
-			if (!hasProperty(json, 'comment') || !Array.isArray(json.comment)) {
-				throw new TypeError('Comment is invalid');
-			}
-
-			return new RecurringEvent(
-				RecurringPeriod.from(json.when),
-				json.comment.map(String),
-			);
+			return new RecurringEvent(RecurringPeriod.from(json.when));
 		} catch (error) {
 			throw new Error(
 				`Cannot deserialize a recurring event from JSON: ${JSON.stringify(json, undefined, 2)}`,
@@ -103,10 +82,7 @@ export class RecurringEvent implements DirectiveChild {
 
 	readonly _type = 'RecurringEvent';
 
-	constructor(
-		readonly when: RecurringPeriod,
-		readonly comment: string[],
-	) {}
+	constructor(readonly when: RecurringPeriod) {}
 
 	getInstance(now: Temporal.ZonedDateTime, directive: Directive) {
 		return this.when.getInstance(now, directive);
@@ -116,11 +92,7 @@ export class RecurringEvent implements DirectiveChild {
 		return this.when.getNextInstance(instance);
 	}
 
-	getLabel(): string | undefined {
-		return this.comment[0];
-	}
-
 	toString() {
-		return `event ${this.when.toString()}\n${this.comment.join('\n')}`;
+		return `event ${this.when.toString()}`;
 	}
 }

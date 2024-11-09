@@ -18,14 +18,7 @@ export class Timer implements DirectiveChild {
 				throw new TypeError('Timer is invalid');
 			}
 
-			if (!hasProperty(json, 'comment') || !Array.isArray(json.comment)) {
-				throw new TypeError('Comment is invalid');
-			}
-
-			return new Timer(
-				Temporal.Duration.from(json.when),
-				json.comment.map(String),
-			);
+			return new Timer(Temporal.Duration.from(json.when));
 		} catch (error) {
 			throw new Error(
 				`Cannot deserialize a timer from JSON: ${JSON.stringify(json, undefined, 2)}`,
@@ -36,10 +29,7 @@ export class Timer implements DirectiveChild {
 
 	readonly _type = 'Timer';
 
-	constructor(
-		readonly when: Temporal.Duration,
-		readonly comment: string[],
-	) {}
+	constructor(readonly when: Temporal.Duration) {}
 
 	getInstance(now: Temporal.ZonedDateTime, directive: Directive) {
 		return new Instance(directive, undefined, undefined);
@@ -49,11 +39,7 @@ export class Timer implements DirectiveChild {
 		return instance;
 	}
 
-	getLabel(): string | undefined {
-		return this.comment[0];
-	}
-
 	toString() {
-		return `timer ${this.when.toString()}\n${this.comment.join('\n')}`;
+		return `timer ${this.when.toString()}`;
 	}
 }

@@ -4,6 +4,7 @@
 
 directive ->
 	alarm
+	comment:?
 	{% $(DirectiveNode) %}
 
 alarm ->
@@ -13,5 +14,4 @@ alarm ->
 		instant {% nearley.id %} |
 		duration {% nearley.id %}
 	)
-	comment:?
 	{% $(AlarmNode) %}

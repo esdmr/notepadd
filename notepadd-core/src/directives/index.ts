@@ -30,7 +30,7 @@ export function parseDirective(text: string, now?: Temporal.ZonedDateTime) {
 
 export function deserializeDirective(text: string, fileUrl?: string) {
 	const directive = Directive.from(JSON.parse(text));
-	return fileUrl ? new Directive(directive.directive, fileUrl) : directive;
+	return fileUrl ? directive.withFileUrl(fileUrl) : directive;
 }
 
 export * from './rules/types.ts';
