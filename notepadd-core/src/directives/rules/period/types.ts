@@ -67,7 +67,9 @@ export class Period {
 	getDuration() {
 		return this.endOrDuration instanceof Temporal.Duration
 			? this.endOrDuration
-			: this.start.until(this.endOrDuration);
+			: this.start.until(
+					this.endOrDuration.withCalendar(this.start.calendarId),
+				);
 	}
 
 	checkBounds(instance: Temporal.ZonedDateTime) {

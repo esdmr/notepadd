@@ -133,10 +133,12 @@ export class RecurringInstant {
 		});
 
 		// This is ‘exact’ because it is nonrecurring, unlike `self.interval`.
-		const deltaTime = this.first.until(now).total({
-			unit: smallestUnit,
-			relativeTo: this.first,
-		});
+		const deltaTime = this.first
+			.until(now.withCalendar(this.first.calendarId))
+			.total({
+				unit: smallestUnit,
+				relativeTo: this.first,
+			});
 
 		const estimatedCoefficient = Math.trunc(deltaTime / estimatedInterval);
 
