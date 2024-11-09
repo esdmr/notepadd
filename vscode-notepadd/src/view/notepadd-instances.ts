@@ -188,7 +188,8 @@ export class NotepaddBridgeView
 
 	private _setStatus() {
 		if (this._stalled) {
-			this._treeView.message = 'Cannot update: Timekeeper is not running.';
+			this._treeView.message =
+				'Cannot update: Timekeeper is not running.';
 			return;
 		}
 

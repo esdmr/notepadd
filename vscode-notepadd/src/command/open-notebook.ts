@@ -25,7 +25,9 @@ export function setupOpenNotebookCommand() {
 						: undefined,
 			};
 
-			const document = await workspace.openNotebookDocument(uri.with({fragment: ''}));
+			const document = await workspace.openNotebookDocument(
+				uri.with({fragment: ''}),
+			);
 			await window.showNotebookDocument(document, options);
 		},
 	);
