@@ -1,5 +1,10 @@
 import {uint8ArrayToString} from 'uint8array-extras';
-import {workspace, type FileSystemWatcher, type Uri} from 'vscode';
+import {
+	workspace,
+	type FileSystemWatcher,
+	type Uri,
+	type Disposable,
+} from 'vscode';
 import {
 	onBookkeeperCached,
 	onBookkeeperUpdated,
@@ -8,11 +13,10 @@ import {
 	type NotepaddStatus,
 } from './bus.ts';
 import {output} from './output.ts';
-import {type AsyncDisposable} from './utils.ts';
 
 const filePattern = '**/*.md';
 
-export class Bookkeeper implements AsyncDisposable {
+export class Bookkeeper implements Disposable {
 	private readonly _handlers = [
 		onTimekeeperStarted.event(() => {
 			onBookkeeperCached.fire(this._cache);
@@ -46,7 +50,7 @@ export class Bookkeeper implements AsyncDisposable {
 		return this;
 	}
 
-	async asyncDispose() {
+	dispose() {
 		for (const item of this._handlers) {
 			item.dispose();
 		}
@@ -88,15 +92,15 @@ export class Bookkeeper implements AsyncDisposable {
 	private async _updateFile(uri: Uri) {
 		const content = await workspace.fs.readFile(uri);
 		const text = uint8ArrayToString(content);
-		const key = uri.toString();
-		this._cache.set(key, text);
-		onBookkeeperUpdated.fire([key, text]);
+		const fileUrl = uri.toString();
+		this._cache.set(fileUrl, text);
+		onBookkeeperUpdated.fire([fileUrl, text]);
 	}
 
 	private _deleteFile(uri: Uri) {
-		const key = uri.toString();
-		this._cache.delete(key);
-		onBookkeeperUpdated.fire([key, '']);
+		const fileUrl = uri.toString();
+		this._cache.delete(fileUrl);
+		onBookkeeperUpdated.fire([fileUrl, '']);
 	}
 
 	private _updateStatus() {

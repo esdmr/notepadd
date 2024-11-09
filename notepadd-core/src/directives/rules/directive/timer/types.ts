@@ -49,6 +49,10 @@ export class Timer implements DirectiveChild {
 		return instance;
 	}
 
+	getLabel(): string | undefined {
+		return this.comment[0];
+	}
+
 	toString() {
 		return `timer ${this.when.toString()}\n${this.comment.join('\n')}`;
 	}

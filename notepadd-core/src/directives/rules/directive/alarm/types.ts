@@ -57,6 +57,10 @@ export class OneShotAlarm implements DirectiveChild {
 		return new Instance(instance.directive, this.when, undefined);
 	}
 
+	getLabel(): string | undefined {
+		return this.comment[0];
+	}
+
 	toString() {
 		return `alarm ${this.when.toString()}\n${this.comment.join('\n')}`;
 	}
@@ -111,6 +115,10 @@ export class RecurringAlarm implements DirectiveChild {
 
 	getNextInstance(instance: Instance) {
 		return this.when.getNextInstance(instance);
+	}
+
+	getLabel(): string | undefined {
+		return this.comment[0];
 	}
 
 	toString() {

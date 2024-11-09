@@ -1,4 +1,4 @@
-import {Disposable, type CancellationToken} from 'vscode';
+import {Disposable, EventEmitter, type CancellationToken} from 'vscode';
 
 export type AsyncDisposable = {
 	asyncDispose(): Promise<any>;
@@ -53,5 +53,38 @@ export class TokenWrapper implements Disposable {
 	dispose() {
 		this._registry?.dispose();
 		this._registry = undefined;
+	}
+}
+
+export class VirtualSocket {
+	private _connections = 0;
+	// eslint-disable-next-line unicorn/prefer-event-target
+	private readonly _didConnect = new EventEmitter<void>();
+	// eslint-disable-next-line unicorn/prefer-event-target
+	private readonly _didDisconnect = new EventEmitter<void>();
+
+	get connected() {
+		return this._connections > 0;
+	}
+
+	get onDidConnect() {
+		return this._didConnect.event;
+	}
+
+	get onDidDisconnect() {
+		return this._didDisconnect.event;
+	}
+
+	connect() {
+		let connected = true;
+		this._connections++;
+		this._didConnect.fire();
+
+		return new Disposable(() => {
+			if (!connected) return;
+			connected = false;
+			this._connections--;
+			this._didDisconnect.fire();
+		});
 	}
 }

@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import process from 'node:process';
-import {FetchMessage} from './messages/fetch.ts';
 import {
 	BookkeeperMessage,
 	DiscoveryMessage,
@@ -34,14 +33,13 @@ process.on('message', async (value) => {
 	if (message instanceof UpdateMessage) {
 		processUpdate(message);
 
-		// In case bridge was already open, we might have missed the fetch
-		// message. Since bridge is not aware of these changes, we must initiate
-		// the update.
-		process.send!(new TimekeeperMessage(new ListMessage(getInstances())));
+		if (message.fetchRequested) {
+			process.send!(
+				new TimekeeperMessage(new ListMessage(getInstances())),
+			);
+		}
 	} else if (message instanceof TerminateMessage) {
 		process.exit(0);
-	} else if (message instanceof FetchMessage) {
-		process.send!(new TimekeeperMessage(new ListMessage(getInstances())));
 	} else {
 		throw new TypeError(
 			`Unknown bookkeeper message: ${JSON.stringify(message, undefined, 2)}`,

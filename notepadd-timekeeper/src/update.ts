@@ -13,11 +13,11 @@ import type {UpdateMessage} from './messages/update.ts';
 const files = new Map<string, FileContext>();
 const directives = new Map<string, DirectiveContext>();
 
-function updateFile(key: string, content: string): UpdateDelta {
-	const context = files.get(key);
+function updateFile(fileUrl: string, content: string): UpdateDelta {
+	const context = files.get(fileUrl);
 
 	if (!content) {
-		files.delete(key);
+		files.delete(fileUrl);
 		const deleted = context?.hashes ?? new Map();
 		return new UpdateDelta(deleted);
 	}
@@ -31,11 +31,13 @@ function updateFile(key: string, content: string): UpdateDelta {
 						if (!output) return;
 
 						const text = uint8ArrayToString(output);
+						const cellUrl = new URL(fileUrl);
+						cellUrl.hash = `C${cellIndex}`;
 
 						return [
 							text,
 							context?.sources.get(text) ??
-								deserializeDirective(text, key, cellIndex),
+								deserializeDirective(text, cellUrl.href),
 						] as const;
 					} catch (error) {
 						output.error(error);
@@ -49,7 +51,7 @@ function updateFile(key: string, content: string): UpdateDelta {
 	const hashes = new Map([...sources.values()].map((i) => [i.toString(), i]));
 
 	const newContext = new FileContext(sources, hashes);
-	files.set(key, newContext);
+	files.set(fileUrl, newContext);
 
 	if (!context) {
 		return new UpdateDelta(undefined, hashes);
@@ -105,9 +107,9 @@ function applyUpdateDelta(delta: UpdateDelta, now: Temporal.ZonedDateTime) {
 export function processUpdate(message: UpdateMessage) {
 	const now = Temporal.Now.zonedDateTimeISO();
 
-	for (const [key, content] of Object.entries(message.changed)) {
+	for (const [fileUrl, content] of Object.entries(message.changed)) {
 		try {
-			const delta = updateFile(key, content);
+			const delta = updateFile(fileUrl, content);
 			applyUpdateDelta(delta, now);
 		} catch (error) {
 			output.error(error);
@@ -116,11 +118,11 @@ export function processUpdate(message: UpdateMessage) {
 
 	if (message.partial) return;
 
-	for (const key of directives.keys()) {
-		if (Object.hasOwn(message.changed, key)) continue;
+	for (const fileUrl of directives.keys()) {
+		if (Object.hasOwn(message.changed, fileUrl)) continue;
 
 		try {
-			const delta = updateFile(key, '');
+			const delta = updateFile(fileUrl, '');
 			applyUpdateDelta(delta, now);
 		} catch (error) {
 			output.error(error);

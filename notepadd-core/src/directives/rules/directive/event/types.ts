@@ -56,6 +56,10 @@ export class OneShotEvent implements DirectiveChild {
 		return this.when.getNextInstance(instance);
 	}
 
+	getLabel(): string | undefined {
+		return this.comment[0];
+	}
+
 	toString() {
 		return `event ${this.when.toString()}\n${this.comment.join('\n')}`;
 	}
@@ -110,6 +114,10 @@ export class RecurringEvent implements DirectiveChild {
 
 	getNextInstance(instance: Instance) {
 		return this.when.getNextInstance(instance);
+	}
+
+	getLabel(): string | undefined {
+		return this.comment[0];
 	}
 
 	toString() {

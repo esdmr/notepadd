@@ -5,7 +5,6 @@ import {TerminateMessage} from './terminate.ts';
 import {TriggerMessage} from './trigger.ts';
 import {UpdateMessage} from './update.ts';
 import {ListMessage} from './list.ts';
-import {FetchMessage} from './fetch.ts';
 
 export * from './discovery.ts';
 export * from './trigger.ts';
@@ -85,10 +84,7 @@ export class TimekeeperMessage {
 	constructor(readonly message: TimekeeperMessageChild) {}
 }
 
-export type BookkeeperMessageChild =
-	| UpdateMessage
-	| TerminateMessage
-	| FetchMessage;
+export type BookkeeperMessageChild = UpdateMessage | TerminateMessage;
 
 export class BookkeeperMessage {
 	static from(json: unknown) {
@@ -124,11 +120,6 @@ export class BookkeeperMessage {
 
 				case 'TerminateMessage' satisfies TerminateMessage['_type']: {
 					message = TerminateMessage.from(json.message);
-					break;
-				}
-
-				case 'FetchMessage' satisfies FetchMessage['_type']: {
-					message = FetchMessage.from(json.message);
 					break;
 				}
 

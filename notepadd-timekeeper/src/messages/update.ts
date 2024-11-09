@@ -27,12 +27,20 @@ export class UpdateMessage {
 				throw new TypeError('Partial is invalid');
 			}
 
+			if (
+				!hasProperty(json, 'fetchRequested') ||
+				typeof json.fetchRequested !== 'boolean'
+			) {
+				throw new TypeError('Fetch request is invalid');
+			}
+
 			return new UpdateMessage(
 				mapRecord(json.changed as Record<string, unknown>, ([k, v]) => [
 					String(k),
 					String(v),
 				]),
 				json.partial,
+				json.fetchRequested,
 			);
 		} catch (error) {
 			throw new Error(
@@ -47,5 +55,6 @@ export class UpdateMessage {
 	constructor(
 		readonly changed: Record<string, string>,
 		readonly partial: boolean,
+		readonly fetchRequested: boolean,
 	) {}
 }

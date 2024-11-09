@@ -63,10 +63,7 @@ export class Directive {
 
 			return new Directive(
 				directive,
-				hasProperty(json, 'uri') ? String(json.uri) : undefined,
-				hasProperty(json, 'cellIndex')
-					? Number(json.cellIndex)
-					: undefined,
+				hasProperty(json, 'fileUrl') ? String(json.fileUrl) : undefined,
 			);
 		} catch (error) {
 			throw new Error(
@@ -80,8 +77,7 @@ export class Directive {
 
 	constructor(
 		readonly directive: DirectiveChild,
-		readonly key?: string,
-		readonly cellIndex?: number,
+		readonly fileUrl?: string,
 	) {}
 
 	getInstance(now: Temporal.ZonedDateTime) {
@@ -90,6 +86,10 @@ export class Directive {
 
 	getNextInstance(instance: Instance) {
 		return this.directive.getNextInstance(instance);
+	}
+
+	getLabel(): string | undefined {
+		return this.directive.getLabel();
 	}
 
 	toString() {

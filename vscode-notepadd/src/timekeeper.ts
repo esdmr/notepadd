@@ -12,13 +12,17 @@ import {ListMessage} from '../../notepadd-timekeeper/src/messages/list.ts';
 import {LogMessage} from '../../notepadd-timekeeper/src/messages/log.ts';
 import {TerminateMessage} from '../../notepadd-timekeeper/src/messages/terminate.ts';
 import {
+	bridgeSocket,
 	onBookkeeperCached,
 	onBookkeeperUpdated,
 	onStatusUpdated,
 	onTimekeeperRestartRequested,
+	onTimekeeperStalled,
 	onTimekeeperStarted,
 	onTimekeeperStartRequested,
 	onTimekeeperStopRequested,
+	onTimekeeperTriggered,
+	onTimekeeperUpdated,
 	type NotepaddStatus,
 } from './bus.ts';
 import {output} from './output.ts';
@@ -33,7 +37,7 @@ const execaOptions = {
 
 const updateDebounceDelay = 17;
 
-export class Bookkeeper implements AsyncDisposable {
+export class Timekeeper implements AsyncDisposable {
 	private readonly _handlers = [
 		onTimekeeperRestartRequested.event(async () => {
 			return this.restart();
@@ -45,16 +49,23 @@ export class Bookkeeper implements AsyncDisposable {
 			return this.stop();
 		}),
 		onBookkeeperCached.event((cache) => {
-			this._queue.clear();
+			this._clearQueue();
 
 			this._process?.send(
 				new BookkeeperMessage(
-					new UpdateMessage(Object.fromEntries(cache), false),
+					new UpdateMessage(
+						Object.fromEntries(cache),
+						false,
+						bridgeSocket.connected,
+					),
 				),
 			);
 		}),
-		onBookkeeperUpdated.event(([key, value]) => {
-			this._queue.set(key, value);
+		onBookkeeperUpdated.event(([fileUrl, content]) => {
+			this._queue.set(fileUrl, content);
+			this._queueUpdate();
+		}),
+		bridgeSocket.onDidConnect(() => {
 			this._queueUpdate();
 		}),
 	] as const;
@@ -98,22 +109,28 @@ export class Bookkeeper implements AsyncDisposable {
 				output.debug('[NotePADD/Timekeeper]', 'Discovery requested.');
 				onTimekeeperStarted.fire();
 			} else if (message instanceof TriggerMessage) {
-				// FIXME: Implement trigger message
 				output.debug(
-					'[NotePADD/Bookkeeper]',
-					'Trigger message is not implemented.',
+					'[NotePADD/Timekeeper]',
+					'Directive triggered.',
+					message.instance,
 				);
+				onTimekeeperTriggered.fire(message.instance);
 			} else if (message instanceof LogMessage) {
 				output[message.level](
 					'[NotePADD/Timekeeper/ipc]',
 					...message.items,
 				);
 			} else if (message instanceof ListMessage) {
-				// FIXME: Implement list message
 				output.debug(
-					'[NotePADD/Bookkeeper]',
-					'List message is not implemented.',
+					'[NotePADD/Timekeeper]',
+					'Received list of instances.',
 				);
+				output.trace(
+					'[NotePADD/Timekeeper]',
+					'Instances:',
+					message.instances,
+				);
+				onTimekeeperUpdated.fire(message.instances);
 			} else {
 				throw new TypeError(
 					`Unknown timekeeper message: ${JSON.stringify(message, undefined, 2)}`,
@@ -150,6 +167,7 @@ export class Bookkeeper implements AsyncDisposable {
 	async stop() {
 		if (!this._process) return;
 
+		onTimekeeperStalled.fire();
 		this._process.send(new BookkeeperMessage(new TerminateMessage()));
 
 		const timeout = setTimeout(() => {
@@ -186,12 +204,24 @@ export class Bookkeeper implements AsyncDisposable {
 
 			this._process.send(
 				new BookkeeperMessage(
-					new UpdateMessage(Object.fromEntries(this._queue), true),
+					new UpdateMessage(
+						Object.fromEntries(this._queue),
+						true,
+						bridgeSocket.connected,
+					),
 				),
 			);
 
 			this._queue.clear();
 		}, updateDebounceDelay);
+	}
+
+	private _clearQueue() {
+		this._queue.clear();
+
+		if (this._timeout) {
+			clearTimeout(this._timeout);
+		}
 	}
 
 	private _updateStatus() {

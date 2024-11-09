@@ -3,6 +3,7 @@
 /// <reference types="vite-plugin-child-process/client" />
 import {type ExtensionContext} from 'vscode';
 import {Bookkeeper} from './bookkeeper.ts';
+import {Timekeeper} from './timekeeper.ts';
 import {NotePaddController} from './notebook/notepadd.controller.ts';
 import {NotePaddSerializer} from './notebook/notepadd.serializer.ts';
 import {output} from './output.ts';
@@ -11,21 +12,36 @@ import {setupStartTimekeeperCommand} from './command/start-timekeeper.ts';
 import {setupStopTimekeeperCommand} from './command/stop-timekeeper.ts';
 import {type AsyncDisposable} from './utils.ts';
 import {setupNotepaddStatus} from './status-bar-item/notepadd-status.ts';
+import {events} from './bus.ts';
+import {NotepaddBridgeView} from './view/notepadd-instances.ts';
+import {setupOpenNotebookCommand} from './command/open-notebook.ts';
 
 const asyncSubscriptions: AsyncDisposable[] = [];
 
 export async function activate(context: ExtensionContext) {
-	context.subscriptions.push(
-		output,
-		setupRestartTimekeeperCommand(),
-		setupStartTimekeeperCommand(),
-		setupStopTimekeeperCommand(),
-		setupNotepaddStatus(),
-		new NotePaddSerializer(),
-		new NotePaddController(),
-	);
+	try {
+		context.subscriptions.push(
+			output,
+			events,
+			setupOpenNotebookCommand(),
+			setupRestartTimekeeperCommand(),
+			setupStartTimekeeperCommand(),
+			setupStopTimekeeperCommand(),
+			setupNotepaddStatus(),
+			new NotePaddSerializer(),
+			new NotePaddController(),
+			new NotepaddBridgeView(),
+			await new Bookkeeper().initialize(),
+		);
 
-	asyncSubscriptions.push(await new Bookkeeper().initialize());
+		asyncSubscriptions.push(new Timekeeper().initialize());
+	} catch (error) {
+		output.error(
+			'[NotePADD]',
+			error instanceof Error ? error.stack : error,
+		);
+		throw error;
+	}
 }
 
 export async function deactivate() {

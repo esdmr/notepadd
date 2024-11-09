@@ -99,7 +99,7 @@ end
 [->> ext ++ : Restart
 ext -> book --++ : Restart
 opt bridge is connected
-	book ->> br : Stale
+	book ->> br : Stall
 end
 book ->> time : Terminate
 deactivate time

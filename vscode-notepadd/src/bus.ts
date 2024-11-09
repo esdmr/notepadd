@@ -1,6 +1,7 @@
 /* eslint-disable unicorn/prefer-event-target */
-import {EventEmitter} from 'vscode';
-import {AsyncEventEmitter} from './utils.ts';
+import {Disposable, EventEmitter} from 'vscode';
+import type {Instance} from 'notepadd-core';
+import {AsyncEventEmitter, VirtualSocket} from './utils.ts';
 
 export type NotepaddStatus = {
 	readonly bookkeeperHealth?: 'active' | 'starting' | 'error' | 'unknown';
@@ -21,3 +22,21 @@ export const onBookkeeperCached = new EventEmitter<
 >();
 export const onBookkeeperUpdated = new EventEmitter<[string, string]>();
 export const onTimekeeperStarted = new EventEmitter<void>();
+export const onTimekeeperUpdated = new EventEmitter<Instance[]>();
+export const onTimekeeperTriggered = new EventEmitter<Instance>();
+export const onTimekeeperStalled = new EventEmitter<void>();
+
+export const events = Disposable.from(
+	onTimekeeperRestartRequested,
+	onTimekeeperStartRequested,
+	onTimekeeperStopRequested,
+	onStatusUpdated,
+	onBookkeeperCached,
+	onBookkeeperUpdated,
+	onTimekeeperStarted,
+	onTimekeeperUpdated,
+	onTimekeeperTriggered,
+	onTimekeeperStalled,
+);
+
+export const bridgeSocket = new VirtualSocket();
