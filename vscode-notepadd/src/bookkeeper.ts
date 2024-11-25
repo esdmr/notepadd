@@ -33,7 +33,9 @@ export class Bookkeeper implements Disposable {
 
 	async initialize() {
 		if (this._initializing && this._watcher) {
-			throw new Error('Tried to initialize bookkeeper multiple times');
+			throw new Error(
+				'Bug: Tried to initialize bookkeeper multiple times',
+			);
 		}
 
 		try {

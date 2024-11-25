@@ -1,9 +1,9 @@
-import {Temporal} from 'temporal-polyfill';
-import {hasProperty, hasTypeBrand, includes, isObject} from '../../../utils.ts';
+import {type Temporal} from 'temporal-polyfill';
+import {hasProperty, hasTypeBrand, isObject} from '../../../utils.ts';
 import {OneShotAlarm, RecurringAlarm} from './alarm/types.ts';
+import {type DirectiveChild, type Instance} from './base.ts';
 import {OneShotEvent, RecurringEvent} from './event/types.ts';
 import {Timer} from './timer/types.ts';
-import {Instance, validInstanceStates, type DirectiveChild} from './base.ts';
 
 export * from './base.ts';
 
@@ -84,11 +84,7 @@ export class Directive {
 				}
 			}
 
-			return new Directive(
-				directive,
-				comment.map(String),
-				hasProperty(json, 'fileUrl') ? String(json.fileUrl) : undefined,
-			);
+			return new Directive(directive, comment.map(String));
 		} catch (error) {
 			throw new Error(
 				`Cannot deserialize a directive from JSON: ${JSON.stringify(json, undefined, 2)}`,
@@ -101,16 +97,11 @@ export class Directive {
 
 	constructor(
 		readonly directive: DirectiveChild,
-		readonly comment: string[] = [],
-		readonly fileUrl?: string,
+		readonly comment: readonly string[] = [],
 	) {}
 
-	withFileUrl(fileUrl?: string) {
-		return new Directive(this.directive, this.comment, fileUrl);
-	}
-
 	getInstance(now: Temporal.ZonedDateTime) {
-		return this.directive.getInstance(now, this);
+		return this.directive.getInstance(now);
 	}
 
 	getNextInstance(instance: Instance) {
@@ -123,63 +114,6 @@ export class Directive {
 
 	toString() {
 		return `${this.directive.toString()}\n${this.comment.join('\n')}`;
-	}
-}
-
-export function instanceFrom(json: unknown) {
-	// Since an `Instance` contains a `Directive` and some methods of
-	// `DirectiveChild` take/return an `Instance`, a `from` static method in
-	// `Instance` cannot directly reference `Directive` without causing a
-	// circular import. However, without a reference to `Directive`, an
-	// `Instance` cannot be constructed. Therefore, to avoid circular imports,
-	// this function cannot be a static method.
-
-	try {
-		if (!isObject(json)) {
-			throw new TypeError('Instance is not an object');
-		}
-
-		if (!hasTypeBrand(json, 'Instance' satisfies Instance['_type'])) {
-			throw new TypeError('Object is not an instance');
-		}
-
-		if (!hasProperty(json, 'directive')) {
-			throw new TypeError('Invalid directive');
-		}
-
-		if (
-			hasProperty(json, 'previous') &&
-			typeof json.previous !== 'string'
-		) {
-			throw new TypeError('Invalid previous instance');
-		}
-
-		if (hasProperty(json, 'next') && typeof json.next !== 'string') {
-			throw new TypeError('Invalid next instance');
-		}
-
-		if (
-			!hasProperty(json, 'currentState') ||
-			!includes(validInstanceStates, json.currentState)
-		) {
-			throw new TypeError('Instance current state is invalid');
-		}
-
-		return new Instance(
-			Directive.from(json.directive),
-			hasProperty(json, 'previous')
-				? Temporal.ZonedDateTime.from(json.previous as string)
-				: undefined,
-			hasProperty(json, 'next')
-				? Temporal.ZonedDateTime.from(json.next as string)
-				: undefined,
-			json.currentState,
-		);
-	} catch (error) {
-		throw new Error(
-			`Cannot deserialize a trigger message from JSON: ${JSON.stringify(json, undefined, 2)}`,
-			{cause: error},
-		);
 	}
 }
 

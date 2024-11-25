@@ -9,7 +9,7 @@ import {
 import {ListMessage} from './messages/list.ts';
 import {TerminateMessage} from './messages/terminate.ts';
 import {output} from './output.ts';
-import {getInstances, processUpdate, resetTimeouts} from './update.ts';
+import {getDirectiveStates, processUpdate, resetTimeouts} from './update.ts';
 
 if (!process.send) {
 	// Do not use `output` here. It requires an IPC channel to pass messages,
@@ -35,14 +35,14 @@ process.on('message', async (value) => {
 
 		if (message.fetchRequested) {
 			process.send!(
-				new TimekeeperMessage(new ListMessage(getInstances())),
+				new TimekeeperMessage(new ListMessage(getDirectiveStates())),
 			);
 		}
 	} else if (message instanceof TerminateMessage) {
 		process.exit(0);
 	} else {
 		throw new TypeError(
-			`Unknown bookkeeper message: ${JSON.stringify(message, undefined, 2)}`,
+			`Bug: Unknown bookkeeper message: ${JSON.stringify(message, undefined, 2)}`,
 		);
 	}
 });

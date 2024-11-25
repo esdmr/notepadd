@@ -1,106 +1,109 @@
 import {
+	deserializeDirective,
 	deserializeNotePadd,
 	directiveMimeType,
-	deserializeDirective,
 	type Directive,
 } from 'notepadd-core';
-import {uint8ArrayToString} from 'uint8array-extras';
 import {Temporal} from 'temporal-polyfill';
-import {output} from './output.ts';
-import {DirectiveContext, FileContext, UpdateDelta} from './types.ts';
+import {uint8ArrayToString} from 'uint8array-extras';
 import type {UpdateMessage} from './messages/update.ts';
+import {output} from './output.ts';
+import {onTimeout} from './timeout.ts';
+import {
+	DirectiveState,
+	FileState,
+	UpdateDelta,
+} from './types.ts';
 
-const files = new Map<string, FileContext>();
-const directives = new Map<string, DirectiveContext>();
+const files = new Map<string, FileState>();
+const directives = new Map<string, DirectiveState>();
 
 function updateFile(fileUrl: string, content: string): UpdateDelta {
-	const context = files.get(fileUrl);
+	const state = files.get(fileUrl);
 
 	if (!content) {
 		files.delete(fileUrl);
-		const deleted = context?.hashes ?? new Map();
-		return new UpdateDelta(deleted);
+		const deleted = state?.hashes ?? new Map();
+		return new UpdateDelta(fileUrl, deleted);
 	}
 
-	const sources = new Map(
-		deserializeNotePadd(content)
-			.cells.flatMap((i, cellIndex) =>
-				i.outputs?.map((i) => {
-					try {
-						const output = i.items[directiveMimeType];
-						if (!output) return;
+	const sources = new Map<string, Directive>();
+	const hashes = new Map<string, Directive>();
 
-						const text = uint8ArrayToString(output);
-						const cellUrl = new URL(fileUrl);
-						cellUrl.hash = `C${cellIndex}`;
+	for (const [cellIndex, cell] of deserializeNotePadd(
+		content,
+	).cells.entries()) {
+		const cellUrl = new URL(fileUrl);
+		cellUrl.hash = `C${cellIndex}`;
 
-						return [
-							text,
-							context?.sources.get(text) ??
-								deserializeDirective(text, cellUrl.href),
-						] as const;
-					} catch (error) {
-						output.error(error);
-						return undefined;
-					}
-				}),
-			)
-			.filter((i) => i !== undefined),
-	);
+		for (const out of cell.outputs ?? []) {
+			try {
+				const content = out.items[directiveMimeType];
+				if (!content) continue;
 
-	const hashes = new Map([...sources.values()].map((i) => [i.toString(), i]));
+				const text = uint8ArrayToString(content);
 
-	const newContext = new FileContext(sources, hashes);
-	files.set(fileUrl, newContext);
+				const directive =
+					sources.get(text) ??
+					state?.sources.get(text) ??
+					deserializeDirective(text);
 
-	if (!context) {
-		return new UpdateDelta(undefined, hashes);
+				sources.set(text, directive);
+				hashes.set(directive.toString(), directive);
+			} catch (error) {
+				output.error(error);
+			}
+		}
+	}
+
+	const newState = new FileState(sources, hashes);
+	files.set(fileUrl, newState);
+
+	if (!state) {
+		return new UpdateDelta(fileUrl, undefined, hashes);
 	}
 
 	const added = new Map<string, Directive>();
 	const deleted = new Map<string, Directive>();
 
-	for (const [hash, directive] of context.hashes) {
+	for (const [hash, directive] of state.hashes) {
 		if (!hashes.has(hash)) {
 			deleted.set(hash, directive);
 		}
 	}
 
 	for (const [hash, directive] of hashes) {
-		if (!context.hashes.has(hash)) {
+		if (!state.hashes.has(hash)) {
 			added.set(hash, directive);
 		}
 	}
 
-	return new UpdateDelta(deleted, added);
+	return new UpdateDelta(fileUrl, deleted, added);
 }
 
 function applyUpdateDelta(delta: UpdateDelta, now: Temporal.ZonedDateTime) {
 	for (const [hash] of delta.deleted) {
-		const context = directives.get(hash);
-		if (!context) continue;
+		const state = directives.get(hash);
+		if (!state) continue;
 
-		context.referenceCount--;
-		if (context.referenceCount > 0) continue;
+		state.sources.delete(delta.fileUrl);
+		if (state.sources.size > 0) continue;
 
-		if (context.lastTimeout) {
-			clearTimeout(context.lastTimeout);
-		}
-
+		state.clearTimeout();
 		directives.delete(hash);
 	}
 
-	for (const [hash, directive] of delta.added) {
-		const oldContext = directives.get(hash);
+	for (const [hash, added] of delta.added) {
+		const oldState = directives.get(hash);
 
-		if (oldContext) {
-			oldContext.referenceCount++;
+		if (oldState) {
+			oldState.sources.add(delta.fileUrl);
 			continue;
 		}
 
-		const context = new DirectiveContext(directive, now);
-		directives.set(hash, context);
-		context.onTimeout();
+		const state = new DirectiveState(added, added.getInstance(now), new Set([delta.fileUrl]));
+		directives.set(hash, state);
+		onTimeout(state);
 	}
 }
 
@@ -131,12 +134,12 @@ export function processUpdate(message: UpdateMessage) {
 }
 
 export function resetTimeouts() {
-	for (const [_hash, directive] of directives) {
-		if (directive.lastTimeout) clearTimeout(directive.lastTimeout);
-		directive.onTimeout();
+	for (const [_hash, state] of directives) {
+		state.clearTimeout();
+		onTimeout(state);
 	}
 }
 
-export function getInstances() {
-	return Array.from(directives.values(), (i) => i.instance);
+export function getDirectiveStates() {
+	return [...directives.values()];
 }

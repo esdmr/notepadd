@@ -5,10 +5,9 @@ import {
 	isObject,
 	minDuration,
 } from '../../../utils.ts';
-import {Period} from '../period/types.ts';
-import {RecurringInstant} from '../instant-recurring/types.ts';
 import {Instance} from '../directive/base.ts';
-import type {Directive} from '../types.ts';
+import {RecurringInstant} from '../instant-recurring/types.ts';
+import {Period} from '../period/types.ts';
 
 export class RecurringPeriod {
 	static from(json: unknown) {
@@ -93,11 +92,11 @@ export class RecurringPeriod {
 		return `R/${this.first.toString()}/${this.interval.toString()}/${this.end?.toString()}`;
 	}
 
-	getInstance(now: Temporal.ZonedDateTime, directive: Directive) {
-		const instance = this._recurringInstant.getInstance(now, directive);
+	getInstance(now: Temporal.ZonedDateTime) {
+		const instance = this._recurringInstant.getInstance(now);
 
 		if (!instance.previous) {
-			return new Instance(directive, undefined, instance.next, 'low');
+			return new Instance(undefined, instance.next, 'low');
 		}
 
 		const previous = new Period(
@@ -113,33 +112,17 @@ export class RecurringPeriod {
 			}
 
 			case 0: {
-				return new Instance(
-					directive,
-					previous.start,
-					previous.getEnd(),
-					'high',
-				);
+				return new Instance(previous.start, previous.getEnd(), 'high');
 			}
 
 			case 1: {
-				return new Instance(
-					directive,
-					previous.getEnd(),
-					instance.next,
-					'low',
-				);
+				return new Instance(previous.getEnd(), instance.next, 'low');
 			}
 		}
 	}
 
 	getNextInstance(instance: Instance) {
-		if (!instance.next)
-			return new Instance(
-				instance.directive,
-				undefined,
-				undefined,
-				'low',
-			);
+		if (!instance.next) return new Instance(undefined, undefined, 'low');
 
 		if (instance.currentState === 'low') {
 			const nextStart = instance.next;
@@ -148,16 +131,16 @@ export class RecurringPeriod {
 				minDuration(this._periodDuration, this.interval, nextStart),
 			).getEnd();
 
-			return new Instance(instance.directive, nextStart, nextEnd, 'high');
+			return new Instance(nextStart, nextEnd, 'high');
 		}
 
 		const previousStart = instance.previous;
 		const previousEnd = instance.next;
 
 		const nextStart = this._recurringInstant.getNextInstance(
-			new Instance(instance.directive, undefined, previousStart),
+			new Instance(undefined, previousStart),
 		).next;
 
-		return new Instance(instance.directive, previousEnd, nextStart, 'low');
+		return new Instance(previousEnd, nextStart, 'low');
 	}
 }

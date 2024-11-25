@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/prefer-event-target */
+import type {DirectiveState} from 'notepadd-timekeeper';
 import {Disposable, EventEmitter} from 'vscode';
-import type {Instance} from 'notepadd-core';
 import {AsyncEventEmitter, VirtualSocket} from './utils.ts';
 
 export type NotepaddStatus = {
@@ -22,8 +22,8 @@ export const onBookkeeperCached = new EventEmitter<
 >();
 export const onBookkeeperUpdated = new EventEmitter<[string, string]>();
 export const onTimekeeperStarted = new EventEmitter<void>();
-export const onTimekeeperUpdated = new EventEmitter<Instance[]>();
-export const onTimekeeperTriggered = new EventEmitter<Instance>();
+export const onTimekeeperUpdated = new EventEmitter<DirectiveState[]>();
+export const onTimekeeperTriggered = new EventEmitter<DirectiveState>();
 export const onTimekeeperStalled = new EventEmitter<void>();
 
 export const events = Disposable.from(

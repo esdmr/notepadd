@@ -1,12 +1,10 @@
 import {inspect} from 'node:util';
-import {type Directive, type Instance} from 'notepadd-core';
+import {type Directive} from 'notepadd-core';
+import {DirectiveState} from 'notepadd-timekeeper';
 import {
-	commands,
 	type Disposable,
 	EventEmitter,
 	type ProviderResult,
-	ThemeColor,
-	ThemeIcon,
 	type TreeDataProvider,
 	TreeItem,
 	window,
@@ -19,52 +17,55 @@ import {
 } from '../bus.ts';
 import {output} from '../output.ts';
 
-class BridgeInstance extends TreeItem {
-	static of(instance: Instance) {
-		return new BridgeInstance(instance.directive, instance);
+class BridgeDirective extends TreeItem {
+	readonly directive: Directive;
+
+	constructor(data: {directive: Directive} | DirectiveState) {
+		// FIXME: Add proper instance and directive toLabel method
+		super(data.directive.getLabel() ?? '[Untitled]');
+
+		this.directive = data.directive;
+		this.id = data.directive.toString();
+
+		if (data instanceof DirectiveState) {
+			this.setState(data);
+		}
 	}
 
-	constructor(
-		readonly directive: Directive,
-		instance?: Instance,
-	) {
-		// FIXME: Add proper instance and directive toLabel method
-		super(directive.getLabel() ?? '[Untitled]');
+	setState(state: DirectiveState) {
+		if (state.directive.toString() !== this.id) {
+			throw new Error(
+				'Bug: Directive state does not belong to this bridge item',
+			);
+		}
 
-		this.id = directive.toString();
+		// TODO: Show a pop-up to select the source.
+		const [source] = state.sources;
 
-		if (directive.fileUrl) {
+		if (source === undefined) {
+			this.command = undefined;
+		} else {
 			// TODO: Add configuration to switch this to `vscode.open`. Make
 			// sure to delete the URI fragments when that happens.
 			this.command = {
 				title: 'Open',
 				command: 'notepadd.openNotebook',
-				arguments: [directive.fileUrl],
+				arguments: [source],
 			};
-		}
-
-		if (instance) {
-			this.setInstance(instance);
-		}
-	}
-
-	setInstance(instance: Instance) {
-		if (instance.directive.toString() !== this.id) {
-			throw new Error('Instance does not belong to this directive');
 		}
 
 		// TODO: Make locale configurable
 		this.description =
-			instance.next?.toLocaleString('en-GB', {
-				calendar: instance.next.calendarId,
+			state.instance.next?.toLocaleString('en-GB', {
+				calendar: state.instance.next.calendarId,
 			}) ??
-			instance.previous?.toLocaleString('en-GB', {
-				calendar: instance.previous.calendarId,
+			state.instance.previous?.toLocaleString('en-GB', {
+				calendar: state.instance.previous.calendarId,
 			});
 	}
 }
 
-type BridgeTreeItem = BridgeInstance;
+type BridgeTreeItem = BridgeDirective;
 
 export class NotepaddBridgeView
 	implements TreeDataProvider<BridgeTreeItem>, Disposable
@@ -72,14 +73,14 @@ export class NotepaddBridgeView
 	private readonly _treeView;
 
 	private readonly _handlers = [
-		onTimekeeperUpdated.event((instances) => {
+		onTimekeeperUpdated.event((states) => {
 			if (!this._connection) return;
 			this._items.clear();
 
-			for (const instance of instances) {
+			for (const state of states) {
 				this._items.set(
-					instance.directive.toString(),
-					BridgeInstance.of(instance),
+					state.directive.toString(),
+					new BridgeDirective(state),
 				);
 			}
 
@@ -88,10 +89,10 @@ export class NotepaddBridgeView
 			this._didChangeTreeData.fire();
 			output.trace('[NotePADD/Bridge]', 'Updated all.');
 		}),
-		onTimekeeperTriggered.event((instance) => {
+		onTimekeeperTriggered.event((state) => {
 			if (!this._connection) return;
 
-			const hash = instance.directive.toString();
+			const hash = state.directive.toString();
 			const treeItem = this._items.get(hash);
 
 			if (!treeItem) {
@@ -108,7 +109,7 @@ export class NotepaddBridgeView
 				return;
 			}
 
-			treeItem.setInstance(instance);
+			treeItem.setState(state);
 			this._setStatus();
 			this._didChangeTreeData.fire(treeItem);
 			output.trace('[NotePADD/Bridge]', 'Updated one.');

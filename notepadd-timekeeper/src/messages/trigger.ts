@@ -1,10 +1,5 @@
-import {
-	hasProperty,
-	hasTypeBrand,
-	type Instance,
-	instanceFrom,
-	isObject,
-} from 'notepadd-core';
+import {hasProperty, hasTypeBrand, isObject} from 'notepadd-core';
+import {DirectiveState} from '../types.ts';
 
 export class TriggerMessage {
 	static from(json: unknown) {
@@ -22,11 +17,11 @@ export class TriggerMessage {
 				throw new TypeError('Object is not a trigger message');
 			}
 
-			if (!hasProperty(json, 'instance')) {
+			if (!hasProperty(json, 'state')) {
 				throw new TypeError('Instance is invalid');
 			}
 
-			return new TriggerMessage(instanceFrom(json.instance));
+			return new TriggerMessage(DirectiveState.from(json.state));
 		} catch (error) {
 			throw new Error(
 				`Cannot deserialize a trigger message from JSON: ${JSON.stringify(json, undefined, 2)}`,
@@ -37,5 +32,5 @@ export class TriggerMessage {
 
 	readonly _type = 'TriggerMessage';
 
-	constructor(readonly instance: Instance) {}
+	constructor(readonly state: DirectiveState) {}
 }

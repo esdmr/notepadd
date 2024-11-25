@@ -38,8 +38,8 @@ export class OneShotEvent implements DirectiveChild {
 
 	constructor(readonly when: Period) {}
 
-	getInstance(now: Temporal.ZonedDateTime, directive: Directive) {
-		return this.when.getInstance(now, directive);
+	getInstance(now: Temporal.ZonedDateTime) {
+		return this.when.getInstance(now);
 	}
 
 	getNextInstance(instance: Instance) {
@@ -84,8 +84,8 @@ export class RecurringEvent implements DirectiveChild {
 
 	constructor(readonly when: RecurringPeriod) {}
 
-	getInstance(now: Temporal.ZonedDateTime, directive: Directive) {
-		return this.when.getInstance(now, directive);
+	getInstance(now: Temporal.ZonedDateTime) {
+		return this.when.getInstance(now);
 	}
 
 	getNextInstance(instance: Instance) {

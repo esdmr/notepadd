@@ -1,10 +1,5 @@
-import {
-	hasProperty,
-	hasTypeBrand,
-	type Instance,
-	instanceFrom,
-	isObject,
-} from 'notepadd-core';
+import {hasProperty, hasTypeBrand, isObject} from 'notepadd-core';
+import {DirectiveState} from '../types.ts';
 
 export class ListMessage {
 	static from(json: unknown) {
@@ -22,14 +17,13 @@ export class ListMessage {
 				throw new TypeError('Object is not a list message');
 			}
 
-			if (
-				!hasProperty(json, 'instances') ||
-				!Array.isArray(json.instances)
-			) {
+			if (!hasProperty(json, 'states') || !Array.isArray(json.states)) {
 				throw new TypeError('Instances are invalid');
 			}
 
-			return new ListMessage(json.instances.map((i) => instanceFrom(i)));
+			return new ListMessage(
+				json.states.map((i) => DirectiveState.from(i)),
+			);
 		} catch (error) {
 			throw new Error(
 				`Cannot deserialize a list message from JSON: ${JSON.stringify(json, undefined, 2)}`,
@@ -40,5 +34,5 @@ export class ListMessage {
 
 	readonly _type = 'ListMessage';
 
-	constructor(readonly instances: Instance[]) {}
+	constructor(readonly states: DirectiveState[]) {}
 }

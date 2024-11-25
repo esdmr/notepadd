@@ -112,9 +112,9 @@ export class Timekeeper implements AsyncDisposable {
 				output.debug(
 					'[NotePADD/Timekeeper]',
 					'Directive triggered.',
-					message.instance,
+					message.state,
 				);
-				onTimekeeperTriggered.fire(message.instance);
+				onTimekeeperTriggered.fire(message.state);
 			} else if (message instanceof LogMessage) {
 				output[message.level](
 					'[NotePADD/Timekeeper/ipc]',
@@ -128,12 +128,12 @@ export class Timekeeper implements AsyncDisposable {
 				output.trace(
 					'[NotePADD/Timekeeper]',
 					'Instances:',
-					message.instances,
+					message.states,
 				);
-				onTimekeeperUpdated.fire(message.instances);
+				onTimekeeperUpdated.fire(message.states);
 			} else {
 				throw new TypeError(
-					`Unknown timekeeper message: ${JSON.stringify(message, undefined, 2)}`,
+					`Bug: Unknown timekeeper message: ${JSON.stringify(message, undefined, 2)}`,
 				);
 			}
 		});

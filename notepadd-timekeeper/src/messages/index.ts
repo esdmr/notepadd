@@ -65,7 +65,7 @@ export class TimekeeperMessage {
 
 				default: {
 					throw new TypeError(
-						`Unknown Timekeeper message: ${JSON.stringify(json.message, undefined, 2)}`,
+						`Bug: Unknown Timekeeper message: ${JSON.stringify(json.message, undefined, 2)}`,
 					);
 				}
 			}
@@ -73,7 +73,7 @@ export class TimekeeperMessage {
 			return new TimekeeperMessage(message);
 		} catch (error) {
 			throw new Error(
-				`Cannot deserialize a Timekeeper message from JSON: ${JSON.stringify(json, undefined, 2)}`,
+				`Bug: Cannot deserialize a Timekeeper message from JSON: ${JSON.stringify(json, undefined, 2)}`,
 				{cause: error},
 			);
 		}
@@ -133,7 +133,7 @@ export class BookkeeperMessage {
 			return new BookkeeperMessage(message);
 		} catch (error) {
 			throw new Error(
-				`Cannot deserialize a Bookkeeper message from JSON: ${JSON.stringify(json, undefined, 2)}`,
+				`Bug: Cannot deserialize a Bookkeeper message from JSON: ${JSON.stringify(json, undefined, 2)}`,
 				{cause: error},
 			);
 		}

@@ -3,45 +3,45 @@ import {Temporal} from 'temporal-polyfill';
 import {TimekeeperMessage} from './messages/index.ts';
 import {TriggerMessage} from './messages/trigger.ts';
 import {output} from './output.ts';
-import type {DirectiveContext} from './types.ts';
+import type {DirectiveState} from './types.ts';
 
 const maxTimeoutDelay = 0x7f_ff_ff_ff;
 
-export function onTimeout(this: DirectiveContext) {
-	this.lastTimeout = undefined;
-	if (!this.instance.next) return;
+export function onTimeout(state: DirectiveState) {
+	state.forgetTimeout();
+	if (!state.instance.next) return;
 
 	const now = Temporal.Now.zonedDateTimeISO();
 
-	if (Temporal.ZonedDateTime.compare(this.instance.next, now) <= 0) {
-		this.instance = this.instance.directive.getNextInstance(this.instance);
+	if (Temporal.ZonedDateTime.compare(state.instance.next, now) <= 0) {
+		state.instance = state.directive.getNextInstance(state.instance);
 
 		if (
-			this.instance.next &&
-			Temporal.ZonedDateTime.compare(this.instance.next, now) <= 0
+			state.instance.next &&
+			Temporal.ZonedDateTime.compare(state.instance.next, now) <= 0
 		) {
 			output.warn(
-				`Next instance is already in the past (${this.instance.next.toString()} ≤ ${now.toString()}). Recalculating instances. Some instances might be skipped by this. (${this.instance.directive.toString()})`,
+				`Next instance is already in the past (${state.instance.next.toString()} ≤ ${now.toString()}). Recalculating instances. Some instances might be skipped by this. (${state.directive.toString()})`,
 			);
 
-			this.instance = this.instance.directive.getInstance(now);
+			state.instance = state.directive.getInstance(now);
 		}
 
-		process.send!(new TimekeeperMessage(new TriggerMessage(this.instance)));
+		process.send!(new TimekeeperMessage(new TriggerMessage(state)));
 	}
 
-	if (this.instance.next) {
+	if (state.instance.next) {
 		// Recalculating `now.epochMilliseconds` here reduces the delay between
 		// retrieving the current time and actually setting the timeout.
 		//
 		// FIXME: See if the delay is negligible.
-		this.lastTimeout = setTimeout(
-			this.onTimeout,
+		state.setTimeout(
 			Math.min(
-				this.instance.next.epochMilliseconds -
+				state.instance.next.epochMilliseconds -
 					Temporal.Now.instant().epochMilliseconds,
 				maxTimeoutDelay,
 			),
+			onTimeout,
 		);
 	}
 }

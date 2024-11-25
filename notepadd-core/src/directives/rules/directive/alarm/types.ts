@@ -37,14 +37,14 @@ export class OneShotAlarm implements DirectiveChild {
 
 	constructor(readonly when: Temporal.ZonedDateTime) {}
 
-	getInstance(now: Temporal.ZonedDateTime, directive: Directive) {
+	getInstance(now: Temporal.ZonedDateTime) {
 		return Temporal.ZonedDateTime.compare(now, this.when) < 0
-			? new Instance(directive, undefined, this.when)
-			: new Instance(directive, this.when, undefined);
+			? new Instance(undefined, this.when)
+			: new Instance(this.when, undefined);
 	}
 
 	getNextInstance(instance: Instance) {
-		return new Instance(instance.directive, this.when, undefined);
+		return new Instance(this.when, undefined);
 	}
 
 	toString() {
@@ -85,8 +85,8 @@ export class RecurringAlarm implements DirectiveChild {
 
 	constructor(readonly when: RecurringInstant) {}
 
-	getInstance(now: Temporal.ZonedDateTime, directive: Directive) {
-		return this.when.getInstance(now, directive);
+	getInstance(now: Temporal.ZonedDateTime) {
+		return this.when.getInstance(now);
 	}
 
 	getNextInstance(instance: Instance) {
