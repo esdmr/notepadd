@@ -19,7 +19,7 @@
 		"temporal-polyfill": "0.2.5",
 		"uint8array-extras": "1.4.0",
 		"whatwg-mimetype": "4.0.0",
-		"yaml": "2.5.0"
+		"yaml": "2.6.0"
 	},
 	"devDependencies": {
 		"@esdmr/nearley": "3.0.3",
