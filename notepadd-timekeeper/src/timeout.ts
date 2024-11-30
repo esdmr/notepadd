@@ -8,7 +8,7 @@ import type {DirectiveState} from './types.ts';
 const maxTimeoutDelay = 0x7f_ff_ff_ff;
 
 export function onTimeout(state: DirectiveState) {
-	state.forgetTimeout();
+	state.clearTimeout();
 	if (!state.instance.next) return;
 
 	const now = Temporal.Now.zonedDateTimeISO();

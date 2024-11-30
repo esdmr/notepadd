@@ -73,14 +73,10 @@ export class DirectiveState {
 		this._lastTimeout = setTimeout(callback, ms, this);
 	}
 
-	forgetTimeout() {
-		this._lastTimeout = undefined;
-	}
-
 	clearTimeout() {
 		if (this._lastTimeout === undefined) return;
 		clearTimeout(this._lastTimeout);
-		this.forgetTimeout();
+		this._lastTimeout = undefined;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention

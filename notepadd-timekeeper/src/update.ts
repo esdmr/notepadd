@@ -135,7 +135,6 @@ export function processUpdate(message: UpdateMessage) {
 
 export function resetTimeouts() {
 	for (const [_hash, state] of directives) {
-		state.clearTimeout();
 		onTimeout(state);
 	}
 }
