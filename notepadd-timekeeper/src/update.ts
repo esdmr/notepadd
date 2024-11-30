@@ -9,11 +9,7 @@ import {uint8ArrayToString} from 'uint8array-extras';
 import type {UpdateMessage} from './messages/update.ts';
 import {output} from './output.ts';
 import {onTimeout} from './timeout.ts';
-import {
-	DirectiveState,
-	FileState,
-	UpdateDelta,
-} from './types.ts';
+import {DirectiveState, FileState, UpdateDelta} from './types.ts';
 
 const files = new Map<string, FileState>();
 const directives = new Map<string, DirectiveState>();
@@ -101,7 +97,11 @@ function applyUpdateDelta(delta: UpdateDelta, now: Temporal.ZonedDateTime) {
 			continue;
 		}
 
-		const state = new DirectiveState(added, added.getInstance(now), new Set([delta.fileUrl]));
+		const state = new DirectiveState(
+			added,
+			added.getInstance(now),
+			new Set([delta.fileUrl]),
+		);
 		directives.set(hash, state);
 		onTimeout(state);
 	}
