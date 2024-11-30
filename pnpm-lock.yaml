@@ -177,8 +177,8 @@ importers:
         specifier: workspace:*
         version: link:../vite-plugin-child-process
       vite-plugin-inspect:
-        specifier: 0.8.5
-        version: 0.8.5(rollup@4.21.0)(vite@5.4.1(@types/node@20.16.1))
+        specifier: 0.8.7
+        version: 0.8.7(rollup@4.21.0)(vite@5.4.1(@types/node@20.16.1))
       vite-plugin-nearley:
         specifier: workspace:*
         version: link:../vite-plugin-nearley
@@ -1366,6 +1366,7 @@ packages:
   eslint@8.57.0:
     resolution: {integrity: sha512-dZ6+mexnaTIbSBZWgou51U6OmzIhYM2VcNdtiTtI7qPNZm35Akpr0f6vtw3w1Kmn5PYo+tZVfh13WrhpS6oLqQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
 
   esm-utils@4.3.0:
@@ -3037,8 +3038,8 @@ packages:
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
 
-  vite-plugin-inspect@0.8.5:
-    resolution: {integrity: sha512-JvTUqsP1JNDw0lMZ5Z/r5cSj81VK2B7884LO1DC3GMBhdcjcsAnJjdWq7bzQL01Xbh+v60d3lju3g+z7eAtNew==}
+  vite-plugin-inspect@0.8.7:
+    resolution: {integrity: sha512-/XXou3MVc13A5O9/2Nd6xczjrUwt7ZyI9h8pTnUMkr5SshLcb0PJUOVq2V+XVkdeU4njsqAtmK87THZuO2coGA==}
     engines: {node: '>=14'}
     peerDependencies:
       '@nuxt/kit': '*'
@@ -6558,7 +6559,7 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-inspect@0.8.5(rollup@4.21.0)(vite@5.4.1(@types/node@20.16.1)):
+  vite-plugin-inspect@0.8.7(rollup@4.21.0)(vite@5.4.1(@types/node@20.16.1)):
     dependencies:
       '@antfu/utils': 0.7.10
       '@rollup/pluginutils': 5.1.0(rollup@4.21.0)
