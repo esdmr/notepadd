@@ -4,7 +4,7 @@
 		"module": "ES2022",
 		"moduleResolution": "bundler",
 		"strict": true,
-		"emitDeclarationOnly": true,
+		"noEmit": true,
 		"noUncheckedIndexedAccess": true,
 		"allowImportingTsExtensions": true,
 		"allowArbitraryExtensions": true,
@@ -14,28 +14,18 @@
 		"noImplicitOverride": true,
 		"noEmitOnError": true,
 		"composite": true,
+		"isolatedModules": true,
+		"customConditions": ["node", "browser"],
 	},
 	"include": [
 		"*",
-	],
-	"references": [
-		{
-			"path": "./notepadd-core/tsconfig.json"
-		},
-		{
-			"path": "./notepadd-timekeeper/tsconfig.json"
-		},
-		{
-			"path": "./vite-plugin-child-process/tsconfig.json"
-		},
-		{
-			"path": "./vite-plugin-nearley/tsconfig.json"
-		},
-		{
-			"path": "./vite-plugin-vscode/tsconfig.json"
-		},
-		{
-			"path": "./vscode-notepadd/tsconfig.json"
-		},
+		"*/**/*.js",
+		"*/**/*.jsx",
+		"*/**/*.cjs",
+		"*/**/*.mjs",
+		"*/**/*.ts",
+		"*/**/*.tsx",
+		"*/**/*.cts",
+		"*/**/*.mts"
 	],
 }
