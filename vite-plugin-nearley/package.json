@@ -6,7 +6,7 @@
 	"devDependencies": {
 		"@esdmr/nearley": "3.0.3",
 		"@types/node": "20.16.1",
-		"vite": "5.4.1"
+		"vite": "5.4.11"
 	},
 	"peerDependencies": {
 		"@esdmr/nearley": "^3.0.0",
