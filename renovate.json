@@ -38,6 +38,7 @@
 		"minimumReleaseAge": "21 days"
 	},
 	"timezone": "Asia/Tehran",
+	"ignoreTests": true,
 	"packageRules": [
 		{
 			"matchDepTypes": [
