@@ -35,9 +35,10 @@
 		"automerge": true
 	},
 	"npm": {
-		"stabilityDays": 21
+		"minimumReleaseAge": "21 days"
 	},
 	"timezone": "Asia/Tehran",
+	"ignoreTests": true,
 	"packageRules": [
 		{
 			"matchDepTypes": [
@@ -68,12 +69,12 @@
 			"groupName": "testing"
 		},
 		{
-			"matchPackagePatterns": [
-				"^typescript$",
-				"^@types/"
-			],
 			"addLabels": [
 				"renovate/typescript"
+			],
+			"matchPackageNames": [
+				"/^typescript$/",
+				"/^@types//"
 			]
 		},
 		{
@@ -128,16 +129,16 @@
 			"matchManagers": [
 				"github-actions"
 			],
-			"matchPackagePatterns": [
-				"^actions/"
-			],
 			"addLabels": [
 				"renovate/actions/official"
 			],
 			"groupName": "actions",
 			"schedule": "at any time",
 			"automerge": true,
-			"stabilityDays": 3
+			"minimumReleaseAge": "3 days",
+			"matchPackageNames": [
+				"/^actions//"
+			]
 		},
 		{
 			"matchManagers": [
