@@ -10,7 +10,7 @@
 		"@types/node": "20.16.1",
 		"type-fest": "4.25.0"
 	},
-	"packageManager": "pnpm@9.7.1",
+	"packageManager": "pnpm@9.15.0",
 	"dependencies": {
 		"notepadd-core": "workspace:*",
 		"temporal-polyfill": "0.2.5",
