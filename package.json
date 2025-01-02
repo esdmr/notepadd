@@ -2,7 +2,7 @@
 	"private": true,
 	"type": "module",
 	"devDependencies": {
-		"typescript": "5.5.4",
+		"typescript": "5.7.2",
 		"vite-node": "2.0.5",
 		"webpack": "npm:ignoredep@200.9999.0",
 		"xo": "0.60.0"
