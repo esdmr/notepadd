@@ -1,42 +1,26 @@
-import {hasProperty, hasTypeBrand, includes, isObject} from 'notepadd-core';
+import {getDiscriminator, transformFallible, v} from 'notepadd-core';
 
-export const logLevels = ['trace', 'debug', 'info', 'warn', 'error'] as const;
-export type LogLevel = (typeof logLevels)[number];
+export const logLevelSchema = v.picklist([
+	'trace',
+	'debug',
+	'info',
+	'warn',
+	'error',
+]);
+
+export type LogLevel = v.InferOutput<typeof logLevelSchema>;
 
 export class LogMessage {
-	static from(json: unknown) {
-		try {
-			if (!isObject(json)) {
-				throw new TypeError('Message is not an object');
-			}
+	static readonly schema = v.pipe(
+		v.object({
+			_type: v.literal('LogMessage'),
+			level: logLevelSchema,
+			items: v.array(v.any()),
+		}),
+		transformFallible((i) => new LogMessage(i.level, i.items)),
+	);
 
-			if (
-				!hasTypeBrand(json, 'LogMessage' satisfies LogMessage['_type'])
-			) {
-				throw new TypeError('Object is not a log message');
-			}
-
-			if (
-				!hasProperty(json, 'level') ||
-				!includes(logLevels, json.level)
-			) {
-				throw new TypeError('Log level is invalid');
-			}
-
-			if (!hasProperty(json, 'items') || !Array.isArray(json.items)) {
-				throw new TypeError('Log items are invalid');
-			}
-
-			return new LogMessage(json.level, json.items);
-		} catch (error) {
-			throw new Error(
-				`Cannot deserialize a log message from JSON: ${JSON.stringify(json, undefined, 2)}`,
-				{cause: error},
-			);
-		}
-	}
-
-	readonly _type = 'LogMessage';
+	readonly _type = getDiscriminator(LogMessage);
 
 	constructor(
 		readonly level: LogLevel,

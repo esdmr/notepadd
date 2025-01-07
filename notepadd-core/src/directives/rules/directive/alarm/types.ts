@@ -1,39 +1,23 @@
 import {Temporal} from 'temporal-polyfill';
+import * as v from 'valibot';
+import {
+	getDiscriminator,
+	transformFallible,
+	zonedDateTimeSchema,
+} from '../../../../utils.ts';
 import {RecurringInstant} from '../../instant-recurring/types.ts';
 import {Instance, type DirectiveChild} from '../base.ts';
-import {hasProperty, hasTypeBrand, isObject} from '../../../../utils.ts';
-import type {Directive} from '../types.ts';
 
 export class OneShotAlarm implements DirectiveChild {
-	static from(json: unknown) {
-		try {
-			if (!isObject(json)) {
-				throw new TypeError('One-shot alarm is not an object');
-			}
+	static readonly schema = v.pipe(
+		v.object({
+			_type: v.literal('OneShotAlarm'),
+			when: zonedDateTimeSchema,
+		}),
+		transformFallible((i) => new OneShotAlarm(i.when)),
+	);
 
-			if (
-				!hasTypeBrand(
-					json,
-					'OneShotAlarm' satisfies OneShotAlarm['_type'],
-				)
-			) {
-				throw new TypeError('Object is not a one-shot alarm');
-			}
-
-			if (!hasProperty(json, 'when') || typeof json.when !== 'string') {
-				throw new TypeError('One-shot alarm is invalid');
-			}
-
-			return new OneShotAlarm(Temporal.ZonedDateTime.from(json.when));
-		} catch (error) {
-			throw new Error(
-				`Cannot deserialize a one-shot alarm from JSON: ${JSON.stringify(json, undefined, 2)}`,
-				{cause: error},
-			);
-		}
-	}
-
-	readonly _type = 'OneShotAlarm';
+	readonly _type = getDiscriminator(OneShotAlarm);
 
 	constructor(readonly when: Temporal.ZonedDateTime) {}
 
@@ -53,35 +37,15 @@ export class OneShotAlarm implements DirectiveChild {
 }
 
 export class RecurringAlarm implements DirectiveChild {
-	static from(json: unknown) {
-		try {
-			if (!isObject(json)) {
-				throw new TypeError('Recurring alarm is not an object');
-			}
+	static readonly schema = v.pipe(
+		v.object({
+			_type: v.literal('RecurringAlarm'),
+			when: RecurringInstant.schema,
+		}),
+		transformFallible((i) => new RecurringAlarm(i.when)),
+	);
 
-			if (
-				!hasTypeBrand(
-					json,
-					'RecurringAlarm' satisfies RecurringAlarm['_type'],
-				)
-			) {
-				throw new TypeError('Object is not a recurring alarm');
-			}
-
-			if (!hasProperty(json, 'when')) {
-				throw new TypeError('Recurring alarm is invalid');
-			}
-
-			return new RecurringAlarm(RecurringInstant.from(json.when));
-		} catch (error) {
-			throw new Error(
-				`Cannot deserialize a recurring alarm from JSON: ${JSON.stringify(json, undefined, 2)}`,
-				{cause: error},
-			);
-		}
-	}
-
-	readonly _type = 'RecurringAlarm';
+	readonly _type = getDiscriminator(RecurringAlarm);
 
 	constructor(readonly when: RecurringInstant) {}
 

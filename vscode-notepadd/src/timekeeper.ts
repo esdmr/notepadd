@@ -8,6 +8,7 @@ import {
 	UpdateMessage,
 } from 'notepadd-timekeeper';
 import timekeeperPath from 'notepadd-timekeeper/service?child-process';
+import {v} from 'notepadd-core';
 import {ListMessage} from '../../notepadd-timekeeper/src/messages/list.ts';
 import {LogMessage} from '../../notepadd-timekeeper/src/messages/log.ts';
 import {TerminateMessage} from '../../notepadd-timekeeper/src/messages/terminate.ts';
@@ -103,7 +104,7 @@ export class Timekeeper implements AsyncDisposable {
 				this._updateStatus();
 			}
 
-			const {message} = TimekeeperMessage.from(value);
+			const {message} = v.parse(TimekeeperMessage.schema, value);
 
 			if (message instanceof DiscoveryMessage) {
 				output.debug('[NotePADD/Timekeeper]', 'Discovery requested.');

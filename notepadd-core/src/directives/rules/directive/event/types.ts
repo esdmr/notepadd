@@ -1,40 +1,20 @@
 import {type Temporal} from 'temporal-polyfill';
+import * as v from 'valibot';
+import {getDiscriminator, transformFallible} from '../../../../utils.ts';
 import {RecurringPeriod} from '../../period-recurring/types.ts';
 import {Period} from '../../period/types.ts';
-import {type Instance, type DirectiveChild} from '../base.ts';
-import {hasProperty, hasTypeBrand, isObject} from '../../../../utils.ts';
-import type {Directive} from '../types.ts';
+import {type DirectiveChild, type Instance} from '../base.ts';
 
 export class OneShotEvent implements DirectiveChild {
-	static from(json: unknown) {
-		try {
-			if (!isObject(json)) {
-				throw new TypeError('One-shot event is not an object');
-			}
+	static readonly schema = v.pipe(
+		v.object({
+			_type: v.literal('OneShotEvent'),
+			when: Period.schema,
+		}),
+		transformFallible((i) => new OneShotEvent(i.when)),
+	);
 
-			if (
-				!hasTypeBrand(
-					json,
-					'OneShotEvent' satisfies OneShotEvent['_type'],
-				)
-			) {
-				throw new TypeError('Object is not a one-shot event');
-			}
-
-			if (!hasProperty(json, 'when')) {
-				throw new TypeError('One-shot event is invalid');
-			}
-
-			return new OneShotEvent(Period.from(json.when));
-		} catch (error) {
-			throw new Error(
-				`Cannot deserialize a one-shot event from JSON: ${JSON.stringify(json, undefined, 2)}`,
-				{cause: error},
-			);
-		}
-	}
-
-	readonly _type = 'OneShotEvent';
+	readonly _type = getDiscriminator(OneShotEvent);
 
 	constructor(readonly when: Period) {}
 
@@ -52,35 +32,15 @@ export class OneShotEvent implements DirectiveChild {
 }
 
 export class RecurringEvent implements DirectiveChild {
-	static from(json: unknown) {
-		try {
-			if (!isObject(json)) {
-				throw new TypeError('Recurring event is not an object');
-			}
+	static readonly schema = v.pipe(
+		v.object({
+			_type: v.literal('RecurringEvent'),
+			when: RecurringPeriod.schema,
+		}),
+		transformFallible((i) => new RecurringEvent(i.when)),
+	);
 
-			if (
-				!hasTypeBrand(
-					json,
-					'RecurringEvent' satisfies RecurringEvent['_type'],
-				)
-			) {
-				throw new TypeError('Object is not a recurring event');
-			}
-
-			if (!hasProperty(json, 'when')) {
-				throw new TypeError('Recurring event is invalid');
-			}
-
-			return new RecurringEvent(RecurringPeriod.from(json.when));
-		} catch (error) {
-			throw new Error(
-				`Cannot deserialize a recurring event from JSON: ${JSON.stringify(json, undefined, 2)}`,
-				{cause: error},
-			);
-		}
-	}
-
-	readonly _type = 'RecurringEvent';
+	readonly _type = getDiscriminator(RecurringEvent);
 
 	constructor(readonly when: RecurringPeriod) {}
 

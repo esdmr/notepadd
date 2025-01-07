@@ -1,5 +1,6 @@
 import {Parser} from '@esdmr/nearley';
 import type {Temporal} from 'temporal-polyfill';
+import * as v from 'valibot';
 import grammar from './grammar.ne';
 import type {DirectiveNode} from './rules/directive/ast.ts';
 import {Directive} from './rules/types.ts';
@@ -29,7 +30,7 @@ export function parseDirective(text: string, now?: Temporal.ZonedDateTime) {
 }
 
 export function deserializeDirective(text: string) {
-	return Directive.from(JSON.parse(text));
+	return v.parse(Directive.schema, JSON.parse(text));
 }
 
 export * from './rules/types.ts';

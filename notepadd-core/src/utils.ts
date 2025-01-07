@@ -1,27 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import {Temporal} from 'temporal-polyfill';
 import {indexOf} from 'uint8array-extras';
+import * as v from 'valibot';
 
 export function isNullish(value: unknown): value is null | undefined {
 	return value === null || value === undefined;
-}
-
-export function isObject(value: unknown): value is object {
-	return typeof value === 'object' && value !== null;
-}
-
-export function hasProperty<T extends object, K extends keyof any>(
-	object: T,
-	key: K,
-): object is T & {[k in K]: unknown} {
-	return key in object;
-}
-
-export function hasTypeBrand<T extends object, V extends string>(
-	object: T,
-	type: V,
-): object is T & {_type: V} {
-	return hasProperty(object, '_type') && object._type === type;
 }
 
 export function includes<T>(
@@ -129,6 +112,53 @@ export function isUriSafe(body: Uint8Array | string) {
 
 export function isBinary(body: Uint8Array | string) {
 	return typeof body === 'string' ? body.includes('\0') : body.includes(0);
+}
+
+export function transformFallible<Input, Output>(
+	operation: (input: Input) => Output,
+): v.RawTransformAction<Input, Output> {
+	return v.rawTransform<Input, Output>((context) => {
+		try {
+			return operation(context.dataset.value);
+		} catch (error) {
+			context.addIssue({
+				message: String(error),
+			});
+
+			return context.NEVER;
+		}
+	});
+}
+
+export const durationSchema = v.pipe(
+	v.string(),
+	transformFallible((i) => Temporal.Duration.from(i)),
+);
+
+export const zonedDateTimeSchema = v.pipe(
+	v.string(),
+	transformFallible((i) => Temporal.ZonedDateTime.from(i)),
+);
+
+export const plainDateSchema = v.pipe(
+	v.string(),
+	transformFallible((i) => Temporal.PlainDate.from(i)),
+);
+
+export const plainTimeSchema = v.pipe(
+	v.string(),
+	transformFallible((i) => Temporal.PlainTime.from(i)),
+);
+
+export const plainDateTimeSchema = v.pipe(
+	v.string(),
+	transformFallible((i) => Temporal.PlainDateTime.from(i)),
+);
+
+export function getDiscriminator<K extends string>(class_: {
+	schema: {entries: {_type: v.LiteralSchema<K, any>}};
+}): K {
+	return class_.schema.entries._type.literal;
 }
 
 export function getSmallestDurationUnit(duration: Temporal.Duration) {

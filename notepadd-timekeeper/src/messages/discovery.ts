@@ -1,29 +1,12 @@
-import {hasTypeBrand, isObject} from 'notepadd-core';
+import {getDiscriminator, transformFallible, v} from 'notepadd-core';
 
 export class DiscoveryMessage {
-	static from(json: unknown) {
-		try {
-			if (!isObject(json)) {
-				throw new TypeError('Message is not an object');
-			}
+	static readonly schema = v.pipe(
+		v.object({
+			_type: v.literal('DiscoveryMessage'),
+		}),
+		transformFallible((i) => new DiscoveryMessage()),
+	);
 
-			if (
-				!hasTypeBrand(
-					json,
-					'DiscoveryMessage' satisfies DiscoveryMessage['_type'],
-				)
-			) {
-				throw new TypeError('Object is not a discovery message');
-			}
-
-			return new DiscoveryMessage();
-		} catch (error) {
-			throw new Error(
-				`Cannot deserialize a discovery message from JSON: ${JSON.stringify(json, undefined, 2)}`,
-				{cause: error},
-			);
-		}
-	}
-
-	readonly _type = 'DiscoveryMessage';
+	readonly _type = getDiscriminator(DiscoveryMessage);
 }

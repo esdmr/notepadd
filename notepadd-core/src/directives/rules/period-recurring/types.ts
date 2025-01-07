@@ -1,57 +1,30 @@
 import {Temporal} from 'temporal-polyfill';
+import * as v from 'valibot';
 import {
-	hasProperty,
-	hasTypeBrand,
-	isObject,
+	durationSchema,
+	transformFallible,
+	getDiscriminator,
 	minDuration,
+	zonedDateTimeSchema,
 } from '../../../utils.ts';
 import {Instance} from '../directive/base.ts';
 import {RecurringInstant} from '../instant-recurring/types.ts';
 import {Period} from '../period/types.ts';
 
 export class RecurringPeriod {
-	static from(json: unknown) {
-		try {
-			if (!isObject(json)) {
-				throw new TypeError('Recurring period is not an object');
-			}
+	static readonly schema = v.pipe(
+		v.object({
+			_type: v.literal('RecurringPeriod'),
+			first: Period.schema,
+			interval: durationSchema,
+			end: v.optional(zonedDateTimeSchema),
+		}),
+		transformFallible(
+			(i) => new RecurringPeriod(i.first, i.interval, i.end),
+		),
+	);
 
-			if (
-				!hasTypeBrand(
-					json,
-					'RecurringPeriod' satisfies RecurringPeriod['_type'],
-				)
-			) {
-				throw new TypeError('Object is not a recurring period');
-			}
-
-			if (!hasProperty(json, 'first')) {
-				throw new TypeError('First period is invalid');
-			}
-
-			if (
-				!hasProperty(json, 'interval') ||
-				typeof json.interval !== 'string'
-			) {
-				throw new TypeError('Interval is invalid');
-			}
-
-			return new RecurringPeriod(
-				Period.from(json.first),
-				Temporal.Duration.from(json.interval),
-				'end' in json && typeof json.end === 'string'
-					? Temporal.ZonedDateTime.from(json.end)
-					: undefined,
-			);
-		} catch (error) {
-			throw new Error(
-				`Cannot deserialize a recurring period from JSON: ${JSON.stringify(json, undefined, 2)}`,
-				{cause: error},
-			);
-		}
-	}
-
-	readonly _type = 'RecurringPeriod';
+	readonly _type = getDiscriminator(RecurringPeriod);
 	private readonly _recurringInstant;
 	private readonly _periodDuration;
 

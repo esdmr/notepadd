@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import process from 'node:process';
+import {v} from 'notepadd-core';
 import {
 	BookkeeperMessage,
 	DiscoveryMessage,
@@ -28,7 +29,7 @@ process.on('uncaughtExceptionMonitor', (error, origin) => {
 });
 
 process.on('message', async (value) => {
-	const {message} = BookkeeperMessage.from(value);
+	const {message} = v.parse(BookkeeperMessage.schema, value);
 
 	if (message instanceof UpdateMessage) {
 		processUpdate(message);

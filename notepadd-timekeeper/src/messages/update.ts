@@ -1,56 +1,19 @@
-import {hasProperty, hasTypeBrand, isObject, mapRecord} from 'notepadd-core';
+import {getDiscriminator, transformFallible, v} from 'notepadd-core';
 
 export class UpdateMessage {
-	static from(json: unknown) {
-		try {
-			if (!isObject(json)) {
-				throw new TypeError('Message is not an object');
-			}
+	static readonly schema = v.pipe(
+		v.object({
+			_type: v.literal('UpdateMessage'),
+			changed: v.record(v.string(), v.string()),
+			partial: v.boolean(),
+			fetchRequested: v.boolean(),
+		}),
+		transformFallible(
+			(i) => new UpdateMessage(i.changed, i.partial, i.fetchRequested),
+		),
+	);
 
-			if (
-				!hasTypeBrand(
-					json,
-					'UpdateMessage' satisfies UpdateMessage['_type'],
-				)
-			) {
-				throw new TypeError('Object is not an update message');
-			}
-
-			if (!hasProperty(json, 'changed') || !isObject(json.changed)) {
-				throw new TypeError('Changes are invalid');
-			}
-
-			if (
-				!hasProperty(json, 'partial') ||
-				typeof json.partial !== 'boolean'
-			) {
-				throw new TypeError('Partial is invalid');
-			}
-
-			if (
-				!hasProperty(json, 'fetchRequested') ||
-				typeof json.fetchRequested !== 'boolean'
-			) {
-				throw new TypeError('Fetch request is invalid');
-			}
-
-			return new UpdateMessage(
-				mapRecord(json.changed as Record<string, unknown>, ([k, v]) => [
-					String(k),
-					String(v),
-				]),
-				json.partial,
-				json.fetchRequested,
-			);
-		} catch (error) {
-			throw new Error(
-				`Cannot deserialize an update message from JSON: ${JSON.stringify(json, undefined, 2)}`,
-				{cause: error},
-			);
-		}
-	}
-
-	readonly _type = 'UpdateMessage';
+	readonly _type = getDiscriminator(UpdateMessage);
 
 	constructor(
 		readonly changed: Record<string, string>,

@@ -1,5 +1,5 @@
 export abstract class SyntaxNode<Children extends readonly any[]> {
-	private declare readonly _brand: 'SyntaxNode';
+	declare private readonly _brand: 'SyntaxNode';
 	constructor(protected readonly _children: Children) {}
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention

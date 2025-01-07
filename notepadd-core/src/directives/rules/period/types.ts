@@ -1,44 +1,24 @@
 import {Temporal} from 'temporal-polyfill';
-import {hasProperty, hasTypeBrand, isObject} from '../../../utils.ts';
+import * as v from 'valibot';
+import {
+	durationSchema,
+	transformFallible,
+	getDiscriminator,
+	zonedDateTimeSchema,
+} from '../../../utils.ts';
 import {Instance} from '../directive/base.ts';
 
 export class Period {
-	static from(json: unknown) {
-		try {
-			if (!isObject(json)) {
-				throw new TypeError('Period is not an object');
-			}
+	static readonly schema = v.pipe(
+		v.object({
+			_type: v.literal('Period'),
+			start: zonedDateTimeSchema,
+			endOrDuration: v.union([durationSchema, zonedDateTimeSchema]),
+		}),
+		transformFallible((i) => new Period(i.start, i.endOrDuration)),
+	);
 
-			if (!hasTypeBrand(json, 'Period' satisfies Period['_type'])) {
-				throw new TypeError('Object is not a period');
-			}
-
-			if (!hasProperty(json, 'start') || typeof json.start !== 'string') {
-				throw new TypeError('Period start is invalid');
-			}
-
-			if (
-				!hasProperty(json, 'endOrDuration') ||
-				typeof json.endOrDuration !== 'string'
-			) {
-				throw new TypeError('Period end/duration is invalid');
-			}
-
-			return new Period(
-				Temporal.ZonedDateTime.from(json.start),
-				json.endOrDuration.startsWith('P')
-					? Temporal.Duration.from(json.endOrDuration)
-					: Temporal.ZonedDateTime.from(json.endOrDuration),
-			);
-		} catch (error) {
-			throw new Error(
-				`Cannot deserialize a period from JSON: ${JSON.stringify(json, undefined, 2)}`,
-				{cause: error},
-			);
-		}
-	}
-
-	readonly _type = 'Period';
+	readonly _type = getDiscriminator(Period);
 
 	constructor(
 		readonly start: Temporal.ZonedDateTime,
