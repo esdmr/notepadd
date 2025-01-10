@@ -151,7 +151,7 @@
 		"@types/node": "20.17.10",
 		"@types/vscode": "1.91.0",
 		"@vscode/vsce": "3.2.1",
-		"vite": "6.0.4",
+		"vite": "6.0.5",
 		"vite-plugin-child-process": "workspace:*",
 		"vite-plugin-inspect": "0.10.4",
 		"vite-plugin-nearley": "workspace:*",
