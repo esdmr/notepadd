@@ -5,7 +5,7 @@
 	"exports": "./src/index.ts",
 	"devDependencies": {
 		"@esdmr/nearley": "3.0.3",
-		"@types/node": "20.17.10",
+		"@types/node": "20.17.11",
 		"vite": "6.0.6"
 	},
 	"peerDependencies": {
