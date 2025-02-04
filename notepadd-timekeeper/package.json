@@ -7,7 +7,7 @@
 		"./service": "./src/service.ts"
 	},
 	"devDependencies": {
-		"@types/node": "20.17.12",
+		"@types/node": "20.17.13",
 		"type-fest": "4.32.0"
 	},
 	"packageManager": "pnpm@9.15.4",
