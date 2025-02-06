@@ -14,7 +14,7 @@ import {
 } from './bus.ts';
 import {output} from './output.ts';
 
-const filePattern = '**/*.md';
+const filePattern = '**/*.np.md';
 
 export class Bookkeeper implements Disposable {
 	private readonly _handlers = [
