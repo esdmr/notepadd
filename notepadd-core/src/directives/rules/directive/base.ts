@@ -32,7 +32,7 @@ export class Instance {
 }
 
 export type DirectiveChild = {
-	getInstance(now: Temporal.ZonedDateTime): Instance;
-	getNextInstance(instance: Instance): Instance;
+	getInstance?(now: Temporal.ZonedDateTime): Instance;
+	getNextInstance?(instance: Instance): Instance;
 	toString(): string;
 };

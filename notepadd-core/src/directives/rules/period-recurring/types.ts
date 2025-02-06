@@ -95,7 +95,7 @@ export class RecurringPeriod {
 	}
 
 	getNextInstance(instance: Instance) {
-		if (!instance.next) return new Instance(undefined, undefined, 'low');
+		if (!instance.next) return instance;
 
 		if (instance.currentState === 'low') {
 			const nextStart = instance.next;

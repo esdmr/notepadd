@@ -2,11 +2,13 @@ import {type Temporal} from 'temporal-polyfill';
 import * as v from 'valibot';
 import {getDiscriminator, transformFallible} from '../../../utils.ts';
 import {OneShotAlarm, RecurringAlarm} from './alarm/types.ts';
-import {type DirectiveChild, type Instance} from './base.ts';
+import {type DirectiveChild, Instance} from './base.ts';
 import {OneShotEvent, RecurringEvent} from './event/types.ts';
 import {Timer} from './timer/types.ts';
 
 export * from './base.ts';
+
+const emptyInstance = new Instance(undefined, undefined);
 
 export class Directive {
 	static readonly schema = v.pipe(
@@ -32,11 +34,11 @@ export class Directive {
 	) {}
 
 	getInstance(now: Temporal.ZonedDateTime) {
-		return this.directive.getInstance(now);
+		return this.directive.getInstance?.(now) ?? emptyInstance;
 	}
 
 	getNextInstance(instance: Instance) {
-		return this.directive.getNextInstance(instance);
+		return this.directive.getNextInstance?.(instance) ?? emptyInstance;
 	}
 
 	getLabel() {

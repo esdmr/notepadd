@@ -20,14 +20,6 @@ export class Timer implements DirectiveChild {
 
 	constructor(readonly when: Temporal.Duration) {}
 
-	getInstance(now: Temporal.ZonedDateTime) {
-		return new Instance(undefined, undefined);
-	}
-
-	getNextInstance(instance: Instance) {
-		return instance;
-	}
-
 	toString() {
 		return `timer ${this.when.toString()}`;
 	}
