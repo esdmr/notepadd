@@ -52,4 +52,5 @@ export class Directive {
 
 export * from './alarm/types.ts';
 export * from './event/types.ts';
+export * from './reference/types.ts';
 export * from './timer/types.ts';

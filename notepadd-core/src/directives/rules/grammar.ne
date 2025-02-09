@@ -23,6 +23,8 @@ at_least_one_ordered_three[X, Y, Z] -> (
 @include "rules/plain-time/grammar.ne"
 @include "rules/time-zone/grammar.ne"
 @include "rules/duration/grammar.ne"
+@include "rules/string/grammar.ne"
+@include "rules/link-target/grammar.ne"
 @include "rules/integer/grammar.ne"
 @include "rules/number-sign/grammar.ne"
 @include "rules/comment/grammar.ne"

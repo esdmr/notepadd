@@ -3,7 +3,8 @@
 directive =
 	alarm (* starts immediately after exec *) |
 	timer (* shows a start/pause/reset button *) |
-	event (* like alarm, but for a period *);
+	event (* like alarm, but for a period *) |
+	reference (* links to a file, directory, or URL *);
 
 (* directives *)
 
@@ -20,6 +21,11 @@ timer =
 event =
 	"event",
 	(period_recurring | period),
+	[comment];
+
+reference =
+	"reference",
+	link_target,
 	[comment];
 
 (* date time *)
@@ -190,6 +196,18 @@ duration_seconds =
 	"s";
 
 (* primitives *)
+
+string = '"', {string_char}, '"';
+
+string_char =
+	"\", ? ["\\/bfnrt] ? |
+	"\u", hex_digit, hex_digit, hex_digit, hex_digit |
+	? [ !#-[\]-\uFFFF] ?;
+
+hex_digit = ? [0-9a-fA-F] ?;
+
+link_target = "<", {? [^<>\n] ?}-, ">";
+
 signed_integer =
 	[number_sign],
 	unsigned_integer;

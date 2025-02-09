@@ -7,6 +7,7 @@ export const lexer = nearley.lexer.compile({
 			alarm: 'alarm',
 			timer: 'timer',
 			event: 'event',
+			reference: 'reference',
 			every: 'every',
 			until: 'until',
 			for: 'for',
@@ -32,6 +33,18 @@ export const lexer = nearley.lexer.compile({
 	},
 	timeZoneIdentifier: {
 		match: /\[[\w/+-]+]/,
+		value(x) {
+			return x.slice(1, -1);
+		},
+	},
+	string: {
+		match: /"(?:\\["\\/bfnrt]|\\u[\da-fA-F]{4}|[ !#-[\]-\uFFFF]+)*"/,
+		value(x) {
+			return String(JSON.parse(x));
+		},
+	},
+	linkTarget: {
+		match: /<[^<>\n]+>/,
 		value(x) {
 			return x.slice(1, -1);
 		},
