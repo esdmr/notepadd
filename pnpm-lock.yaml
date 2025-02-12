@@ -82,8 +82,8 @@ importers:
         specifier: 3.0.2
         version: 3.0.2
       mdast-util-directive:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 3.1.0
+        version: 3.1.0
       mdast-util-math:
         specifier: 3.0.0
         version: 3.0.0
@@ -2374,8 +2374,8 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
-  mdast-util-directive@3.0.0:
-    resolution: {integrity: sha512-JUpYOqKI4mM3sZcNxmF/ox04XYFFkNwr0CFlrQIkCwbvH0xzMCqkMqAde9wRd80VAhaUrwFwKm2nxretdT1h7Q==}
+  mdast-util-directive@3.1.0:
+    resolution: {integrity: sha512-I3fNFt+DHmpWCYAT7quoM6lHf9wuqtI+oCOfvILnoicNIqjh5E3dEJWiXuYME2gNe8vl1iMQwyUHa7bgFmak6Q==}
 
   mdast-util-find-and-replace@3.0.1:
     resolution: {integrity: sha512-SG21kZHGC3XRTSUhtofZkBzZTJNM5ecCi0SK2IMKmSXR8vO3peL+kb1O0z7Zl83jKtutG4k5Wv/W7V3/YHvzPA==}
@@ -5818,10 +5818,11 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  mdast-util-directive@3.0.0:
+  mdast-util-directive@3.1.0:
     dependencies:
       '@types/mdast': 4.0.4
       '@types/unist': 3.0.3
+      ccount: 2.0.1
       devlop: 1.1.0
       mdast-util-from-markdown: 2.0.1
       mdast-util-to-markdown: 2.1.0
@@ -6581,7 +6582,7 @@ snapshots:
   remark-directive@3.0.1:
     dependencies:
       '@types/mdast': 4.0.4
-      mdast-util-directive: 3.0.0
+      mdast-util-directive: 3.1.0
       micromark-extension-directive: 3.0.1
       unified: 11.0.5
     transitivePeerDependencies:
