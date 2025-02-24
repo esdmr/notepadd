@@ -3,7 +3,7 @@
 	"type": "module",
 	"devDependencies": {
 		"typescript": "5.7.3",
-		"vite-node": "2.1.8",
+		"vite-node": "2.1.9",
 		"webpack": "npm:ignoredep@200.9999.0",
 		"xo": "0.60.0"
 	},
