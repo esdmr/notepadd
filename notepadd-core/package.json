@@ -7,8 +7,11 @@
 		"build-directives-tsd": "nearleyc src/directives/tsd.ne -o src/directives/tsd.generated.ts"
 	},
 	"dependencies": {
+		"bidi-js": "1.0.3",
 		"data-urls": "5.0.0",
+		"escape-latex": "1.2.0",
 		"rehype": "13.0.2",
+		"rehype-remark": "10.0.0",
 		"rehype-sanitize": "6.0.0",
 		"remark": "15.0.1",
 		"remark-directive": "3.0.1",
@@ -25,6 +28,7 @@
 	"devDependencies": {
 		"@esdmr/nearley": "3.0.3",
 		"@types/data-urls": "3.0.4",
+		"@types/escape-latex": "0.1.36",
 		"@types/hast": "3.0.4",
 		"@types/mdast": "4.0.4",
 		"@types/whatwg-mimetype": "3.0.2",

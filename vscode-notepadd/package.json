@@ -63,6 +63,11 @@
 		],
 		"commands": [
 			{
+				"command": "notepadd.exportToLatex",
+				"title": "Export to LaTeX",
+				"category": "NotePADD"
+			},
+			{
 				"command": "notepadd.restartTimekeeper",
 				"title": "Restart Timekeeper",
 				"category": "NotePADD"
@@ -78,6 +83,11 @@
 				"category": "NotePADD"
 			}
 		],
+		"menus": {
+			"notebook/toolbar": [
+				{"group": "Export", "command": "notepadd.exportToLatex"}
+			]
+		},
 		"configuration": {
 			"title": "NotePADD",
 			"properties": {

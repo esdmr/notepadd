@@ -9,6 +9,7 @@
 			"fields"
 		],
 		"unicorn/prefer-top-level-await": "off",
-		"no-await-in-loop": "off"
+		"no-await-in-loop": "off",
+		"import/no-cycle": "off"
 	}
 }

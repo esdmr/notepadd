@@ -15,6 +15,7 @@ import {setupNotepaddStatus} from './status-bar-item/notepadd-status.ts';
 import {events} from './bus.ts';
 import {NotepaddBridgeView} from './view/notepadd-instances.ts';
 import {setupOpenNotebookCommand} from './command/open-notebook.ts';
+import {setupExportToLatexCommand} from './command/export-to-latex.ts';
 
 const asyncSubscriptions: AsyncDisposable[] = [];
 
@@ -23,6 +24,7 @@ export async function activate(context: ExtensionContext) {
 		context.subscriptions.push(
 			output,
 			events,
+			setupExportToLatexCommand(),
 			setupOpenNotebookCommand(),
 			setupRestartTimekeeperCommand(),
 			setupStartTimekeeperCommand(),
