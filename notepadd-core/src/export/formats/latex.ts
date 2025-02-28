@@ -230,7 +230,7 @@ const latexExportFormat: NotePaddExportFormat<{
 			)}}`;
 		}
 
-		return `\\begin{lstlisting}\n${source.replaceAll('\\end', '\\\u{200B}end')}\n\\end{lstlisting}`;
+		return `\\begin{lstlisting}\n${source.replaceAll('\\end', '\\end\u{200B}')}\n\\end{lstlisting}`;
 	},
 	onTitle(context, getTitle, getAuthors) {
 		context.definitions.title = joinPhrasingNodes(
