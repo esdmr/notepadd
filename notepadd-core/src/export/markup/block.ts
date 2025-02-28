@@ -130,17 +130,32 @@ export function exportMarkdownBlockNode<T extends NotePaddExportFormatTypes>(
 			);
 
 			if (node.children.length === 0 || columns === 0) {
-				return [
-					format.onLtr(context, (context) => [
-						format.onParagraph(context, (context) => [
-							format.onText(context, '['),
-							format.onEmphasis(context, (context) => [
-								format.onText(context, 'Empty table.'),
-							]),
-							format.onText(context, ']'),
-						]),
-					]),
-				];
+				return exportMarkdownBlockNode(
+					{
+						type: 'containerDirective',
+						name: 'ltr',
+						children: [
+							{
+								type: 'paragraph',
+								children: [
+									{type: 'text', value: '['},
+									{
+										type: 'emphasis',
+										children: [
+											{
+												type: 'text',
+												value: 'Empty table.',
+											},
+										],
+									},
+									{type: 'text', value: ']'},
+								],
+							},
+						],
+					},
+					format,
+					context,
+				);
 			}
 
 			const align = node.align?.map((i) => i ?? 'center') ?? [];
@@ -189,53 +204,93 @@ export function exportMarkdownBlockNode<T extends NotePaddExportFormatTypes>(
 				];
 			}
 
-			return [
-				format.onParagraph(context, (context) => [
-					format.onText(context, '['),
-					format.onInlineLtr(context, (context) => [
-						format.onEmphasis(context, (context) => [
-							format.onText(
-								context,
-								'Start of unknown container directive',
-							),
-						]),
-						format.onText(context, ' '),
-						format.onInlineCode(context, node.name),
-					]),
-					format.onText(context, '.]'),
-				]),
-				...exportMarkdownBlockNodes(node.children, format, context),
-				format.onParagraph(context, (context) => [
-					format.onText(context, '['),
-					format.onInlineLtr(context, (context) => [
-						format.onEmphasis(context, (context) => [
-							format.onText(
-								context,
-								'End of unknown container directive',
-							),
-						]),
-						format.onText(context, ' '),
-						format.onInlineCode(context, node.name),
-					]),
-					format.onText(context, '.]'),
-				]),
-			];
+			return exportMarkdownBlockNodes(
+				[
+					{
+						type: 'containerDirective',
+						name: 'ltr',
+						children: [
+							{
+								type: 'paragraph',
+								children: [
+									{type: 'text', value: '['},
+									{
+										type: 'emphasis',
+										children: [
+											{
+												type: 'text',
+												value: 'Start of unknown container directive',
+											},
+										],
+									},
+									{type: 'text', value: ' '},
+									{type: 'inlineCode', value: node.name},
+									{type: 'text', value: '.]'},
+								],
+							},
+						],
+					},
+					...node.children,
+
+					{
+						type: 'containerDirective',
+						name: 'ltr',
+						children: [
+							{
+								type: 'paragraph',
+								children: [
+									{type: 'text', value: '['},
+									{
+										type: 'emphasis',
+										children: [
+											{
+												type: 'text',
+												value: 'End of unknown container directive',
+											},
+										],
+									},
+									{type: 'text', value: ' '},
+									{type: 'inlineCode', value: node.name},
+									{type: 'text', value: '.]'},
+								],
+							},
+						],
+					},
+				],
+				format,
+				context,
+			);
 		}
 
 		case 'leafDirective': {
-			return [
-				format.onParagraph(context, (context) => [
-					format.onText(context, '['),
-					format.onInlineLtr(context, (context) => [
-						format.onEmphasis(context, (context) => [
-							format.onText(context, 'Unknown leaf directive'),
-						]),
-						format.onText(context, ' '),
-						format.onInlineCode(context, node.name),
-					]),
-					format.onText(context, '.]'),
-				]),
-			];
+			return exportMarkdownBlockNode(
+				{
+					type: 'containerDirective',
+					name: 'ltr',
+					children: [
+						{
+							type: 'paragraph',
+							children: [
+								{type: 'text', value: '['},
+								{
+									type: 'emphasis',
+									children: [
+										{
+											type: 'text',
+											value: 'Unknown leaf directive',
+										},
+									],
+								},
+								{type: 'text', value: ' '},
+								{type: 'inlineCode', value: node.name},
+								{type: 'text', value: '.]'},
+							],
+						},
+					],
+				},
+				format,
+				context,
+			);
 		}
 
 		case 'math': {
