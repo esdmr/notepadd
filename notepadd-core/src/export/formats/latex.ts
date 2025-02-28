@@ -180,7 +180,7 @@ const latexExportFormat: NotePaddExportFormat<{
 					? '\\end{LTR}'
 					: '';
 
-			preamble += `\\newenvironment{rtl}{${begin}}{${end}}\n`;
+			preamble += `\\newenvironment{ltr}{${begin}}{${end}}\n`;
 		}
 
 		if (context.packages.listings) {
