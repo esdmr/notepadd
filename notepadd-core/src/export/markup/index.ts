@@ -2,7 +2,8 @@ import {uint8ArrayToString} from 'uint8array-extras';
 import {markdown} from '../../format/parsers.ts';
 import type {NotePadd, NotePaddCell} from '../../format/types.ts';
 import {isBinary} from '../../utils.ts';
-import {exportMarkdownNode} from './block.ts';
+import {getLangIdOfMimeType} from '../../format/mime.ts';
+import {exportMarkdownBlockNode, exportMarkdownNode} from './block.ts';
 import {collectMarkdownDefinitionNode} from './definition.ts';
 import type {
 	NotePaddExportContext,
@@ -26,24 +27,28 @@ function exportNotebookCell<T extends NotePaddExportFormatTypes>(
 	}
 
 	return [
-		...exportMarkdownNode(
+		...exportMarkdownBlockNode(
 			{type: 'code', value: cell.source, lang: cell.lang},
 			format,
 			context,
 		),
 		...(cell.outputs?.flatMap((output) => {
-			for (const item of Object.values(output.items)) {
+			for (const [mime, item] of Object.entries(output.items)) {
 				// TODO: Improve output logic.
 				if (!isBinary(item)) {
-					return exportMarkdownNode(
-						{type: 'code', value: uint8ArrayToString(item)},
+					return exportMarkdownBlockNode(
+						{
+							type: 'code',
+							value: uint8ArrayToString(item),
+							lang: getLangIdOfMimeType(mime),
+						},
 						format,
 						context,
 					);
 				}
 			}
 
-			return exportMarkdownNode(
+			return exportMarkdownBlockNode(
 				{
 					type: 'containerDirective',
 					name: 'ltr',
