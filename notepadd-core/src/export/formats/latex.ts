@@ -347,14 +347,20 @@ const latexExportFormat: NotePaddExportFormat<{
 	onInlineCode(context, source) {
 		context.packages.listings = true;
 
-		if (context.moving) {
-			return `\\texttt{${escapeLatex(source, {preserveFormatting: true})}}`;
-		}
-
-		return source
+		// TODO: Try different symbols before falling back to splitting.
+		const command = source
 			.split('|')
 			.map((i) => `\\lstinline|${i}|`)
 			.join('\\lstinline=|=');
+
+		return context.moving
+			? `\\input{${addFileByHash(
+					context,
+					stringToUint8Array(command),
+					'code',
+					'part.tex',
+				)}}`
+			: command;
 	},
 	onLink(context, url, title, getChildren) {
 		context.packages.hyperref = true;
