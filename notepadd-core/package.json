@@ -16,7 +16,7 @@
 		"remark": "15.0.1",
 		"remark-directive": "3.0.1",
 		"remark-frontmatter": "5.0.0",
-		"remark-gfm": "4.0.0",
+		"remark-gfm": "4.0.1",
 		"remark-math": "6.0.0",
 		"srcset": "5.0.1",
 		"temporal-polyfill": "0.2.5",
