@@ -158,7 +158,7 @@
 		"uint8array-extras": "1.4.0"
 	},
 	"devDependencies": {
-		"@types/node": "20.17.18",
+		"@types/node": "20.17.19",
 		"@types/vscode": "1.91.0",
 		"@vscode/vsce": "3.2.2",
 		"vite": "6.1.0",
