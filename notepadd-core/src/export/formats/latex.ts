@@ -47,6 +47,7 @@ type NotePaddExportLatexContext = NotePaddExportContext & {
 		strng?: boolean;
 		rl?: boolean;
 		lr?: boolean;
+		lre?: boolean;
 		rtl?: boolean;
 		ltr?: boolean;
 		title?: string;
@@ -149,6 +150,10 @@ const latexExportFormat: NotePaddExportFormat<{
 		if (!useXepersian && context.definitions.lr) {
 			const target = useBidi ? '\\LRE' : '\\empty';
 			preamble += `\\let \\lr ${target}\n`;
+		}
+
+		if (!useBidi && context.definitions.lre) {
+			preamble += `\\let \\LRE \\empty\n`;
 		}
 
 		if (context.definitions.rtl) {
@@ -379,9 +384,35 @@ const latexExportFormat: NotePaddExportFormat<{
 		return `\\rl{${joinPhrasingNodes(getChildren({...context, direction: 'rtl', moving: true}))}}`;
 	},
 	onInlineLtr(context, getChildren) {
+		const content = joinPhrasingNodes(
+			getChildren({
+				...context,
+				direction: 'ltr',
+				moving: true,
+			}),
+		);
+
+		// Edge case: Numerals are mostly LTR. However, when using XePersian,
+		// bidi contexts have different fonts, of which the default LTR font
+		// (Latin Modern) does not support persian numerals. Additionally,
+		// numerals do not need explicit bidi marking. Therefore, if an inline
+		// LTR context contains only numerals, we should unwrap it, so it will
+		// have the same font as the surrounding RTL text.
+		if (/^\p{N}+$/u.test(content)) {
+			return content;
+		}
+
+		// Edge case: Same as above, but since there are some punctuation marks,
+		// we will be more careful and wrap it in an LTR embed.
+		if (/^[\p{N}\p{Po}]+$/u.test(content)) {
+			context.definitions.lre = true;
+
+			return `\\LRE{${content}}`;
+		}
+
 		context.definitions.lr = true;
 
-		return `\\lr{${joinPhrasingNodes(getChildren({...context, direction: 'ltr', moving: true}))}}`;
+		return `\\lr{${content}}`;
 	},
 	onText(context, content) {
 		return escapeLatex(content);
