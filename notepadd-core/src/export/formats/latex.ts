@@ -404,11 +404,12 @@ const latexExportFormat: NotePaddExportFormat<{
 		}
 
 		// Edge case: Same as above, but since there are some punctuation marks,
-		// we will be more careful and wrap it in an LTR embed.
+		// we will be more careful and wrap it in an LTR embed. Also, `.` breaks
+		// the LTR flow, so we must wrap it in braces. (I do not know why.)
 		if (/^[\p{N}\p{Po}]+$/u.test(content)) {
 			context.definitions.lre = true;
 
-			return `\\LRE{${content}}`;
+			return `\\LRE{${content.replaceAll('.', '{.}')}}`;
 		}
 
 		context.definitions.lr = true;
