@@ -23,7 +23,7 @@
 		"uint8array-extras": "1.4.0",
 		"valibot": "0.42.1",
 		"whatwg-mimetype": "4.0.0",
-		"yaml": "2.5.0"
+		"yaml": "2.7.0"
 	},
 	"devDependencies": {
 		"@esdmr/nearley": "3.0.3",
