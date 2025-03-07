@@ -195,6 +195,7 @@ const latexExportFormat: NotePaddExportFormat<{
 
 		if (useXepersian) {
 			preamble += `\\settextfont{XB Yas}\n`;
+			preamble += `\\setmathdigitfont{XB Yas}\n`;
 		}
 
 		if (context.definitions.title) {
