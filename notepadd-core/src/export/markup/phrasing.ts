@@ -4,6 +4,24 @@ import {generateBidiNode} from './bidi.ts';
 import {exportMarkdownBlockNodes} from './block.ts';
 import type {NotePaddExportFormat, NotePaddExportFormatTypes} from './types.ts';
 
+export function createInlineSystemMessage(
+	...children: Array<string | PhrasingContent>
+): PhrasingContent[] {
+	return [
+		{type: 'text', value: '['},
+		{
+			type: 'textDirective',
+			name: 'ltr',
+			children: children.map((i) =>
+				typeof i === 'string'
+					? {type: 'emphasis', children: [{type: 'text', value: i}]}
+					: i,
+			),
+		},
+		{type: 'text', value: ']'},
+	];
+}
+
 // eslint-disable-next-line complexity
 export function exportMarkdownPhrasingNode<T extends NotePaddExportFormatTypes>(
 	node: PhrasingContent,
@@ -36,25 +54,7 @@ export function exportMarkdownPhrasingNode<T extends NotePaddExportFormatTypes>(
 
 			if (!definition) {
 				return exportMarkdownPhrasingNodes(
-					[
-						{type: 'text', value: '['},
-						{
-							type: 'emphasis',
-							children: [
-								{
-									type: 'textDirective',
-									name: 'ltr',
-									children: [
-										{
-											type: 'text',
-											value: 'Footnote missing.',
-										},
-									],
-								},
-							],
-						},
-						{type: 'text', value: ']'},
-					],
+					createInlineSystemMessage('Footnote missing.'),
 					format,
 					context,
 				);
@@ -95,25 +95,10 @@ export function exportMarkdownPhrasingNode<T extends NotePaddExportFormatTypes>(
 
 			if (!definition) {
 				return exportMarkdownPhrasingNodes(
-					[
-						{type: 'text', value: '['},
-						{
-							type: 'emphasis',
-							children: [
-								{
-									type: 'textDirective',
-									name: 'ltr',
-									children: [
-										{
-											type: 'text',
-											value: 'Image missing.',
-										},
-									],
-								},
-							],
-						},
-						{type: 'text', value: ']'},
-					],
+					createInlineSystemMessage('Image definition missing', {
+						type: 'text',
+						value: node.alt ? `, ${node.alt}.` : '.]',
+					}),
 					format,
 					context,
 				);
@@ -164,23 +149,7 @@ export function exportMarkdownPhrasingNode<T extends NotePaddExportFormatTypes>(
 				return exportMarkdownPhrasingNodes(
 					[
 						...node.children,
-						{type: 'text', value: ' ['},
-						{
-							type: 'emphasis',
-							children: [
-								{
-									type: 'textDirective',
-									name: 'ltr',
-									children: [
-										{
-											type: 'text',
-											value: 'Link missing.',
-										},
-									],
-								},
-							],
-						},
-						{type: 'text', value: ']'},
+						...createInlineSystemMessage('Link missing.'),
 					],
 					format,
 					context,
@@ -251,27 +220,11 @@ export function exportMarkdownPhrasingNode<T extends NotePaddExportFormatTypes>(
 			}
 
 			return exportMarkdownPhrasingNodes(
-				[
-					{type: 'text', value: '['},
-					{
-						type: 'emphasis',
-						children: [
-							{
-								type: 'textDirective',
-								name: 'ltr',
-								children: [
-									{
-										type: 'text',
-										value: 'Unknown text directive',
-									},
-								],
-							},
-						],
-					},
-					{type: 'text', value: ' '},
+				createInlineSystemMessage(
+					'Unknown text directive ',
 					{type: 'inlineCode', value: node.name},
-					{type: 'text', value: '.]'},
-				],
+					'.',
+				),
 				format,
 				context,
 			);

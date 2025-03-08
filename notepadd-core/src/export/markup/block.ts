@@ -7,9 +7,29 @@ import type {
 } from 'mdast';
 import {html, htmlToMarkdown} from '../../format/parsers.ts';
 import {exportMarkdownItemNode} from './item.ts';
-import {exportMarkdownPhrasingNodes} from './phrasing.ts';
+import {
+	createInlineSystemMessage,
+	exportMarkdownPhrasingNodes,
+} from './phrasing.ts';
 import {exportMarkdownRowNode} from './row.ts';
 import type {NotePaddExportFormat, NotePaddExportFormatTypes} from './types.ts';
+
+export function createSystemMessage(
+	...children: Parameters<typeof createInlineSystemMessage>
+): BlockContent[] {
+	return [
+		{
+			type: 'containerDirective',
+			name: 'ltr',
+			children: [
+				{
+					type: 'paragraph',
+					children: createInlineSystemMessage(...children),
+				},
+			],
+		},
+	];
+}
 
 // eslint-disable-next-line complexity
 export function exportMarkdownBlockNode<T extends NotePaddExportFormatTypes>(
@@ -130,29 +150,8 @@ export function exportMarkdownBlockNode<T extends NotePaddExportFormatTypes>(
 			);
 
 			if (node.children.length === 0 || columns === 0) {
-				return exportMarkdownBlockNode(
-					{
-						type: 'containerDirective',
-						name: 'ltr',
-						children: [
-							{
-								type: 'paragraph',
-								children: [
-									{type: 'text', value: '['},
-									{
-										type: 'emphasis',
-										children: [
-											{
-												type: 'text',
-												value: 'Empty table.',
-											},
-										],
-									},
-									{type: 'text', value: ']'},
-								],
-							},
-						],
-					},
+				return exportMarkdownBlockNodes(
+					createSystemMessage('Empty table.'),
 					format,
 					context,
 				);
@@ -206,56 +205,17 @@ export function exportMarkdownBlockNode<T extends NotePaddExportFormatTypes>(
 
 			return exportMarkdownBlockNodes(
 				[
-					{
-						type: 'containerDirective',
-						name: 'ltr',
-						children: [
-							{
-								type: 'paragraph',
-								children: [
-									{type: 'text', value: '['},
-									{
-										type: 'emphasis',
-										children: [
-											{
-												type: 'text',
-												value: 'Start of unknown container directive',
-											},
-										],
-									},
-									{type: 'text', value: ' '},
-									{type: 'inlineCode', value: node.name},
-									{type: 'text', value: '.]'},
-								],
-							},
-						],
-					},
+					...createSystemMessage(
+						'Start of unknown container directive ',
+						{type: 'inlineCode', value: node.name},
+						'.',
+					),
 					...node.children,
-
-					{
-						type: 'containerDirective',
-						name: 'ltr',
-						children: [
-							{
-								type: 'paragraph',
-								children: [
-									{type: 'text', value: '['},
-									{
-										type: 'emphasis',
-										children: [
-											{
-												type: 'text',
-												value: 'End of unknown container directive',
-											},
-										],
-									},
-									{type: 'text', value: ' '},
-									{type: 'inlineCode', value: node.name},
-									{type: 'text', value: '.]'},
-								],
-							},
-						],
-					},
+					...createSystemMessage(
+						'End of unknown container directive ',
+						{type: 'inlineCode', value: node.name},
+						'.',
+					),
 				],
 				format,
 				context,
@@ -263,31 +223,12 @@ export function exportMarkdownBlockNode<T extends NotePaddExportFormatTypes>(
 		}
 
 		case 'leafDirective': {
-			return exportMarkdownBlockNode(
-				{
-					type: 'containerDirective',
-					name: 'ltr',
-					children: [
-						{
-							type: 'paragraph',
-							children: [
-								{type: 'text', value: '['},
-								{
-									type: 'emphasis',
-									children: [
-										{
-											type: 'text',
-											value: 'Unknown leaf directive',
-										},
-									],
-								},
-								{type: 'text', value: ' '},
-								{type: 'inlineCode', value: node.name},
-								{type: 'text', value: '.]'},
-							],
-						},
-					],
-				},
+			return exportMarkdownBlockNodes(
+				createSystemMessage(
+					'Unknown leaf directive ',
+					{type: 'inlineCode', value: node.name},
+					'.',
+				),
 				format,
 				context,
 			);

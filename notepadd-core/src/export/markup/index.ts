@@ -3,7 +3,12 @@ import {markdown} from '../../format/parsers.ts';
 import type {NotePadd, NotePaddCell} from '../../format/types.ts';
 import {isBinary} from '../../utils.ts';
 import {getLangIdOfMimeType} from '../../format/mime.ts';
-import {exportMarkdownBlockNode, exportMarkdownNode} from './block.ts';
+import {
+	createSystemMessage,
+	exportMarkdownBlockNode,
+	exportMarkdownBlockNodes,
+	exportMarkdownNode,
+} from './block.ts';
 import {collectMarkdownDefinitionNode} from './definition.ts';
 import type {
 	NotePaddExportContext,
@@ -48,29 +53,8 @@ function exportNotebookCell<T extends NotePaddExportFormatTypes>(
 				}
 			}
 
-			return exportMarkdownBlockNode(
-				{
-					type: 'containerDirective',
-					name: 'ltr',
-					children: [
-						{
-							type: 'paragraph',
-							children: [
-								{type: 'text', value: '['},
-								{
-									type: 'emphasis',
-									children: [
-										{
-											type: 'text',
-											value: 'Unknown output format.',
-										},
-									],
-								},
-								{type: 'text', value: ']'},
-							],
-						},
-					],
-				},
+			return exportMarkdownBlockNodes(
+				createSystemMessage('Unknown output format.'),
 				format,
 				context,
 			);
