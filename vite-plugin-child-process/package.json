@@ -8,7 +8,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "20.17.19",
-		"type-fest": "4.34.1",
+		"type-fest": "4.35.0",
 		"vite": "6.1.0"
 	},
 	"peerDependencies": {
