@@ -100,8 +100,8 @@ importers:
         specifier: 3.0.0
         version: 3.0.0
       type-fest:
-        specifier: 4.36.0
-        version: 4.36.0
+        specifier: 4.37.0
+        version: 4.37.0
 
   notepadd-timekeeper:
     dependencies:
@@ -119,8 +119,8 @@ importers:
         specifier: 20.17.23
         version: 20.17.23
       type-fest:
-        specifier: 4.36.0
-        version: 4.36.0
+        specifier: 4.37.0
+        version: 4.37.0
 
   vite-plugin-child-process:
     devDependencies:
@@ -128,8 +128,8 @@ importers:
         specifier: 20.17.23
         version: 20.17.23
       type-fest:
-        specifier: 4.36.0
-        version: 4.36.0
+        specifier: 4.37.0
+        version: 4.37.0
       vite:
         specifier: 6.2.0
         version: 6.2.0(@types/node@20.17.23)(yaml@2.5.0)
@@ -152,8 +152,8 @@ importers:
         specifier: 20.17.23
         version: 20.17.23
       type-fest:
-        specifier: 4.36.0
-        version: 4.36.0
+        specifier: 4.37.0
+        version: 4.37.0
       vite:
         specifier: 6.2.0
         version: 6.2.0(@types/node@20.17.23)(yaml@2.5.0)
@@ -3289,8 +3289,8 @@ packages:
     resolution: {integrity: sha512-RAH822pAdBgcNMAfWnCBU3CFZcfZ/i1eZjwFU/dsLKumyuuP3niueg2UAukXYF0E2AAoc82ZSSf9J0WQBinzHA==}
     engines: {node: '>=12.20'}
 
-  type-fest@4.36.0:
-    resolution: {integrity: sha512-3T/PUdKTCnkUmhQU6FFJEHsLwadsRegktX3TNHk+2JJB9HlA8gp1/VXblXVDI93kSnXF2rdPx0GMbHtJIV2LPg==}
+  type-fest@4.37.0:
+    resolution: {integrity: sha512-S/5/0kFftkq27FPNye0XM1e2NsnoD/3FS+pBmbjmmtLT6I+i344KoOf7pvXreaFsDamWeaJX55nczA1m5PsBDg==}
     engines: {node: '>=16'}
 
   typed-array-buffer@1.0.2:
@@ -7135,7 +7135,7 @@ snapshots:
 
   type-fest@2.19.0: {}
 
-  type-fest@4.36.0: {}
+  type-fest@4.37.0: {}
 
   typed-array-buffer@1.0.2:
     dependencies:
