@@ -167,7 +167,7 @@
 		"vite-plugin-nearley": "workspace:*",
 		"vite-plugin-vscode": "workspace:*"
 	},
-	"packageManager": "pnpm@9.15.6",
+	"packageManager": "pnpm@9.15.7",
 	"engines": {
 		"vscode": "^1.91.0"
 	},
