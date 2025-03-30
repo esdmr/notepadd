@@ -39,5 +39,5 @@
 	"peerDependencies": {
 		"@esdmr/nearley": "^3.0.0"
 	},
-	"packageManager": "pnpm@9.15.7"
+	"packageManager": "pnpm@9.15.8"
 }
