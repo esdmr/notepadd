@@ -14,5 +14,5 @@
 	"peerDependencies": {
 		"vite": "^5.4.0 || ^6.0.0"
 	},
-	"packageManager": "pnpm@9.15.8"
+	"packageManager": "pnpm@9.15.9"
 }

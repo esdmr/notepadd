@@ -7,7 +7,7 @@
 		"webpack": "npm:ignoredep@200.9999.0",
 		"xo": "0.60.0"
 	},
-	"packageManager": "pnpm@9.15.8",
+	"packageManager": "pnpm@9.15.9",
 	"engines": {
 		"node": ">=20"
 	}
