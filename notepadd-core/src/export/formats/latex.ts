@@ -31,6 +31,11 @@ function joinPhrasingNodes(nodes: string[]) {
 	return nodes.join('');
 }
 
+export type NotePaddExportLatexFile =
+	| {type: 'raw'; content: Uint8Array}
+	| {type: 'image'; url: string}
+	| {type: 'rawImage'; content: Uint8Array; mime: string};
+
 type NotePaddExportLatexContext = NotePaddExportContext & {
 	readonly packages: {
 		amssymb?: boolean;
@@ -40,6 +45,7 @@ type NotePaddExportLatexContext = NotePaddExportContext & {
 		listings?: boolean;
 		mathtools?: boolean;
 		ulem?: boolean;
+		graphicx?: boolean;
 	};
 
 	readonly definitions: {
@@ -54,31 +60,52 @@ type NotePaddExportLatexContext = NotePaddExportContext & {
 		author?: string;
 	};
 
-	readonly files: Map<string, Uint8Array>;
+	readonly files: Map<string, NotePaddExportLatexFile>;
 	readonly moving: boolean;
 	readonly basename: string;
 };
 
 function shouldOverwrite(
-	oldContent: Uint8Array | undefined,
-	newContent: Uint8Array,
+	oldFile: NotePaddExportLatexFile | undefined,
+	newFile: NotePaddExportLatexFile,
 ) {
-	if (!oldContent) return true;
-	if (newContent.byteLength !== oldContent.byteLength) return false;
+	if (!oldFile) return true;
+	if (
+		oldFile.type !== 'raw' ||
+		newFile.type !== 'raw' ||
+		newFile.content.byteLength !== oldFile.content.byteLength
+	) {
+		return false;
+	}
 
-	for (let i = 0; i < newContent.byteLength; i++) {
-		if (newContent[i] !== oldContent[i]) return false;
+	for (let i = 0; i < newFile.content.byteLength; i++) {
+		if (newFile.content[i] !== oldFile.content[i]) return false;
 	}
 
 	return true;
 }
 
-function addFileByHash(
+function addFileByDigest(
 	context: NotePaddExportLatexContext,
-	content: Uint8Array,
+	file: NotePaddExportLatexFile,
 	prefix = '',
 	suffix = '',
 ) {
+	let content;
+
+	switch (file.type) {
+		case 'raw':
+		case 'rawImage': {
+			content = file.content;
+			break;
+		}
+
+		case 'image': {
+			content = stringToUint8Array(file.url);
+			break;
+		}
+	}
+
 	for (const digest of getContentDigest(content)) {
 		const filename =
 			context.basename +
@@ -87,8 +114,8 @@ function addFileByHash(
 			digest +
 			(suffix && '.' + suffix);
 
-		if (shouldOverwrite(context.files.get(filename), content)) {
-			context.files.set(filename, content);
+		if (shouldOverwrite(context.files.get(filename), file)) {
+			context.files.set(filename, file);
 			return filename;
 		}
 	}
@@ -100,7 +127,7 @@ const latexExportFormat: NotePaddExportFormat<{
 	Cell: string;
 	Item: string;
 	Phrasing: string;
-	Root: Map<string, Uint8Array>;
+	Root: Map<string, NotePaddExportLatexFile>;
 	Row: string;
 }> = {
 	// eslint-disable-next-line complexity
@@ -206,16 +233,16 @@ const latexExportFormat: NotePaddExportFormat<{
 			preamble += `\\author{${context.definitions.author}}\n`;
 		}
 
-		context.files.set(
-			`${context.basename}.tex`,
-			stringToUint8Array(
+		context.files.set(`${context.basename}.tex`, {
+			type: 'raw',
+			content: stringToUint8Array(
 				`${preamble}\n\\begin{document}\n${
 					useXepersian && context.direction === 'ltr'
 						? `\\begin{latin}\n${body}\n\\end{latin}`
 						: body
 				}\n\\end{document}\n`,
 			),
-		);
+		});
 
 		return context.files;
 	},
@@ -228,9 +255,9 @@ const latexExportFormat: NotePaddExportFormat<{
 		context.packages.listings = true;
 
 		if (context.moving) {
-			return `\\lstinputlisting{${addFileByHash(
+			return `\\lstinputlisting{${addFileByDigest(
 				context,
-				stringToUint8Array(source),
+				{type: 'raw', content: stringToUint8Array(source)},
 				language ?? 'code',
 				'txt',
 			)}}`;
@@ -347,8 +374,28 @@ const latexExportFormat: NotePaddExportFormat<{
 		return `\\footnote{${joinBlockNodes(getChildren({...context, moving: true}))}}`;
 	},
 	onImage(context, alt, url, title) {
-		// TODO: Implement LaTeX Image export.
-		return `% Images are not supported yet.\n`;
+		context.packages.graphicx = true;
+
+		const match = /(?:^|\/)([^./?#]+)(?:\.[^/?#]+)?(?:$|[?#])/.exec(url);
+		const options = alt ? `[alt={${escapeLatex(alt)}}]` : '';
+
+		return `\\includegraphics${options}{${addFileByDigest(
+			context,
+			{type: 'image', url},
+			match?.[1] ?? 'image',
+		)}}`;
+	},
+	// eslint-disable-next-line max-params
+	onRawImage(context, alt, content, mime, title) {
+		context.packages.graphicx = true;
+
+		const options = alt ? `[alt={${escapeLatex(alt)}}]` : '';
+
+		return `\\includegraphics${options}{${addFileByDigest(
+			context,
+			{type: 'rawImage', content, mime},
+			'image',
+		)}}`;
 	},
 	onInlineCode(context, source) {
 		context.packages.listings = true;
@@ -360,9 +407,9 @@ const latexExportFormat: NotePaddExportFormat<{
 			.join('\\lstinline=|=');
 
 		return context.moving
-			? `\\input{${addFileByHash(
+			? `\\input{${addFileByDigest(
 					context,
-					stringToUint8Array(command),
+					{type: 'raw', content: stringToUint8Array(command)},
 					'code',
 					'part.tex',
 				)}}`
@@ -430,7 +477,7 @@ const latexExportFormat: NotePaddExportFormat<{
 export function exportNotebookToLatex(
 	notebook: NotePadd,
 	basename: string,
-): Map<string, Uint8Array> {
+): Map<string, NotePaddExportLatexFile> {
 	return exportNotebook(latexExportFormat, {
 		...createExportContext(notebook),
 		packages: {},

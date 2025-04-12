@@ -124,6 +124,14 @@ export type NotePaddExportFormat<T extends NotePaddExportFormatTypes> = {
 		title: string | undefined,
 	): T['Phrasing'];
 
+	onRawImage(
+		context: T['Context'],
+		alt: string | undefined,
+		content: Uint8Array,
+		mime: string,
+		title: string | undefined,
+	): T['Phrasing'];
+
 	onInlineCode(context: T['Context'], source: string): T['Phrasing'];
 
 	onLink(

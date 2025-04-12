@@ -1,4 +1,4 @@
-import {Disposable, EventEmitter, type CancellationToken} from 'vscode';
+import {Disposable, EventEmitter, Uri, type CancellationToken} from 'vscode';
 
 export type AsyncDisposable = {
 	asyncDispose(): Promise<any>;
@@ -87,4 +87,12 @@ export class VirtualSocket {
 			this._didDisconnect.fire();
 		});
 	}
+}
+
+export function convertUriToUrl(uri: Uri) {
+	return new URL(uri.toString(true));
+}
+
+export function convertUrlToUri(url: URL) {
+	return Uri.parse(url.href, true);
 }
