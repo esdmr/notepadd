@@ -1,5 +1,6 @@
 import MIMEType from 'whatwg-mimetype';
 import {mapRecord} from '../utils.ts';
+import {directiveMimeType} from '../directives/index.ts';
 
 const builtinMimeTypeOfLangIds: Record<string, string> = {
 	html: 'text/html',
@@ -10,7 +11,7 @@ const builtinMimeTypeOfLangIds: Record<string, string> = {
 	error: 'application/vnd.code.notebook.error',
 	stderr: 'application/vnd.code.notebook.stderr',
 	stdout: 'application/vnd.code.notebook.stdout',
-	notepadd: 'application/x-notepadd+json',
+	notepadd: directiveMimeType,
 };
 
 export function getMimeTypeOfLangId(langId: string) {
