@@ -135,6 +135,13 @@ export class NotePaddController implements Disposable {
 			return;
 		}
 
+		if (result.stderr.length > 0) {
+			output.error(
+				'[NotePADD/Arch/PlantUML/err]',
+				uint8ArrayToString(result.stderr),
+			);
+		}
+
 		if (result.exitCode !== 0) {
 			output.error(
 				'[NotePADD/Arch/PlantUML]',
@@ -151,13 +158,6 @@ export class NotePaddController implements Disposable {
 			);
 
 			execution.end(false, Date.now());
-		}
-
-		if (result.stderr.length > 0) {
-			output.error(
-				'[NotePADD/Arch/PlantUML/err]',
-				uint8ArrayToString(result.stderr),
-			);
 		}
 
 		const delimiterUint8Array = stringToUint8Array(delimiter);
@@ -218,6 +218,9 @@ export class NotePaddController implements Disposable {
 		controller: NotebookController,
 	) {
 		for (const cell of cells) {
+			// FIXME: Pressing the ‘Stop execution’ button should stop all
+			// cells.
+
 			const execution = controller.createNotebookCellExecution(cell);
 
 			execution.start(Date.now());

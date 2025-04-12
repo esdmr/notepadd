@@ -48,7 +48,7 @@ process.on('message', async (value) => {
 	}
 });
 
-// When the computer goes to sleep, Node.JS might stop tracking timeouts
+// When the computer goes to sleep, Node.js might stop tracking timeouts
 // accurately and may even forget to call some of them.
 //
 // - If the sleep duration is ignored, the timeouts would get triggered later
