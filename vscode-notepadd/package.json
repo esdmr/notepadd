@@ -85,7 +85,11 @@
 		],
 		"menus": {
 			"notebook/toolbar": [
-				{"group": "Export", "command": "notepadd.exportToLatex"}
+				{
+					"group": "Export",
+					"command": "notepadd.exportToLatex",
+					"when": "notebookType == 'notepadd'"
+				}
 			]
 		},
 		"configuration": {
