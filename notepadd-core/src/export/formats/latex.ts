@@ -130,6 +130,14 @@ const latexExportFormat: NotePaddExportFormat<{
 	Root: Map<string, NotePaddExportLatexFile>;
 	Row: string;
 }> = {
+	preferredImageMimeTypes: [
+		'application/pdf',
+		'image/svg+xml',
+		'application/postscript',
+		'image/png',
+		'image/jpeg',
+	],
+
 	// eslint-disable-next-line complexity
 	onRoot(context, getChildren) {
 		const body = joinBlockNodes(getChildren(context));

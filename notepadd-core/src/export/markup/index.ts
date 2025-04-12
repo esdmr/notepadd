@@ -1,8 +1,15 @@
 import {uint8ArrayToString} from 'uint8array-extras';
-import {markdown} from '../../format/parsers.ts';
-import type {NotePadd, NotePaddCell} from '../../format/types.ts';
-import {isBinary} from '../../utils.ts';
-import {getLangIdOfMimeType} from '../../format/mime.ts';
+import MIMEType from 'whatwg-mimetype';
+import {
+	deserializeDirective,
+	directiveMimeType,
+} from '../../directives/index.ts';
+import {html, htmlToMarkdown, markdown} from '../../format/parsers.ts';
+import type {
+	NotePadd,
+	NotePaddCell,
+	NotePaddOutput,
+} from '../../format/types.ts';
 import {
 	createSystemMessage,
 	exportMarkdownBlockNode,
@@ -15,6 +22,109 @@ import type {
 	NotePaddExportFormat,
 	NotePaddExportFormatTypes,
 } from './types.ts';
+
+function exportNotebookOutput<T extends NotePaddExportFormatTypes>(
+	output: NotePaddOutput,
+	format: NotePaddExportFormat<T>,
+	context: T['Context'],
+): Array<T['Block']> {
+	let content: Uint8Array | undefined;
+
+	if ((content = output.items[directiveMimeType])) {
+		// TODO: Improve directive output.
+		const directive = deserializeDirective(uint8ArrayToString(content));
+
+		return exportMarkdownBlockNodes(
+			createSystemMessage(
+				'Directive: ',
+				{type: 'text', value: directive.getLabel() ?? '(Untitled)'},
+				'.',
+			),
+			format,
+			context,
+		);
+	}
+
+	if ((content = output.items['text/markdown'])) {
+		return exportMarkdownNode(markdown.parse(content), format, context);
+	}
+
+	if ((content = output.items['text/html'])) {
+		return exportMarkdownNode(
+			htmlToMarkdown.runSync(html.parse(content)),
+			format,
+			context,
+		);
+	}
+
+	// FIXME: Support non-image media
+
+	for (const mime of format.preferredImageMimeTypes) {
+		let content: Uint8Array | undefined;
+
+		if ((content = output.items[mime])) {
+			// TODO: Replace paragraph with a figure.
+			// TODO: Do not use format directly.
+			return [
+				format.onParagraph(context, (context) => [
+					format.onRawImage(
+						context,
+						undefined,
+						content!,
+						mime,
+						undefined,
+					),
+				]),
+			];
+		}
+	}
+
+	const keys = Object.keys(output.items).filter((i) => output.items[i]);
+
+	for (const mime of keys) {
+		const mimeType = new MIMEType(mime);
+
+		if (mimeType.type === 'image') {
+			// TODO: Replace paragraph with a figure.
+			// TODO: Do not use format directly.
+			return [
+				format.onParagraph(context, (context) => [
+					format.onRawImage(
+						context,
+						undefined,
+						output.items[mime]!,
+						mime,
+						undefined,
+					),
+				]),
+			];
+		}
+	}
+
+	for (const mime of keys) {
+		if (
+			mime === 'application/vnd.code.notebook.error' ||
+			mime === 'application/vnd.code.notebook.stderr' ||
+			mime === 'application/vnd.code.notebook.stdout' ||
+			mime === 'text/plain'
+		) {
+			return exportMarkdownBlockNode(
+				{
+					type: 'code',
+					value: uint8ArrayToString(output.items[mime]!),
+				},
+				format,
+				context,
+			);
+		}
+	}
+
+	return exportMarkdownBlockNodes(
+		createSystemMessage('Unknown output format.'),
+		format,
+		context,
+	);
+}
 
 function exportNotebookCell<T extends NotePaddExportFormatTypes>(
 	cell: NotePaddCell,
@@ -31,35 +141,17 @@ function exportNotebookCell<T extends NotePaddExportFormatTypes>(
 		return exportMarkdownNode(root, format, context);
 	}
 
-	return [
-		...exportMarkdownBlockNode(
+	if (!cell.outputs?.length) {
+		return exportMarkdownBlockNode(
 			{type: 'code', value: cell.source, lang: cell.lang},
 			format,
 			context,
-		),
-		...(cell.outputs?.flatMap((output) => {
-			for (const [mime, item] of Object.entries(output.items)) {
-				// TODO: Improve output logic.
-				if (!isBinary(item)) {
-					return exportMarkdownBlockNode(
-						{
-							type: 'code',
-							value: uint8ArrayToString(item),
-							lang: getLangIdOfMimeType(mime),
-						},
-						format,
-						context,
-					);
-				}
-			}
+		);
+	}
 
-			return exportMarkdownBlockNodes(
-				createSystemMessage('Unknown output format.'),
-				format,
-				context,
-			);
-		}) ?? []),
-	];
+	return cell.outputs?.flatMap((output) =>
+		exportNotebookOutput(output, format, context),
+	);
 }
 
 export function createExportContext(notebook: NotePadd): NotePaddExportContext {

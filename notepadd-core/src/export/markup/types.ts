@@ -25,6 +25,8 @@ export type NotePaddExportFormatTypes = {
 };
 
 export type NotePaddExportFormat<T extends NotePaddExportFormatTypes> = {
+	readonly preferredImageMimeTypes: readonly string[];
+
 	onRoot(
 		context: T['Context'],
 		getChildren: (context: T['Context']) => Array<T['Block']>,
