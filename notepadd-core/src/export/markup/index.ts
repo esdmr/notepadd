@@ -94,6 +94,8 @@ function exportNotebookOutput<T extends NotePaddExportFormatTypes>(
 		return exportMarkdownBlockNodes(
 			createSystemMessage(
 				'Directive: ',
+				{type: 'inlineCode', value: directive.directive.toString()},
+				', ',
 				{type: 'text', value: directive.getLabel() ?? '(Untitled)'},
 				'.',
 			),
