@@ -75,11 +75,15 @@ function toOutputHtml(
 	};
 }
 
-function serializeMetadata(metadata: NotePaddMetadata | undefined) {
+function toAttributeMetadata(metadata: NotePaddMetadata | undefined) {
 	return mapRecord(filterNullishValues(metadata ?? {}), ([k, v]) => [
 		k,
 		JSON.stringify(v),
 	]);
+}
+
+function toCodeMetadata(metadata: NotePaddMetadata | undefined) {
+	return JSON.stringify(metadata);
 }
 
 function toOutput(output: NotePaddOutput): mdast.RootContent {
@@ -165,7 +169,7 @@ function toOutput(output: NotePaddOutput): mdast.RootContent {
 	return {
 		type: 'containerDirective',
 		name: outputDirective,
-		attributes: serializeMetadata(output.metadata),
+		attributes: toAttributeMetadata(output.metadata),
 		children,
 	};
 }
@@ -174,23 +178,31 @@ function* toCell(
 	cell: NotePaddCell,
 ): Generator<mdast.RootContent, void, undefined> {
 	if (cell.type === 'code') {
-		yield {type: 'code', lang: cell.lang, value: cell.source};
-	} else {
-		yield* markdown.parse(cell.source).children;
-	}
-
-	const metadata = serializeMetadata(cell.metadata);
-
-	if (Object.keys(metadata).length > 0) {
 		yield {
-			type: 'leafDirective',
-			name: cellDirective,
-			children: [],
-			attributes: metadata,
+			type: 'code',
+			lang: cell.lang || 'plaintext',
+			value: cell.source,
+			meta: toCodeMetadata(cell.metadata),
 		};
+	} else {
+		const {children} = markdown.parse(cell.source);
+		const metadata = toAttributeMetadata(cell.metadata);
+
+		yield children.length === 1 &&
+		children[0]!.type !== 'code' &&
+		Object.keys(metadata).length === 0
+			? children[0]!
+			: {
+					type: 'containerDirective',
+					name: cellDirective,
+					children: children as Array<
+						mdast.BlockContent | mdast.DefinitionContent
+					>,
+					attributes: metadata,
+				};
 	}
 
-	const executionSummary = serializeMetadata({
+	const executionSummary = toAttributeMetadata({
 		order: cell.executionSummary?.executionOrder,
 		success: cell.executionSummary?.success,
 		start: cell.executionSummary?.timing?.startTime,

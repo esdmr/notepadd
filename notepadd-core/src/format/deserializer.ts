@@ -4,6 +4,7 @@ import type * as mdast from 'mdast';
 import {parseSrcset} from 'srcset';
 import {stringToUint8Array} from 'uint8array-extras';
 import * as yaml from 'yaml';
+import * as v from 'valibot';
 import {filterNullishValues, mapRecord} from '../utils.ts';
 import {
 	getLastCell,
@@ -135,14 +136,40 @@ function addOutputMarkdown(context: NotePadd, node: mdast.RootContent) {
 	}
 }
 
-function deserializeMetadata(
+function deserializeAttributeMetadata(
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	attributes: Record<string, string | null | undefined> | null | undefined,
-) {
-	return mapRecord(filterNullishValues(attributes ?? {}), ([k, v]) => [
-		k,
-		JSON.parse(v) as unknown,
-	]);
+): NotePaddMetadata | undefined {
+	try {
+		return mapRecord(filterNullishValues(attributes ?? {}), ([k, v]) => [
+			k,
+			JSON.parse(v) as unknown,
+		]);
+	} catch (error) {
+		console.error(
+			'[NotePADD/.np.md/Deserializer]',
+			'Invalid metadata JSON ignored.',
+			error,
+		);
+	}
+}
+
+const metadataSchema = v.record(v.string(), v.unknown());
+
+function deserializeCodeMetadata(
+	meta: string | undefined,
+): NotePaddMetadata | undefined {
+	if (!meta) return;
+
+	try {
+		return v.parse(metadataSchema, JSON.parse(meta));
+	} catch (error) {
+		console.error(
+			'[NotePADD/.np.md/Deserializer]',
+			'Invalid metadata JSON ignored.',
+			error,
+		);
+	}
 }
 
 // eslint-disable-next-line complexity
@@ -153,6 +180,7 @@ function addCell(context: NotePadd, node: mdast.RootContent) {
 				type: 'code',
 				lang: node.lang ?? 'plaintext',
 				source: node.value,
+				metadata: deserializeCodeMetadata(node.meta ?? undefined),
 			});
 
 			return;
@@ -165,7 +193,9 @@ function addCell(context: NotePadd, node: mdast.RootContent) {
 
 		case 'leafDirective': {
 			if (node.name === cellDirective) {
-				getLastCell(context).metadata = deserializeMetadata(
+				// TODO: Remove this branch for v1. `cell` was switched to a
+				// container directive.
+				getLastCell(context).metadata = deserializeAttributeMetadata(
 					node.attributes,
 				);
 
@@ -179,7 +209,7 @@ function addCell(context: NotePadd, node: mdast.RootContent) {
 				success,
 				start: startTime,
 				end: endTime,
-			} = deserializeMetadata(node.attributes);
+			} = deserializeAttributeMetadata(node.attributes) ?? {};
 
 			const timing =
 				typeof startTime === 'number' && typeof endTime === 'number'
@@ -196,6 +226,20 @@ function addCell(context: NotePadd, node: mdast.RootContent) {
 		}
 
 		case 'containerDirective': {
+			if (node.name === cellDirective) {
+				context.cells.push({
+					type: 'markup',
+					lang: 'markdown',
+					source: markdown.stringify({
+						type: 'root',
+						children: node.children,
+					}),
+					metadata: deserializeAttributeMetadata(node.attributes),
+				});
+
+				return;
+			}
+
 			if (node.name !== outputDirective) break;
 
 			const lastCell = getLastCell(context);
@@ -203,7 +247,7 @@ function addCell(context: NotePadd, node: mdast.RootContent) {
 			lastCell.outputs ??= [];
 			lastCell.outputs.push({
 				items: {},
-				metadata: deserializeMetadata(node.attributes),
+				metadata: deserializeAttributeMetadata(node.attributes),
 			});
 
 			for (const child of node.children) {
