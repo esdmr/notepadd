@@ -22,6 +22,8 @@ export function getMimeTypeOfMarkdownLang(
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	mdLang: string | null | undefined,
 ) {
+	// TODO: Remove this function for v1. Output code blocks now use `meta` to
+	// store the MIME type.
 	const [langId = 'plaintext', mime] = mdLang?.split(' ', 2) ?? [];
 
 	return mime ?? getMimeTypeOfLangId(langId);
@@ -42,12 +44,6 @@ export function getLangIdOfMimeType(mime: string) {
 		mimeSubTypeLangIdRegExp.exec(mimeType.subtype)?.[1] ??
 		mimeType.subtype
 	);
-}
-
-export function getMarkdownLangOfMimeType(mime: string) {
-	const langId = getLangIdOfMimeType(mime);
-
-	return getMimeTypeOfLangId(langId) === mime ? langId : `${langId} ${mime}`;
 }
 
 const builtinMimeTypeOfFileExtensions: Record<string, string> = {

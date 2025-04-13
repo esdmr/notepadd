@@ -88,7 +88,8 @@ function addOutputMarkdown(context: NotePadd, node: mdast.RootContent) {
 		case 'code': {
 			addOutput(
 				context,
-				getMimeTypeOfMarkdownLang(node.lang),
+				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+				node.meta || getMimeTypeOfMarkdownLang(node.lang),
 				node.value,
 			);
 			break;

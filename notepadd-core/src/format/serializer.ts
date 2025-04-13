@@ -18,7 +18,7 @@ import type {
 	NotePaddMetadata,
 	NotePaddOutput,
 } from './types.ts';
-import {getMarkdownLangOfMimeType} from './mime.ts';
+import {getLangIdOfMimeType} from './mime.ts';
 
 function toOutputUri(mimeType: string, body: Uint8Array | string) {
 	if (isUriSafe(body)) {
@@ -143,7 +143,8 @@ function toOutput(output: NotePaddOutput): mdast.RootContent {
 	for (const [k, v] of Object.entries(text)) {
 		children.push({
 			type: 'code',
-			lang: getMarkdownLangOfMimeType(k),
+			lang: getLangIdOfMimeType(k),
+			meta: k,
 			value: typeof v === 'string' ? v : uint8ArrayToString(v),
 		});
 	}
