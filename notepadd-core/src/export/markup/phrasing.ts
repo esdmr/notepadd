@@ -12,11 +12,18 @@ export function createInlineSystemMessage(
 		{
 			type: 'textDirective',
 			name: 'ltr',
-			children: children.map((i) =>
-				typeof i === 'string'
-					? {type: 'emphasis', children: [{type: 'text', value: i}]}
-					: i,
-			),
+			children: children.map((i) => {
+				if (typeof i !== 'string') return i;
+
+				if (/\p{L}/u.test(i)) {
+					return {
+						type: 'emphasis',
+						children: [{type: 'text', value: i}],
+					};
+				}
+
+				return {type: 'text', value: i};
+			}),
 		},
 		{type: 'text', value: ']'},
 	];
@@ -221,7 +228,8 @@ export function exportMarkdownPhrasingNode<T extends NotePaddExportFormatTypes>(
 
 			return exportMarkdownPhrasingNodes(
 				createInlineSystemMessage(
-					'Unknown text directive ',
+					'Unknown text directive',
+					' ',
 					{type: 'inlineCode', value: node.name},
 					'.',
 				),

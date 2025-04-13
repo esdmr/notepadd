@@ -206,13 +206,15 @@ export function exportMarkdownBlockNode<T extends NotePaddExportFormatTypes>(
 			return exportMarkdownBlockNodes(
 				[
 					...createSystemMessage(
-						'Start of unknown container directive ',
+						'Start of unknown container directive',
+						' ',
 						{type: 'inlineCode', value: node.name},
 						'.',
 					),
 					...node.children,
 					...createSystemMessage(
-						'End of unknown container directive ',
+						'End of unknown container directive',
+						' ',
 						{type: 'inlineCode', value: node.name},
 						'.',
 					),
@@ -225,7 +227,8 @@ export function exportMarkdownBlockNode<T extends NotePaddExportFormatTypes>(
 		case 'leafDirective': {
 			return exportMarkdownBlockNodes(
 				createSystemMessage(
-					'Unknown leaf directive ',
+					'Unknown leaf directive',
+					' ',
 					{type: 'inlineCode', value: node.name},
 					'.',
 				),
