@@ -1,9 +1,11 @@
 import {uint8ArrayToString} from 'uint8array-extras';
 import MIMEType from 'whatwg-mimetype';
+import * as v from 'valibot';
 import {
 	deserializeDirective,
 	directiveMimeType,
 } from '../../directives/index.ts';
+import {getLangIdOfMimeType} from '../../format/mime.ts';
 import {html, htmlToMarkdown, markdown} from '../../format/parsers.ts';
 import type {
 	NotePadd,
@@ -22,6 +24,61 @@ import type {
 	NotePaddExportFormat,
 	NotePaddExportFormatTypes,
 } from './types.ts';
+
+const errorOutputSchema = v.object({
+	name: v.optional(v.string()),
+	message: v.optional(v.string()),
+	stack: v.optional(v.string()),
+});
+
+function exportNotebookErrorOutput<T extends NotePaddExportFormatTypes>(
+	content: Uint8Array,
+	format: NotePaddExportFormat<T>,
+	context: T['Context'],
+): Array<T['Block']> {
+	let error;
+
+	try {
+		error = v.parse(
+			errorOutputSchema,
+			JSON.parse(uint8ArrayToString(content)),
+		);
+	} catch {
+		return exportMarkdownBlockNodes(
+			createSystemMessage('Invalid error output.'),
+			format,
+			context,
+		);
+	}
+
+	if (error.stack) {
+		return exportMarkdownBlockNode(
+			{type: 'code', value: error.stack},
+			format,
+			context,
+		);
+	}
+
+	const message =
+		error.name && error.message
+			? `${error.name}: ${error.message}`
+			: // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+				error.name || error.message;
+
+	if (!message) {
+		return exportMarkdownBlockNodes(
+			createSystemMessage('Blank error output.'),
+			format,
+			context,
+		);
+	}
+
+	return exportMarkdownBlockNode(
+		{type: 'code', value: message},
+		format,
+		context,
+	);
+}
 
 function exportNotebookOutput<T extends NotePaddExportFormatTypes>(
 	output: NotePaddOutput,
@@ -102,8 +159,30 @@ function exportNotebookOutput<T extends NotePaddExportFormatTypes>(
 	}
 
 	for (const mime of keys) {
+		const mimeType = new MIMEType(mime);
+
 		if (
-			mime === 'application/vnd.code.notebook.error' ||
+			mime === 'application/json' ||
+			(mimeType.type === 'text' && mimeType.subtype.startsWith('x-'))
+		) {
+			return exportMarkdownBlockNode(
+				{
+					type: 'code',
+					value: uint8ArrayToString(output.items[mime]!),
+					lang: getLangIdOfMimeType(mime),
+				},
+				format,
+				context,
+			);
+		}
+	}
+
+	if ((content = output.items['application/vnd.code.notebook.error'])) {
+		return exportNotebookErrorOutput(content, format, context);
+	}
+
+	for (const mime of keys) {
+		if (
 			mime === 'application/vnd.code.notebook.stderr' ||
 			mime === 'application/vnd.code.notebook.stdout' ||
 			mime === 'text/plain'
