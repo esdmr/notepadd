@@ -4,7 +4,7 @@
 	"private": true,
 	"exports": "./src/index.ts",
 	"devDependencies": {
-		"@types/node": "20.17.25",
+		"@types/node": "20.17.26",
 		"type-fest": "4.37.0",
 		"vite": "6.2.2"
 	},
