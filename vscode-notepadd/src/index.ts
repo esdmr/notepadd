@@ -18,6 +18,7 @@ import {setupOpenNotebookCommand} from './command/open-notebook.ts';
 import {setupExportToLatexCommand} from './command/export-to-latex.ts';
 import {PastAlarmsView} from './view/past-alarms.ts';
 import {ActiveEventsView} from './view/active-events.ts';
+import {setupBridgeNotification} from './bridge-notification.ts';
 
 const asyncSubscriptions: AsyncDisposable[] = [];
 
@@ -32,6 +33,7 @@ export async function activate(context: ExtensionContext) {
 			setupStartTimekeeperCommand(),
 			setupStopTimekeeperCommand(),
 			setupNotepaddStatus(),
+			setupBridgeNotification(),
 			new NotePaddSerializer(),
 			new NotePaddController(),
 			new ActiveEventsView(),
