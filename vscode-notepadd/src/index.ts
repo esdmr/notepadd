@@ -13,9 +13,11 @@ import {setupStopTimekeeperCommand} from './command/stop-timekeeper.ts';
 import {type AsyncDisposable} from './utils.ts';
 import {setupNotepaddStatus} from './status-bar-item/notepadd-status.ts';
 import {events} from './bus.ts';
-import {NotepaddBridgeView} from './view/notepadd-instances.ts';
+import {DirectivesView} from './view/directives.ts';
 import {setupOpenNotebookCommand} from './command/open-notebook.ts';
 import {setupExportToLatexCommand} from './command/export-to-latex.ts';
+import {PastAlarmsView} from './view/past-alarms.ts';
+import {ActiveEventsView} from './view/active-events.ts';
 
 const asyncSubscriptions: AsyncDisposable[] = [];
 
@@ -32,7 +34,9 @@ export async function activate(context: ExtensionContext) {
 			setupNotepaddStatus(),
 			new NotePaddSerializer(),
 			new NotePaddController(),
-			new NotepaddBridgeView(),
+			new ActiveEventsView(),
+			new PastAlarmsView(),
+			new DirectivesView(),
 			await new Bookkeeper().initialize(),
 		);
 

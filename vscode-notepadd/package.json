@@ -46,6 +46,18 @@
 		"views": {
 			"notepadd": [
 				{
+					"id": "notepadd-active-events",
+					"contextualTitle": "NotePADD",
+					"name": "Active Events",
+					"icon": "src/notepadd-icon.svg"
+				},
+				{
+					"id": "notepadd-past-alarms",
+					"contextualTitle": "NotePADD",
+					"name": "Past Alarms",
+					"icon": "src/notepadd-icon.svg"
+				},
+				{
 					"id": "notepadd-directives",
 					"contextualTitle": "NotePADD",
 					"name": "Directives",

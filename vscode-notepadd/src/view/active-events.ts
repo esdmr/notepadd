@@ -1,12 +1,11 @@
 import {inspect} from 'node:util';
-import {type Directive} from 'notepadd-core';
-import {DirectiveState} from 'notepadd-timekeeper';
+import {type DirectiveState} from 'notepadd-timekeeper';
 import {
 	type Disposable,
 	EventEmitter,
 	type ProviderResult,
 	type TreeDataProvider,
-	TreeItem,
+	type TreeItem,
 	window,
 } from 'vscode';
 import {
@@ -16,59 +15,21 @@ import {
 	onTimekeeperUpdated,
 } from '../bus.ts';
 import {output} from '../output.ts';
+import {BridgeDirective} from './directives.ts';
 
-class BridgeDirective extends TreeItem {
-	readonly directive: Directive;
+export class BridgeEvent extends BridgeDirective {
+	active = false;
 
-	constructor(data: {directive: Directive} | DirectiveState) {
-		// FIXME: Add proper instance and directive toLabel method
-		super(data.directive.getLabel() ?? '[Untitled]');
-
-		this.directive = data.directive;
-		this.id = data.directive.toString();
-
-		if (data instanceof DirectiveState) {
-			this.setState(data);
-		}
-	}
-
-	setState(state: DirectiveState) {
-		if (state.directive.toString() !== this.id) {
-			throw new Error(
-				'Bug: Directive state does not belong to this bridge item',
-			);
-		}
-
-		// TODO: Show a pop-up to select the source.
-		const [source] = state.sources;
-
-		if (source === undefined) {
-			this.command = undefined;
-		} else {
-			// TODO: Add configuration to switch this to `vscode.open`. Make
-			// sure to delete the URI fragments when that happens.
-			this.command = {
-				title: 'Open',
-				command: 'notepadd.openNotebook',
-				arguments: [source],
-			};
-		}
-
-		// TODO: Make locale configurable
-		this.description =
-			state.instance.next?.toLocaleString('en-GB', {
-				calendar: state.instance.next.calendarId,
-			}) ??
-			state.instance.previous?.toLocaleString('en-GB', {
-				calendar: state.instance.previous.calendarId,
-			});
+	override setState(state: DirectiveState) {
+		super.setState(state);
+		this.active = state.instance.currentState === 'high';
 	}
 }
 
-type BridgeTreeItem = BridgeDirective;
+type ActiveEventsTreeItem = BridgeEvent;
 
-export class NotepaddBridgeView
-	implements TreeDataProvider<BridgeTreeItem>, Disposable
+export class ActiveEventsView
+	implements TreeDataProvider<ActiveEventsTreeItem>, Disposable
 {
 	private readonly _treeView;
 
@@ -78,31 +39,35 @@ export class NotepaddBridgeView
 			this._items.clear();
 
 			for (const state of states) {
+				if (state.instance.currentState === 'pulse') continue;
+
 				this._items.set(
 					state.directive.toString(),
-					new BridgeDirective(state),
+					new BridgeEvent(state),
 				);
 			}
 
 			this._stalled = false;
 			this._setStatus();
 			this._didChangeTreeData.fire();
-			output.trace('[NotePADD/Bridge]', 'Updated all.');
+			output.trace('[NotePADD/Bridge/Active Events]', 'Updated.');
 		}),
 		onTimekeeperTriggered.event((state) => {
-			if (!this._connection) return;
+			if (!this._connection || state.instance.currentState === 'pulse') {
+				return;
+			}
 
 			const hash = state.directive.toString();
 			const treeItem = this._items.get(hash);
 
 			if (!treeItem) {
 				output.error(
-					'[NotePADD/Bridge]',
+					'[NotePADD/Bridge/Active Events]',
 					'Bug: Unknown directive was triggered:',
 					hash,
 				);
 				output.trace(
-					'[NotePADD/Bridge]',
+					'[NotePADD/Bridge/Active Events]',
 					'Items:',
 					inspect(this._items),
 				);
@@ -111,20 +76,23 @@ export class NotepaddBridgeView
 
 			treeItem.setState(state);
 			this._setStatus();
-			this._didChangeTreeData.fire(treeItem);
-			output.trace('[NotePADD/Bridge]', 'Updated one.');
+			this._didChangeTreeData.fire();
+			output.trace('[NotePADD/Bridge/Active Events]', 'Updated.');
 		}),
 		onTimekeeperStalled.event(() => {
 			this._stalled = true;
 			this._setStatus();
 			this._didChangeTreeData.fire();
-			output.trace('[NotePADD/Bridge]', 'Marked as stalled.');
+			output.trace(
+				'[NotePADD/Bridge/Active Events]',
+				'Marked as stalled.',
+			);
 		}),
 	];
 
 	// eslint-disable-next-line unicorn/prefer-event-target
 	private readonly _didChangeTreeData = new EventEmitter<
-		void | BridgeTreeItem | BridgeTreeItem[] | undefined
+		void | ActiveEventsTreeItem | ActiveEventsTreeItem[] | undefined
 	>();
 
 	get onDidChangeTreeData() {
@@ -133,10 +101,10 @@ export class NotepaddBridgeView
 
 	private _connection: Disposable | undefined;
 	private _stalled = true;
-	private readonly _items = new Map<string, BridgeTreeItem>();
+	private readonly _items = new Map<string, ActiveEventsTreeItem>();
 
 	constructor() {
-		this._treeView = window.createTreeView('notepadd-directives', {
+		this._treeView = window.createTreeView('notepadd-active-events', {
 			treeDataProvider: this,
 		});
 		this._handlers.push(
@@ -156,15 +124,15 @@ export class NotepaddBridgeView
 		}
 	}
 
-	getTreeItem(element: BridgeTreeItem): TreeItem | Thenable<TreeItem> {
+	getTreeItem(element: ActiveEventsTreeItem): TreeItem | Thenable<TreeItem> {
 		return element;
 	}
 
 	getChildren(
-		element?: BridgeTreeItem | undefined,
-	): ProviderResult<BridgeTreeItem[]> {
+		element?: ActiveEventsTreeItem | undefined,
+	): ProviderResult<ActiveEventsTreeItem[]> {
 		if (element !== undefined) return;
-		return [...this._items.values()];
+		return [...this._items.values()].filter((i) => i.active);
 	}
 
 	private _setConnected(connected: boolean) {
@@ -172,12 +140,12 @@ export class NotepaddBridgeView
 
 		if (connected && !this._connection) {
 			this._connection = bridgeSocket.connect();
-			output.debug('[NotePADD/Bridge]', 'Connected.');
+			output.debug('[NotePADD/Bridge/Active Events]', 'Connected.');
 		} else if (!connected && this._connection) {
 			this._connection.dispose();
 			this._connection = undefined;
 			this._items.clear();
-			output.debug('[NotePADD/Bridge]', 'Disconnected.');
+			output.debug('[NotePADD/Bridge/Active Events]', 'Disconnected.');
 		}
 
 		if (changed) {
