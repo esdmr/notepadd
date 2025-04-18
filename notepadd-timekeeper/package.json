@@ -13,7 +13,7 @@
 	"packageManager": "pnpm@9.15.9",
 	"dependencies": {
 		"notepadd-core": "workspace:*",
-		"temporal-polyfill": "0.2.5",
+		"temporal-polyfill": "0.3.0",
 		"uint8array-extras": "1.4.0"
 	}
 }

@@ -19,7 +19,7 @@
 		"remark-gfm": "4.0.1",
 		"remark-math": "6.0.0",
 		"srcset": "5.0.1",
-		"temporal-polyfill": "0.2.5",
+		"temporal-polyfill": "0.3.0",
 		"uint8array-extras": "1.4.0",
 		"valibot": "0.42.1",
 		"whatwg-mimetype": "4.0.0",
