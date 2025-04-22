@@ -8,7 +8,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "20.17.29",
-		"type-fest": "4.38.0"
+		"type-fest": "4.39.0"
 	},
 	"packageManager": "pnpm@9.15.9",
 	"dependencies": {

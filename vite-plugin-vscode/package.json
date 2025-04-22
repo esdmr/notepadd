@@ -5,7 +5,7 @@
 	"exports": "./src/index.ts",
 	"devDependencies": {
 		"@types/node": "20.17.29",
-		"type-fest": "4.38.0",
+		"type-fest": "4.39.0",
 		"vite": "6.2.4"
 	},
 	"peerDependencies": {
