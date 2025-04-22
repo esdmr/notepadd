@@ -21,6 +21,8 @@ export class EventNode
 			return new OneShotEvent(this.when.toPeriod(now));
 		}
 
+		this.when satisfies never;
+
 		throw new TypeError(
 			`Bug: Unhandled event kind: ${JSON.stringify(this.when, undefined, 2)}`,
 		);

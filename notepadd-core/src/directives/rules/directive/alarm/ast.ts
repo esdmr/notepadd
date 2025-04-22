@@ -28,6 +28,8 @@ export class AlarmNode
 			return new OneShotAlarm(now.add(this.when.toDuration()));
 		}
 
+		this.when satisfies never;
+
 		throw new TypeError(
 			`Bug: Unhandled alarm kind: ${JSON.stringify(this.when, undefined, 2)}`,
 		);
