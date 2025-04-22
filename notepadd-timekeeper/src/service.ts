@@ -31,20 +31,24 @@ process.on('uncaughtExceptionMonitor', (error, origin) => {
 process.on('message', async (value) => {
 	const {message} = v.parse(BookkeeperMessage.schema, value);
 
-	if (message instanceof UpdateMessage) {
-		processUpdate(message);
+	switch (message._type) {
+		case 'UpdateMessage': {
+			processUpdate(message);
 
-		if (message.fetchRequested) {
-			process.send!(
-				new TimekeeperMessage(new ListMessage(getDirectiveStates())),
-			);
+			if (message.fetchRequested) {
+				process.send!(
+					new TimekeeperMessage(
+						new ListMessage(getDirectiveStates()),
+					),
+				);
+			}
+
+			break;
 		}
-	} else if (message instanceof TerminateMessage) {
-		process.exit(0);
-	} else {
-		throw new TypeError(
-			`Bug: Unknown bookkeeper message: ${JSON.stringify(message, undefined, 2)}`,
-		);
+
+		case 'TerminateMessage': {
+			process.exit(0);
+		}
 	}
 });
 

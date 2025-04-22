@@ -106,36 +106,47 @@ export class Timekeeper implements AsyncDisposable {
 
 			const {message} = v.parse(TimekeeperMessage.schema, value);
 
-			if (message instanceof DiscoveryMessage) {
-				output.debug('[NotePADD/Timekeeper]', 'Discovery requested.');
-				onTimekeeperStarted.fire();
-			} else if (message instanceof TriggerMessage) {
-				output.debug(
-					'[NotePADD/Timekeeper]',
-					'Directive triggered.',
-					message.state,
-				);
-				onTimekeeperTriggered.fire(message.state);
-			} else if (message instanceof LogMessage) {
-				output[message.level](
-					'[NotePADD/Timekeeper/ipc]',
-					...message.items,
-				);
-			} else if (message instanceof ListMessage) {
-				output.debug(
-					'[NotePADD/Timekeeper]',
-					'Received list of instances.',
-				);
-				output.trace(
-					'[NotePADD/Timekeeper]',
-					'Instances:',
-					message.states,
-				);
-				onTimekeeperUpdated.fire(message.states);
-			} else {
-				throw new TypeError(
-					`Bug: Unknown timekeeper message: ${JSON.stringify(message, undefined, 2)}`,
-				);
+			switch (message._type) {
+				case 'DiscoveryMessage': {
+					output.debug(
+						'[NotePADD/Timekeeper]',
+						'Discovery requested.',
+					);
+					onTimekeeperStarted.fire();
+					break;
+				}
+
+				case 'TriggerMessage': {
+					output.debug(
+						'[NotePADD/Timekeeper]',
+						'Directive triggered.',
+						message.state,
+					);
+					onTimekeeperTriggered.fire(message.state);
+					break;
+				}
+
+				case 'LogMessage': {
+					output[message.level](
+						'[NotePADD/Timekeeper/ipc]',
+						...message.items,
+					);
+					break;
+				}
+
+				case 'ListMessage': {
+					output.debug(
+						'[NotePADD/Timekeeper]',
+						'Received list of instances.',
+					);
+					output.trace(
+						'[NotePADD/Timekeeper]',
+						'Instances:',
+						message.states,
+					);
+					onTimekeeperUpdated.fire(message.states);
+					break;
+				}
 			}
 		});
 
