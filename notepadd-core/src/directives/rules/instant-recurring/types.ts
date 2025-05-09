@@ -46,12 +46,26 @@ export class RecurringInstant {
 	}
 
 	getInstance(now: Temporal.ZonedDateTime) {
-		if (this._checkBounds(now) < 0) {
-			// Edge case for before recurrence starts, because the following
-			// algorithm would likely estimate some instance from before the
-			// start and then filter it at the bounds checking, yielding no
-			// instance.
-			return new Instance(undefined, this.first);
+		switch (this._checkBounds(now)) {
+			case -1: {
+				// Edge case for before recurrence starts, because the following
+				// algorithm would likely estimate some instance from before the
+				// start and then filter it at the bounds checking, yielding no
+				// instance.
+				return new Instance(undefined, this.first);
+			}
+
+			case 0: {
+				break;
+			}
+
+			case 1: {
+				// Edge case for after recurrence ends, similar to above.
+				// However, since the last instance may be before the end of
+				// recurrence, we must calculate it and cannot return early.
+				// This case can only happen if the recurrence ends.
+				now = this.end!;
+			}
 		}
 
 		const guessedInstant = this._estimateInstancePrecise(now);
@@ -78,7 +92,7 @@ export class RecurringInstant {
 		const next = instance.next?.add(this.interval);
 
 		return new Instance(
-			instance.next,
+			instance.next ?? instance.previous,
 			next && this._checkBounds(next) === 0 ? next : undefined,
 		);
 	}

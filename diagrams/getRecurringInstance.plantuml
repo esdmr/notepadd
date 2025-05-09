@@ -58,12 +58,21 @@ split again
 start
 
 group edge case
-	if (<latex>p(t_{\mathrm{now}})</latex>) then (<latex>= -1</latex>)
+	switch (<latex>p(t_{\mathrm{now}})</latex>)
+	case (<latex>= -1</latex>)
 		:<latex>t_{\mathrm{prev}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow \varnothing\\t_{\mathrm{next}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow t_0</latex>
 		Recurrence has not started yet.
 		This means that the following algorithm would likely estimate some instance from before the start and then filter it at the bounds checking, yielding no instance.;
 		stop
-	endif
+	case (<latex>= 1</latex>)
+		:<latex>t_{\mathrm{now}}\colon \mathrm{zdt} \mathrel\leftarrow t_{\mathrm{end}} \pod{t_{\mathrm{end}} \ne \varnothing}</latex>
+		Recurrence has ended already.
+		This means that the following algorithm would likely estimate some instance from after the end and then filter it at the bounds checking, yielding no instance.
+		Since the last instance may be before the end of recurrence, we must calculate it and cannot return early.
+		This case can only happen if the recurrence ends.;
+	case (<latex>= 0</latex>)
+		:Base case;
+	endswitch
 end group
 
 group estimate imprecise
@@ -109,7 +118,7 @@ end group
 
 group bounds check
 	split
-		if (<latex>p(t_{\mathrm{next}})</latex>) then
+		if (<latex>p(t_{\mathrm{prev}})</latex>) then
 			:<latex>t_{\mathrm{prev}} \mathrel\leftarrow \varnothing</latex>
 			Previous instance was out-of-bounds, so it should be null instead.;
 		else (<latex>= 0</latex>)
