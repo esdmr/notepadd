@@ -1,10 +1,20 @@
 import {inspect} from 'node:util';
-import {type Directive, type InstanceState} from 'notepadd-core';
+import {
+	type Directive,
+	type InstanceState,
+	type OneShotAlarm,
+	type OneShotEvent,
+	type RecurringAlarm,
+	type RecurringEvent,
+	type Reference,
+	type Timer,
+} from 'notepadd-core';
 import {DirectiveState} from 'notepadd-timekeeper';
 import {
 	type Disposable,
 	EventEmitter,
 	type ProviderResult,
+	ThemeIcon,
 	type TreeDataProvider,
 	TreeItem,
 	window,
@@ -38,6 +48,40 @@ export class BridgeDirective extends TreeItem {
 
 		this.directive = data.directive;
 		this.id = data.directive.toString();
+
+		switch (
+			(
+				data.directive.directive as
+					| OneShotAlarm
+					| RecurringAlarm
+					| Timer
+					| Reference
+					| OneShotEvent
+					| RecurringEvent
+			)._type
+		) {
+			case 'OneShotAlarm':
+			case 'RecurringAlarm': {
+				this.iconPath = new ThemeIcon('bell');
+				break;
+			}
+
+			case 'Timer': {
+				this.iconPath = new ThemeIcon('watch');
+				break;
+			}
+
+			case 'Reference': {
+				this.iconPath = new ThemeIcon('link');
+				break;
+			}
+
+			case 'OneShotEvent':
+			case 'RecurringEvent': {
+				this.iconPath = new ThemeIcon('calendar');
+				break;
+			}
+		}
 
 		if (data instanceof DirectiveState) {
 			this.setState(data);
