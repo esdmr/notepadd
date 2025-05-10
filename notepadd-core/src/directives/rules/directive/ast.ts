@@ -14,7 +14,7 @@ export class DirectiveNode extends SyntaxNode<
 	readonly directive = this._children[0];
 	readonly comment = this._children[1];
 
-	toDirective(now = Temporal.Now.zonedDateTime('iso8601')) {
+	toDirective(now = Temporal.Now.zonedDateTimeISO()) {
 		// TODO: Make time-zone configurable.
 
 		return new Directive(
