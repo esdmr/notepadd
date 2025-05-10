@@ -69,7 +69,7 @@ instant_literal =
 	[time_zone (* defaults to local *)];
 
 instant_later =
-	plain_time (* next occurence, either today or tomorrow *),
+	plain_time (* next occurrence, either today or tomorrow *),
 	[time_zone (* defaults to local *)];
 
 instant_now =
