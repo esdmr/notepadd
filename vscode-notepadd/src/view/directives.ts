@@ -1,5 +1,5 @@
 import {inspect} from 'node:util';
-import {type Directive} from 'notepadd-core';
+import {type Directive, type InstanceState} from 'notepadd-core';
 import {DirectiveState} from 'notepadd-timekeeper';
 import {
 	type Disposable,
@@ -16,6 +16,18 @@ import {
 	onTimekeeperUpdated,
 } from '../bus.ts';
 import {output} from '../output.ts';
+
+const previousLabels: Record<InstanceState, string> = {
+	pulse: 'Previously at',
+	high: 'Started at',
+	low: 'Previously ended at',
+};
+
+const nextLabels: Record<InstanceState, string> = {
+	pulse: 'At',
+	high: 'Ends at',
+	low: 'Starts at',
+};
 
 export class BridgeDirective extends TreeItem {
 	readonly directive: Directive;
@@ -72,6 +84,25 @@ export class BridgeDirective extends TreeItem {
 					calendar: state.instance.previous.calendarId,
 				});
 		}
+
+		this.tooltip =
+			`${this.directive.comment.join('\n')}\n` +
+			(state.instance.next
+				? `\n${nextLabels[state.instance.currentState]} ${state.instance.next.toLocaleString(
+						'en-GB',
+						{
+							calendar: state.instance.next.calendarId,
+						},
+					)}`
+				: '') +
+			(state.instance.previous
+				? `\n${previousLabels[state.instance.currentState]} ${state.instance.previous.toLocaleString(
+						'en-GB',
+						{
+							calendar: state.instance.previous.calendarId,
+						},
+					)}`
+				: '');
 	}
 }
 
