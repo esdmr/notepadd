@@ -1,13 +1,7 @@
-import {type Temporal} from 'temporal-polyfill';
 import * as v from 'valibot';
-import {
-	durationSchema,
-	getDiscriminator,
-	transformFallible,
-} from '../../../../utils.ts';
-import {Instance, type DirectiveChild} from '../base.ts';
+import {getDiscriminator, transformFallible} from '../../../../utils.ts';
 
-export class Reference implements DirectiveChild {
+export class Reference {
 	static readonly schema = v.pipe(
 		v.object({
 			_type: v.literal('Reference'),
@@ -17,6 +11,8 @@ export class Reference implements DirectiveChild {
 	);
 
 	readonly _type = getDiscriminator(Reference);
+	declare readonly getInstance: undefined;
+	declare readonly getNextInstance: undefined;
 
 	constructor(readonly target: string) {}
 

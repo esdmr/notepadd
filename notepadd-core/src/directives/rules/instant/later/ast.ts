@@ -2,12 +2,10 @@ import {Temporal} from 'temporal-polyfill';
 import {SyntaxNode} from '../../ast.ts';
 import type {PlainTimeNode} from '../../plain-time/ast.ts';
 import type {TimeZoneNode} from '../../time-zone/ast.ts';
-import type {InstantChildNode} from '../ast.ts';
 
-export class InstantLaterNode
-	extends SyntaxNode<[PlainTimeNode, TimeZoneNode | undefined]>
-	implements InstantChildNode
-{
+export class InstantLaterNode extends SyntaxNode<
+	[PlainTimeNode, TimeZoneNode | undefined]
+> {
 	readonly time = this._children[0];
 	readonly timeZone = this._children[1];
 

@@ -1,12 +1,8 @@
 import type {MooToken} from '@esdmr/nearley';
 import {Temporal} from 'temporal-polyfill';
 import {SyntaxNode} from '../../ast.ts';
-import type {PlainTimeChildNode} from '../ast.ts';
 
-export class PlainTimeOfDayNode
-	extends SyntaxNode<[MooToken]>
-	implements PlainTimeChildNode
-{
+export class PlainTimeOfDayNode extends SyntaxNode<[MooToken]> {
 	readonly timeOfDay = this._children[0].type;
 
 	toPlainTime(_now: Temporal.PlainTime) {

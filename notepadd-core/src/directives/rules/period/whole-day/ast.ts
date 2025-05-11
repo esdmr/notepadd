@@ -4,14 +4,10 @@ import {SyntaxNode} from '../../ast.ts';
 import type {PlainDateNode} from '../../plain-date/ast.ts';
 import type {TimeZoneNode} from '../../time-zone/ast.ts';
 import {Period} from '../types.ts';
-import type {PeriodChildNode} from '../ast.ts';
 
-export class PeriodWholeDayNode
-	extends SyntaxNode<
-		[PlainDateNode, MooToken, MooToken, TimeZoneNode | undefined]
-	>
-	implements PeriodChildNode
-{
+export class PeriodWholeDayNode extends SyntaxNode<
+	[PlainDateNode, MooToken, MooToken, TimeZoneNode | undefined]
+> {
 	readonly date = this._children[0];
 	readonly timeZone = this._children[3];
 

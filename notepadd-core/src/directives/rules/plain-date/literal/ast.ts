@@ -3,21 +3,17 @@ import {Temporal} from 'temporal-polyfill';
 import {SyntaxNode} from '../../ast.ts';
 import type {CalendarNode} from '../../calendar/ast.ts';
 import type {UnsignedIntegerNode} from '../../integer/unsigned/ast.ts';
-import type {PlainDateChildNode} from '../ast.ts';
 
-export class PlainDateLiteralNode
-	extends SyntaxNode<
-		[
-			CalendarNode | undefined,
-			UnsignedIntegerNode,
-			MooToken,
-			UnsignedIntegerNode,
-			MooToken,
-			UnsignedIntegerNode,
-		]
-	>
-	implements PlainDateChildNode
-{
+export class PlainDateLiteralNode extends SyntaxNode<
+	[
+		CalendarNode | undefined,
+		UnsignedIntegerNode,
+		MooToken,
+		UnsignedIntegerNode,
+		MooToken,
+		UnsignedIntegerNode,
+	]
+> {
 	readonly calendar = this._children[0];
 	readonly year = this._children[1];
 	readonly month = this._children[3];

@@ -6,9 +6,9 @@ import {
 	zonedDateTimeSchema,
 } from '../../../../utils.ts';
 import {RecurringInstant} from '../../instant-recurring/types.ts';
-import {Instance, type DirectiveChild} from '../base.ts';
+import {Instance} from '../base.ts';
 
-export class OneShotAlarm implements DirectiveChild {
+export class OneShotAlarm {
 	static readonly schema = v.pipe(
 		v.object({
 			_type: v.literal('OneShotAlarm'),
@@ -36,7 +36,7 @@ export class OneShotAlarm implements DirectiveChild {
 	}
 }
 
-export class RecurringAlarm implements DirectiveChild {
+export class RecurringAlarm {
 	static readonly schema = v.pipe(
 		v.object({
 			_type: v.literal('RecurringAlarm'),

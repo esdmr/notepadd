@@ -5,9 +5,8 @@ import {
 	getDiscriminator,
 	transformFallible,
 } from '../../../../utils.ts';
-import {Instance, type DirectiveChild} from '../base.ts';
 
-export class Timer implements DirectiveChild {
+export class Timer {
 	static readonly schema = v.pipe(
 		v.object({
 			_type: v.literal('Timer'),
@@ -17,6 +16,8 @@ export class Timer implements DirectiveChild {
 	);
 
 	readonly _type = getDiscriminator(Timer);
+	declare readonly getInstance: undefined;
+	declare readonly getNextInstance: undefined;
 
 	constructor(readonly when: Temporal.Duration) {}
 

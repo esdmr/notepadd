@@ -4,15 +4,11 @@ import {SyntaxNode} from '../../ast.ts';
 import {DurationNode} from '../../duration/ast.ts';
 import {InstantRecurringNode} from '../../instant-recurring/ast.ts';
 import {InstantNode} from '../../instant/ast.ts';
-import type {DirectiveChildNode} from '../ast.ts';
-import {RecurringAlarm, OneShotAlarm} from './types.ts';
+import {OneShotAlarm, RecurringAlarm} from './types.ts';
 
-export class AlarmNode
-	extends SyntaxNode<
-		[MooToken, InstantRecurringNode | InstantNode | DurationNode]
-	>
-	implements DirectiveChildNode
-{
+export class AlarmNode extends SyntaxNode<
+	[MooToken, InstantRecurringNode | InstantNode | DurationNode]
+> {
 	readonly when = this._children[1];
 
 	toDirective(now: Temporal.ZonedDateTime) {

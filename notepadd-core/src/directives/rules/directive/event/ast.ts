@@ -3,13 +3,11 @@ import type {Temporal} from 'temporal-polyfill';
 import {SyntaxNode} from '../../ast.ts';
 import {PeriodRecurringNode} from '../../period-recurring/ast.ts';
 import {PeriodNode} from '../../period/ast.ts';
-import type {DirectiveChildNode} from '../ast.ts';
 import {OneShotEvent, RecurringEvent} from './types.ts';
 
-export class EventNode
-	extends SyntaxNode<[MooToken, PeriodRecurringNode | PeriodNode]>
-	implements DirectiveChildNode
-{
+export class EventNode extends SyntaxNode<
+	[MooToken, PeriodRecurringNode | PeriodNode]
+> {
 	readonly when = this._children[1];
 
 	toDirective(now: Temporal.ZonedDateTime) {

@@ -30,9 +30,3 @@ export class Instance {
 		readonly currentState: InstanceState = 'pulse',
 	) {}
 }
-
-export type DirectiveChild = {
-	getInstance?(now: Temporal.ZonedDateTime): Instance;
-	getNextInstance?(instance: Instance): Instance;
-	toString(): string;
-};

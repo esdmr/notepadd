@@ -1,14 +1,12 @@
 import type {MooToken} from '@esdmr/nearley';
 import {type Temporal} from 'temporal-polyfill';
-import {Period} from '../types.ts';
 import {SyntaxNode} from '../../ast.ts';
 import type {InstantNode} from '../../instant/ast.ts';
-import type {PeriodChildNode} from '../ast.ts';
+import {Period} from '../types.ts';
 
-export class PeriodWithEndNode
-	extends SyntaxNode<[InstantNode, MooToken, InstantNode]>
-	implements PeriodChildNode
-{
+export class PeriodWithEndNode extends SyntaxNode<
+	[InstantNode, MooToken, InstantNode]
+> {
 	readonly start = this._children[0];
 	readonly end = this._children[2];
 

@@ -1,13 +1,8 @@
 import {inspect} from 'node:util';
 import {
 	type Directive,
+	type DirectiveChild,
 	type InstanceState,
-	type OneShotAlarm,
-	type OneShotEvent,
-	type RecurringAlarm,
-	type RecurringEvent,
-	type Reference,
-	type Timer,
 } from 'notepadd-core';
 import {DirectiveState} from 'notepadd-timekeeper';
 import {
@@ -27,16 +22,27 @@ import {
 } from '../bus.ts';
 import {output} from '../output.ts';
 
-const previousLabels: Record<InstanceState, string> = {
+const previousLabels: Readonly<Record<InstanceState, string>> = {
 	pulse: 'Previously at',
 	high: 'Started at',
 	low: 'Previously ended at',
 };
 
-const nextLabels: Record<InstanceState, string> = {
+const nextLabels: Readonly<Record<InstanceState, string>> = {
 	pulse: 'At',
 	high: 'Ends at',
 	low: 'Starts at',
+};
+
+const icons: Readonly<Record<DirectiveChild['_type'], string>> = {
+	/* eslint-disable @typescript-eslint/naming-convention */
+	OneShotAlarm: 'bell',
+	RecurringAlarm: 'bell',
+	Timer: 'watch',
+	Reference: 'link',
+	OneShotEvent: 'calendar',
+	RecurringEvent: 'calendar',
+	/* eslint-enable @typescript-eslint/naming-convention */
 };
 
 export class BridgeDirective extends TreeItem {
@@ -48,40 +54,7 @@ export class BridgeDirective extends TreeItem {
 
 		this.directive = data.directive;
 		this.id = data.directive.toString();
-
-		switch (
-			(
-				data.directive.directive as
-					| OneShotAlarm
-					| RecurringAlarm
-					| Timer
-					| Reference
-					| OneShotEvent
-					| RecurringEvent
-			)._type
-		) {
-			case 'OneShotAlarm':
-			case 'RecurringAlarm': {
-				this.iconPath = new ThemeIcon('bell');
-				break;
-			}
-
-			case 'Timer': {
-				this.iconPath = new ThemeIcon('watch');
-				break;
-			}
-
-			case 'Reference': {
-				this.iconPath = new ThemeIcon('link');
-				break;
-			}
-
-			case 'OneShotEvent':
-			case 'RecurringEvent': {
-				this.iconPath = new ThemeIcon('calendar');
-				break;
-			}
-		}
+		this.iconPath = new ThemeIcon(icons[data.directive.directive._type]);
 
 		if (data instanceof DirectiveState) {
 			this.setState(data);

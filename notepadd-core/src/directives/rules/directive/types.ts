@@ -2,13 +2,22 @@ import {type Temporal} from 'temporal-polyfill';
 import * as v from 'valibot';
 import {getDiscriminator, transformFallible} from '../../../utils.ts';
 import {OneShotAlarm, RecurringAlarm} from './alarm/types.ts';
-import {type DirectiveChild, Instance} from './base.ts';
+import {Instance} from './base.ts';
 import {OneShotEvent, RecurringEvent} from './event/types.ts';
+import {Reference} from './reference/types.ts';
 import {Timer} from './timer/types.ts';
 
 export * from './base.ts';
 
 const emptyInstance = new Instance(undefined, undefined);
+
+export type DirectiveChild =
+	| OneShotAlarm
+	| RecurringAlarm
+	| Timer
+	| Reference
+	| OneShotEvent
+	| RecurringEvent;
 
 export class Directive {
 	static readonly schema = v.pipe(
@@ -18,6 +27,7 @@ export class Directive {
 				RecurringAlarm.schema,
 				OneShotAlarm.schema,
 				Timer.schema,
+				Reference.schema,
 				RecurringEvent.schema,
 				OneShotEvent.schema,
 			]),

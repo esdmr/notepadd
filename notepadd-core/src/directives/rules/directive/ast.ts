@@ -1,12 +1,17 @@
 import {Temporal} from 'temporal-polyfill';
 import {SyntaxNode} from '../ast.ts';
 import type {CommentNode} from '../comment/ast.ts';
+import type {AlarmNode} from './alarm/ast.ts';
+import type {EventNode} from './event/ast.ts';
+import type {ReferenceNode} from './reference/ast.ts';
+import type {TimerNode} from './timer/ast.ts';
 import {Directive} from './types.ts';
-import {type DirectiveChild} from './base.ts';
 
-export type DirectiveChildNode = {
-	toDirective(now: Temporal.ZonedDateTime): DirectiveChild;
-};
+export type DirectiveChildNode =
+	| AlarmNode
+	| TimerNode
+	| ReferenceNode
+	| EventNode;
 
 export class DirectiveNode extends SyntaxNode<
 	[DirectiveChildNode, CommentNode | undefined]
