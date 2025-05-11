@@ -89,11 +89,13 @@ export class RecurringInstant {
 	}
 
 	getNextInstance(instance: Instance) {
-		const next = instance.next?.add(this.interval);
+		if (!instance.next) return instance;
+
+		const next = instance.next.add(this.interval);
 
 		return new Instance(
-			instance.next ?? instance.previous,
-			next && this._checkBounds(next) === 0 ? next : undefined,
+			instance.next,
+			this._checkBounds(next) === 0 ? next : undefined,
 		);
 	}
 
