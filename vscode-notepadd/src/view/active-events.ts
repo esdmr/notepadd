@@ -15,18 +15,9 @@ import {
 	onTimekeeperUpdated,
 } from '../bus.ts';
 import {output} from '../output.ts';
-import {BridgeDirective} from './directives.ts';
+import {BridgeDirective} from '../tree-item/directive.ts';
 
-export class BridgeEvent extends BridgeDirective {
-	active = false;
-
-	override setState(state: DirectiveState) {
-		super.setState(state);
-		this.active = state.instance.currentState === 'high';
-	}
-}
-
-type ActiveEventsTreeItem = BridgeEvent;
+type ActiveEventsTreeItem = BridgeDirective;
 
 export class ActiveEventsView
 	implements TreeDataProvider<ActiveEventsTreeItem>, Disposable
@@ -43,7 +34,7 @@ export class ActiveEventsView
 
 				this._items.set(
 					state.directive.toString(),
-					new BridgeEvent(state),
+					new BridgeDirective(state),
 				);
 			}
 
@@ -132,7 +123,7 @@ export class ActiveEventsView
 		element?: ActiveEventsTreeItem | undefined,
 	): ProviderResult<ActiveEventsTreeItem[]> {
 		if (element !== undefined) return;
-		return [...this._items.values()].filter((i) => i.active);
+		return [...this._items.values()].filter((i) => i.lastState === 'high');
 	}
 
 	private _setConnected(connected: boolean) {

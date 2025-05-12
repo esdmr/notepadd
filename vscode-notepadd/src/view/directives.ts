@@ -1,17 +1,10 @@
 import {inspect} from 'node:util';
 import {
-	type Directive,
-	type DirectiveChild,
-	type InstanceState,
-} from 'notepadd-core';
-import {DirectiveState} from 'notepadd-timekeeper';
-import {
 	type Disposable,
 	EventEmitter,
 	type ProviderResult,
-	ThemeIcon,
 	type TreeDataProvider,
-	TreeItem,
+	type TreeItem,
 	window,
 } from 'vscode';
 import {
@@ -21,107 +14,7 @@ import {
 	onTimekeeperUpdated,
 } from '../bus.ts';
 import {output} from '../output.ts';
-
-const previousLabels: Readonly<Record<InstanceState, string>> = {
-	pulse: 'Previously at',
-	high: 'Started at',
-	low: 'Previously ended at',
-};
-
-const nextLabels: Readonly<Record<InstanceState, string>> = {
-	pulse: 'At',
-	high: 'Ends at',
-	low: 'Starts at',
-};
-
-const icons: Readonly<Record<DirectiveChild['_type'], string>> = {
-	/* eslint-disable @typescript-eslint/naming-convention */
-	OneShotAlarm: 'bell',
-	RecurringAlarm: 'bell',
-	Timer: 'watch',
-	Reference: 'link',
-	OneShotEvent: 'calendar',
-	RecurringEvent: 'calendar',
-	/* eslint-enable @typescript-eslint/naming-convention */
-};
-
-export class BridgeDirective extends TreeItem {
-	readonly directive: Directive;
-
-	constructor(data: {directive: Directive} | DirectiveState) {
-		// FIXME: Add proper instance and directive toLabel method
-		super(data.directive.getLabel() ?? '[Untitled]');
-
-		this.directive = data.directive;
-		this.id = data.directive.toString();
-		this.iconPath = new ThemeIcon(icons[data.directive.directive._type]);
-
-		if (data instanceof DirectiveState) {
-			this.setState(data);
-		}
-	}
-
-	setState(state: DirectiveState) {
-		if (state.directive.toString() !== this.id) {
-			throw new Error(
-				'Bug: Directive state does not belong to this bridge item',
-			);
-		}
-
-		// TODO: Show a pop-up to select the source.
-		const [source] = state.sources;
-
-		if (source === undefined) {
-			this.command = undefined;
-		} else {
-			// TODO: Add configuration to switch this to `vscode.open`. Make
-			// sure to delete the URI fragments when that happens.
-			this.command = {
-				title: 'Open',
-				command: 'notepadd.openNotebook',
-				arguments: [source],
-			};
-		}
-
-		// TODO: Make locale configurable. Also make the display
-		// timezone/calendar configurable.
-		if (state.instance.currentState === 'high') {
-			this.description = state.instance.previous?.toLocaleString(
-				'en-GB',
-				{
-					calendar: state.instance.previous.calendarId,
-				},
-			);
-		} else {
-			this.description =
-				state.instance.next?.toLocaleString('en-GB', {
-					calendar: state.instance.next.calendarId,
-				}) ??
-				state.instance.previous?.toLocaleString('en-GB', {
-					calendar: state.instance.previous.calendarId,
-				});
-		}
-
-		this.tooltip =
-			`${this.directive.comment.join('\n')}\n` +
-			(state.instance.next
-				? `\n${nextLabels[state.instance.currentState]} ${state.instance.next.toLocaleString(
-						'en-GB',
-						{
-							calendar: state.instance.next.calendarId,
-						},
-					)}`
-				: '') +
-			(state.instance.previous
-				? `\n${previousLabels[state.instance.currentState]} ${state.instance.previous.toLocaleString(
-						'en-GB',
-						{
-							calendar: state.instance.previous.calendarId,
-						},
-					)}`
-				: '');
-	}
-}
+import {BridgeDirective} from '../tree-item/directive.ts';
 
 type DirectivesTreeItem = BridgeDirective;
 
