@@ -1,4 +1,5 @@
 import {createInterface} from 'node:readline';
+import process from 'node:process';
 import {execaNode, type Options, type ResultPromise} from 'execa';
 import {v} from 'notepadd-core';
 import {
@@ -30,7 +31,12 @@ const execaOptions = {
 	serialization: 'json',
 	forceKillAfterDelay: 1000,
 	reject: false,
+	nodeOptions: [...process.execArgv],
 } satisfies Options;
+
+if (import.meta.env.MODE !== 'production') {
+	execaOptions.nodeOptions.push('--enable-source-maps');
+}
 
 const updateDebounceDelay = 17;
 
