@@ -1,17 +1,13 @@
 import {createInterface} from 'node:readline';
 import {execaNode, type Options, type ResultPromise} from 'execa';
+import {v} from 'notepadd-core';
 import {
 	BookkeeperMessage,
-	DiscoveryMessage,
 	TimekeeperMessage,
-	TriggerMessage,
 	UpdateMessage,
+	TerminateMessage,
 } from 'notepadd-timekeeper';
 import timekeeperPath from 'notepadd-timekeeper/service?child-process';
-import {v} from 'notepadd-core';
-import {ListMessage} from '../../notepadd-timekeeper/src/messages/list.ts';
-import {LogMessage} from '../../notepadd-timekeeper/src/messages/log.ts';
-import {TerminateMessage} from '../../notepadd-timekeeper/src/messages/terminate.ts';
 import {
 	bridgeSocket,
 	onBookkeeperCached,

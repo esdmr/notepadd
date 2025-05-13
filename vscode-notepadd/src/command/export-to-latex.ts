@@ -3,14 +3,15 @@ import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {setTimeout} from 'node:timers/promises';
 import {execa, type Options} from 'execa';
-import {deserializeNotePadd, exportNotebookToLatex} from 'notepadd-core';
-import {uint8ArrayToString} from 'uint8array-extras';
-import {commands, ProgressLocation, Uri, window, workspace} from 'vscode';
 import {
+	deserializeNotePadd,
+	exportNotebookToLatex,
 	getMimeTypeOfFileExtension,
 	getPreferredFileExtensionOfMimeType,
 	isMimeTypeVectorImage,
-} from '../../../notepadd-core/src/format/mime.ts';
+} from 'notepadd-core';
+import {uint8ArrayToString} from 'uint8array-extras';
+import {commands, ProgressLocation, Uri, window, workspace} from 'vscode';
 import {output} from '../output.ts';
 import {convertUriToUrl} from '../utils.ts';
 
