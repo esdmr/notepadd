@@ -9,28 +9,32 @@ import {uint8ArrayToString} from 'uint8array-extras';
 import type {UpdateMessage} from './messages/update.ts';
 import {output} from './output.ts';
 import {onTimeout} from './timeout.ts';
-import {DirectiveState, FileState, UpdateDelta} from './types.ts';
+import {CellState, DirectiveState, UpdateDelta} from './types.ts';
 
-const files = new Map<string, FileState>();
+const files = new Map<string, CellState[]>();
 const directives = new Map<string, DirectiveState>();
 
-function updateFile(fileUrl: string, content: string): UpdateDelta {
-	const state = files.get(fileUrl);
+function* updateFile(fileUrl: string, content: string): Generator<UpdateDelta> {
+	const states = files.get(fileUrl) ?? [];
+	files.set(fileUrl, states);
 
 	if (!content) {
 		files.delete(fileUrl);
-		const deleted = state?.hashes ?? new Map();
-		return new UpdateDelta(fileUrl, deleted);
+
+		for (const [index, state] of states?.entries() ?? []) {
+			yield new UpdateDelta(fileUrl, index, state.hashes, new Map());
+		}
+
+		return;
 	}
 
-	const sources = new Map<string, Directive>();
-	const hashes = new Map<string, Directive>();
+	const notebook = deserializeNotePadd(content);
 
-	for (const [cellIndex, cell] of deserializeNotePadd(
-		content,
-	).cells.entries()) {
-		const cellUrl = new URL(fileUrl);
-		cellUrl.hash = `C${cellIndex}`;
+	for (const [index, cell] of notebook.cells.entries()) {
+		const state = states[index];
+
+		const sources = new Map<string, Directive>();
+		const hashes = new Map<string, Directive>();
 
 		for (const out of cell.outputs ?? []) {
 			try {
@@ -50,31 +54,38 @@ function updateFile(fileUrl: string, content: string): UpdateDelta {
 				output.error(error);
 			}
 		}
-	}
 
-	const newState = new FileState(sources, hashes);
-	files.set(fileUrl, newState);
+		const newState = new CellState(sources, hashes);
+		states[index] = newState;
 
-	if (!state) {
-		return new UpdateDelta(fileUrl, undefined, hashes);
-	}
-
-	const added = new Map<string, Directive>();
-	const deleted = new Map<string, Directive>();
-
-	for (const [hash, directive] of state.hashes) {
-		if (!hashes.has(hash)) {
-			deleted.set(hash, directive);
+		if (!state) {
+			yield new UpdateDelta(fileUrl, index, new Map(), hashes);
+			continue;
 		}
-	}
 
-	for (const [hash, directive] of hashes) {
-		if (!state.hashes.has(hash)) {
-			added.set(hash, directive);
+		const added = new Map<string, Directive>();
+		const deleted = new Map<string, Directive>();
+
+		for (const [hash, directive] of state.hashes) {
+			if (!hashes.has(hash)) {
+				deleted.set(hash, directive);
+			}
 		}
+
+		for (const [hash, directive] of hashes) {
+			if (!state.hashes.has(hash)) {
+				added.set(hash, directive);
+			}
+		}
+
+		yield new UpdateDelta(fileUrl, index, deleted, added);
 	}
 
-	return new UpdateDelta(fileUrl, deleted, added);
+	for (let index = notebook.cells.length; index < states.length; index++) {
+		yield new UpdateDelta(fileUrl, index, states[index]!.hashes, new Map());
+	}
+
+	states.length = notebook.cells.length;
 }
 
 function applyUpdateDelta(delta: UpdateDelta, now: Temporal.ZonedDateTime) {
@@ -82,7 +93,7 @@ function applyUpdateDelta(delta: UpdateDelta, now: Temporal.ZonedDateTime) {
 		const state = directives.get(hash);
 		if (!state) continue;
 
-		state.sources.delete(delta.fileUrl);
+		state.sources.delete(delta.source);
 		if (state.sources.size > 0) continue;
 
 		state.clearTimeout();
@@ -93,14 +104,14 @@ function applyUpdateDelta(delta: UpdateDelta, now: Temporal.ZonedDateTime) {
 		const oldState = directives.get(hash);
 
 		if (oldState) {
-			oldState.sources.add(delta.fileUrl);
+			oldState.sources.add(delta.source);
 			continue;
 		}
 
 		const state = new DirectiveState(
 			added,
 			added.getInstance(now),
-			new Set([delta.fileUrl]),
+			new Set([delta.source]),
 		);
 		directives.set(hash, state);
 		onTimeout(state);
@@ -112,8 +123,9 @@ export function processUpdate(message: UpdateMessage) {
 
 	for (const [fileUrl, content] of Object.entries(message.changed)) {
 		try {
-			const delta = updateFile(fileUrl, content);
-			applyUpdateDelta(delta, now);
+			for (const delta of updateFile(fileUrl, content)) {
+				applyUpdateDelta(delta, now);
+			}
 		} catch (error) {
 			output.error(error);
 		}
@@ -125,8 +137,9 @@ export function processUpdate(message: UpdateMessage) {
 		if (Object.hasOwn(message.changed, fileUrl)) continue;
 
 		try {
-			const delta = updateFile(fileUrl, '');
-			applyUpdateDelta(delta, now);
+			for (const delta of updateFile(fileUrl, '')) {
+				applyUpdateDelta(delta, now);
+			}
 		} catch (error) {
 			output.error(error);
 		}

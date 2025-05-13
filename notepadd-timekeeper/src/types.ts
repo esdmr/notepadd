@@ -6,11 +6,26 @@ import {
 	v,
 } from 'notepadd-core';
 
-export class FileState {
+export class CellState {
 	constructor(
 		readonly sources: ReadonlyMap<string, Directive>,
 		readonly hashes: ReadonlyMap<string, Directive>,
 	) {}
+}
+
+export class UpdateDelta {
+	readonly source: string;
+
+	constructor(
+		fileUrl: string,
+		cellIndex: number,
+		readonly deleted: ReadonlyMap<string, Directive>,
+		readonly added: ReadonlyMap<string, Directive>,
+	) {
+		const url = new URL(fileUrl);
+		url.hash = `C${cellIndex}`;
+		this.source = url.href;
+	}
 }
 
 export class DirectiveState {
@@ -58,12 +73,4 @@ export class DirectiveState {
 			sources: [...this.sources],
 		};
 	}
-}
-
-export class UpdateDelta {
-	constructor(
-		readonly fileUrl: string,
-		readonly deleted: ReadonlyMap<string, Directive> = new Map(),
-		readonly added: ReadonlyMap<string, Directive> = new Map(),
-	) {}
 }
