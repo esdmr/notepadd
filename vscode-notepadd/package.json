@@ -93,6 +93,60 @@
 				"command": "notepadd.stopTimekeeper",
 				"title": "Stop Timekeeper",
 				"category": "NotePADD"
+			},
+			{
+				"command": "notepadd.directives.sortFromTimeAscending",
+				"title": "Sort…",
+				"category": "NotePADD Directives",
+				"icon": {
+					"light": "src/view/time-ascending-light.svg",
+					"dark": "src/view/time-ascending-dark.svg"
+				},
+				"enablement": "notepadd.directives.sortBy == 'timeAscending' || !notepadd.directives.sortBy"
+			},
+			{
+				"command": "notepadd.directives.sortFromTimeDescending",
+				"title": "Sort…",
+				"category": "NotePADD Directives",
+				"icon": {
+					"light": "src/view/time-descending-light.svg",
+					"dark": "src/view/time-descending-dark.svg"
+				},
+				"enablement": "notepadd.directives.sortBy == 'timeDescending'"
+			},
+			{
+				"command": "notepadd.directives.sortFromOrderAscending",
+				"title": "Sort…",
+				"category": "NotePADD Directives",
+				"icon": {
+					"light": "src/view/order-ascending-light.svg",
+					"dark": "src/view/order-ascending-dark.svg"
+				},
+				"enablement": "notepadd.directives.sortBy == 'orderAscending'"
+			},
+			{
+				"command": "notepadd.directives.sortFromOrderDescending",
+				"title": "Sort…",
+				"category": "NotePADD Directives",
+				"icon": {
+					"light": "src/view/order-descending-light.svg",
+					"dark": "src/view/order-descending-dark.svg"
+				},
+				"enablement": "notepadd.directives.sortBy == 'orderDescending'"
+			},
+			{
+				"command": "notepadd.directives.viewAsList",
+				"title": "View as List",
+				"category": "NotePADD Directives",
+				"icon": "$(list-tree)",
+				"enablement": "notepadd.directives.viewAsTree"
+			},
+			{
+				"command": "notepadd.directives.viewAsTree",
+				"title": "View as Tree",
+				"category": "NotePADD Directives",
+				"icon": "$(list-flat)",
+				"enablement": "!notepadd.directives.viewAsTree"
 			}
 		],
 		"menus": {
@@ -101,6 +155,38 @@
 					"group": "Export",
 					"command": "notepadd.exportToLatex",
 					"when": "notebookType == 'notepadd'"
+				}
+			],
+			"view/title": [
+				{
+					"group": "navigation",
+					"command": "notepadd.directives.sortFromTimeAscending",
+					"when": "view == 'notepadd-directives' && (notepadd.directives.sortBy == 'timeAscending' || !notepadd.directives.sortBy)"
+				},
+				{
+					"group": "navigation",
+					"command": "notepadd.directives.sortFromTimeDescending",
+					"when": "view == 'notepadd-directives' && notepadd.directives.sortBy == 'timeDescending'"
+				},
+				{
+					"group": "navigation",
+					"command": "notepadd.directives.sortFromOrderAscending",
+					"when": "view == 'notepadd-directives' && notepadd.directives.sortBy == 'orderAscending'"
+				},
+				{
+					"group": "navigation",
+					"command": "notepadd.directives.sortFromOrderDescending",
+					"when": "view == 'notepadd-directives' && notepadd.directives.sortBy == 'orderDescending'"
+				},
+				{
+					"group": "navigation",
+					"command": "notepadd.directives.viewAsList",
+					"when": "view == 'notepadd-directives' && notepadd.directives.viewAsTree"
+				},
+				{
+					"group": "navigation",
+					"command": "notepadd.directives.viewAsTree",
+					"when": "view == 'notepadd-directives' && !notepadd.directives.viewAsTree"
 				}
 			]
 		},
@@ -158,6 +244,26 @@
 					},
 					"default": [],
 					"description": "Arguments passed to plantuml.jar"
+				},
+				"notepadd.view.directives.viewAsTree": {
+					"type": "boolean",
+					"scope": "application",
+					"ignoreSync": true,
+					"default": false,
+					"description": "Should the directives panel be shown as a tree"
+				},
+				"notepadd.view.directives.sortBy": {
+					"type": "string",
+					"scope": "application",
+					"ignoreSync": true,
+					"default": "timeAscending",
+					"enum": [
+						"timeAscending",
+						"timeDescending",
+						"orderAscending",
+						"orderDescending"
+					],
+					"description": "How should the directives panel be sorted"
 				}
 			}
 		}

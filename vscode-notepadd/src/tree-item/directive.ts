@@ -31,14 +31,18 @@ const icons: Readonly<Record<DirectiveChild['_type'], string>> = {
 
 export class BridgeDirective extends TreeItem {
 	readonly directive: Directive;
-	lastState: InstanceState | undefined;
+	lastState: DirectiveState | undefined;
+	override id: string;
 
-	constructor(data: {directive: Directive} | DirectiveState) {
+	constructor(
+		data: {directive: Directive} | DirectiveState,
+		id = data.directive.toString(),
+	) {
 		// FIXME: Add proper instance and directive toLabel method
 		super(data.directive.getLabel() ?? '[Untitled]');
 
+		this.id = id;
 		this.directive = data.directive;
-		this.id = data.directive.toString();
 		this.iconPath = new ThemeIcon(icons[data.directive.directive._type]);
 
 		if (data instanceof DirectiveState) {
@@ -47,13 +51,13 @@ export class BridgeDirective extends TreeItem {
 	}
 
 	setState(state: DirectiveState) {
-		if (state.directive.toString() !== this.id) {
+		if (state.directive.toString() !== this.directive.toString()) {
 			throw new Error(
 				'Bug: Directive state does not belong to this bridge item',
 			);
 		}
 
-		this.lastState = state.instance.currentState;
+		this.lastState = state;
 
 		// TODO: Show a pop-up to select the source.
 		const [source] = state.sources;

@@ -1,5 +1,4 @@
 import {inspect} from 'node:util';
-import {type DirectiveState} from 'notepadd-timekeeper';
 import {
 	type Disposable,
 	EventEmitter,
@@ -123,7 +122,9 @@ export class ActiveEventsView
 		element?: ActiveEventsTreeItem | undefined,
 	): ProviderResult<ActiveEventsTreeItem[]> {
 		if (element !== undefined) return;
-		return [...this._items.values()].filter((i) => i.lastState === 'high');
+		return [...this._items.values()].filter(
+			(i) => i.lastState?.instance.currentState === 'high',
+		);
 	}
 
 	private _setConnected(connected: boolean) {

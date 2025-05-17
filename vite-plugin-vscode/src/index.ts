@@ -90,10 +90,40 @@ async function extractIcons(
 		(contributes.views as Record<string, View[]>) ?? {},
 	)) {
 		for (const view of views) {
-			if (!view.icon) return;
+			if (!view.icon) continue;
 			const fileName = `view.${view.id}.svg`;
 			await resolveAndEmit(context, fileName, view.icon);
 			view.icon = fileName;
+		}
+	}
+
+	for (const command of Array.isArray(contributes.commands)
+		? contributes.commands
+		: contributes.commands
+			? [contributes.commands]
+			: []) {
+		if (!command.icon) continue;
+
+		if (typeof command.icon === 'string') {
+			if (/^\$\(.*\)$/.test(command.icon)) continue;
+
+			const fileName = `command.${command.command}.svg`;
+			await resolveAndEmit(context, fileName, command.icon);
+			command.icon = fileName;
+
+			continue;
+		}
+
+		if (command.icon.light) {
+			const fileName = `command.${command.command}.light.svg`;
+			await resolveAndEmit(context, fileName, command.icon.light);
+			command.icon.light = fileName;
+		}
+
+		if (command.icon.dark) {
+			const fileName = `command.${command.command}.dark.svg`;
+			await resolveAndEmit(context, fileName, command.icon.dark);
+			command.icon.dark = fileName;
 		}
 	}
 }
@@ -128,6 +158,66 @@ export function vscode<T extends VsCodePackageJson = VsCodePackageJson>({
 					minify: env.mode === 'production',
 				},
 			};
+		},
+		async resolveId(source) {
+			if (source.startsWith('command-icon:')) {
+				return '\0' + source;
+			}
+		},
+		async load(id, options) {
+			if (id.startsWith('\0command-icon:')) {
+				const commandName = id.slice(14);
+
+				const resolution = await resolveAndNormalize(
+					this,
+					'./package.json',
+				);
+				const text = await readFile(resolution.id, 'utf8');
+
+				const packageJson = JSON.parse(text) as T;
+
+				assert(
+					packageJson.contributes,
+					'Extension does not contribute anything',
+				);
+
+				const commands = Array.isArray(packageJson.contributes.commands)
+					? packageJson.contributes.commands
+					: packageJson.contributes.commands
+						? [packageJson.contributes.commands]
+						: [];
+
+				const command = commands.find((i) => i.command === commandName);
+
+				assert(
+					command,
+					`Extension does not contribute the command ${JSON.stringify(commandName)}`,
+				);
+
+				assert(
+					command.icon,
+					`Command ${JSON.stringify(commandName)} does not have an icon`,
+				);
+
+				if (typeof command.icon === 'string') {
+					if (/^\$\(.*\)$/.test(command.icon)) {
+						return `import {ThemeIcon} from 'vscode';\nexport default new ThemeIcon(${JSON.stringify(command.icon.slice(2, -1))});`;
+					}
+
+					const fileName = `command.${command.command}.svg`;
+
+					return `export default ${JSON.stringify(fileName)};`;
+				}
+
+				return `export default ${JSON.stringify({
+					light:
+						command.icon.light &&
+						`command.${command.command}.light.svg`,
+					dark:
+						command.icon.dark &&
+						`command.${command.command}.dark.svg`,
+				})};`;
+			}
 		},
 		async generateBundle(options, bundle) {
 			const entryResolution = await resolveAndNormalize(this, '.');

@@ -2,7 +2,10 @@
 	"name": "vite-plugin-vscode",
 	"version": "0.1.0",
 	"private": true,
-	"exports": "./src/index.ts",
+	"exports": {
+		".": "./src/index.ts",
+		"./client": "./src/client.ts"
+	},
 	"devDependencies": {
 		"@types/node": "20.17.31",
 		"type-fest": "4.40.0",
