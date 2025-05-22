@@ -147,6 +147,24 @@
 				"category": "NotePADD Directives",
 				"icon": "$(list-flat)",
 				"enablement": "!notepadd.directives.viewAsTree"
+			},
+			{
+				"command": "notepadd.active-events.find",
+				"title": "Find or Filter",
+				"category": "NotePADD Active Events",
+				"icon": "$(search)"
+			},
+			{
+				"command": "notepadd.past-alarms.find",
+				"title": "Find or Filter",
+				"category": "NotePADD Past Alarms",
+				"icon": "$(search)"
+			},
+			{
+				"command": "notepadd.directives.find",
+				"title": "Find or Filter",
+				"category": "NotePADD Directives",
+				"icon": "$(search)"
 			}
 		],
 		"menus": {
@@ -187,6 +205,21 @@
 					"group": "navigation",
 					"command": "notepadd.directives.viewAsTree",
 					"when": "view == 'notepadd-directives' && !notepadd.directives.viewAsTree"
+				},
+				{
+					"group": "navigation",
+					"command": "notepadd.active-events.find",
+					"when": "view == 'notepadd-active-events'"
+				},
+				{
+					"group": "navigation",
+					"command": "notepadd.past-alarms.find",
+					"when": "view == 'notepadd-past-alarms'"
+				},
+				{
+					"group": "navigation",
+					"command": "notepadd.directives.find",
+					"when": "view == 'notepadd-directives'"
 				}
 			]
 		},

@@ -22,6 +22,9 @@ import {type AsyncDisposable} from './utils.ts';
 import {ActiveEventsView} from './view/active-events.ts';
 import {DirectivesView} from './view/directives.ts';
 import {PastAlarmsView} from './view/past-alarms.ts';
+import {setupDirectivesFindCommand} from './command/directives-find.ts';
+import {setupPastAlarmsFindCommand} from './command/past-alarms-find.ts';
+import {setupActiveEventsFindCommand} from './command/active-events-find.ts';
 
 const asyncSubscriptions: AsyncDisposable[] = [];
 
@@ -30,6 +33,9 @@ export async function activate(context: ExtensionContext) {
 		context.subscriptions.push(
 			output,
 			events,
+			setupActiveEventsFindCommand(),
+			setupPastAlarmsFindCommand(),
+			setupDirectivesFindCommand(),
 			setupDirectivesSortByCommands(context),
 			setupDirectivesViewAsCommands(),
 			setupExportToLatexCommand(),
