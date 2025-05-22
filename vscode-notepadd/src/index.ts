@@ -6,13 +6,7 @@ import {type ExtensionContext} from 'vscode';
 import {Bookkeeper} from './bookkeeper.ts';
 import {setupBridgeNotification} from './bridge-notification.ts';
 import {events} from './bus.ts';
-import {setupDirectivesSortByCommands} from './command/directives-sort-by.ts';
-import {setupDirectivesViewAsCommands} from './command/directives-view-as.ts';
-import {setupExportToLatexCommand} from './command/export-to-latex.ts';
-import {setupOpenNotebookCommand} from './command/open-notebook.ts';
-import {setupRestartTimekeeperCommand} from './command/restart-timekeeper.ts';
-import {setupStartTimekeeperCommand} from './command/start-timekeeper.ts';
-import {setupStopTimekeeperCommand} from './command/stop-timekeeper.ts';
+import {setupCommands} from './command/index.ts';
 import {NotePaddController} from './notebook/notepadd.controller.ts';
 import {NotePaddSerializer} from './notebook/notepadd.serializer.ts';
 import {output} from './output.ts';
@@ -22,12 +16,6 @@ import {type AsyncDisposable} from './utils.ts';
 import {ActiveEventsView} from './view/active-events.ts';
 import {DirectivesView} from './view/directives.ts';
 import {PastAlarmsView} from './view/past-alarms.ts';
-import {setupDirectivesFindCommand} from './command/directives-find.ts';
-import {setupPastAlarmsFindCommand} from './command/past-alarms-find.ts';
-import {setupActiveEventsFindCommand} from './command/active-events-find.ts';
-import {setupActiveEventsSortByCommands} from './command/active-events-sort-by.ts';
-import {setupActiveEventsViewAsCommands} from './command/active-events-view-as.ts';
-import {setupPastAlarmsSortByCommands} from './command/past-alarms-sort-by.ts';
 
 const asyncSubscriptions: AsyncDisposable[] = [];
 
@@ -36,19 +24,7 @@ export async function activate(context: ExtensionContext) {
 		context.subscriptions.push(
 			output,
 			events,
-			setupActiveEventsSortByCommands(context),
-			setupActiveEventsViewAsCommands(),
-			setupActiveEventsFindCommand(),
-			setupPastAlarmsSortByCommands(),
-			setupPastAlarmsFindCommand(),
-			setupDirectivesFindCommand(),
-			setupDirectivesSortByCommands(context),
-			setupDirectivesViewAsCommands(),
-			setupExportToLatexCommand(),
-			setupOpenNotebookCommand(),
-			setupRestartTimekeeperCommand(),
-			setupStartTimekeeperCommand(),
-			setupStopTimekeeperCommand(),
+			setupCommands(context),
 			setupNotepaddStatus(),
 			setupBridgeNotification(),
 			new NotePaddSerializer(),

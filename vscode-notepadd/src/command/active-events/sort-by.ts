@@ -13,13 +13,13 @@ import {
 	type ExtensionContext,
 	type QuickPickItem,
 } from 'vscode';
-import type {DirectivesSortBy} from '../view/directives.ts';
+import type {DirectivesSortBy} from '../../view/directives.ts';
 
 type SortByQuickPickItem = QuickPickItem & {
 	value: DirectivesSortBy;
 };
 
-export function setupDirectivesSortByCommands(context: ExtensionContext) {
+export function setupActiveEventsSortByCommands(context: ExtensionContext) {
 	const generateIcon = (
 		icon: typeof timeAscendingIcon,
 	): QuickPickItem['iconPath'] => {
@@ -73,25 +73,25 @@ export function setupDirectivesSortByCommands(context: ExtensionContext) {
 		if (!result) return;
 
 		await workspace
-			.getConfiguration('notepadd.view.directives')
+			.getConfiguration('notepadd.view.activeEvents')
 			.update('sortBy', result?.value, ConfigurationTarget.Global);
 	};
 
 	return Disposable.from(
 		commands.registerCommand(
-			'notepadd.directives.sortFromTimeAscending',
+			'notepadd.activeEvents.sortFromTimeAscending',
 			handler('timeAscending'),
 		),
 		commands.registerCommand(
-			'notepadd.directives.sortFromTimeDescending',
+			'notepadd.activeEvents.sortFromTimeDescending',
 			handler('timeDescending'),
 		),
 		commands.registerCommand(
-			'notepadd.directives.sortFromOrderAscending',
+			'notepadd.activeEvents.sortFromOrderAscending',
 			handler('orderAscending'),
 		),
 		commands.registerCommand(
-			'notepadd.directives.sortFromOrderDescending',
+			'notepadd.activeEvents.sortFromOrderDescending',
 			handler('orderDescending'),
 		),
 	);

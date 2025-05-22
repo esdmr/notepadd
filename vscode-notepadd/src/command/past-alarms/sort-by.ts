@@ -1,5 +1,5 @@
 import {commands, ConfigurationTarget, Disposable, workspace} from 'vscode';
-import type {InstancesSortBy} from '../view/past-alarms.ts';
+import type {InstancesSortBy} from '../../view/past-alarms.ts';
 
 export function setupPastAlarmsSortByCommands() {
 	const handler = (value: InstancesSortBy) => async () => {
