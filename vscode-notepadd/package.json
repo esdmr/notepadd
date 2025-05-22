@@ -22,6 +22,25 @@
 	"scripts": {
 		"vsce": "cd build && vsce"
 	},
+	"icons": {
+		"notepadd": "src/icon/notepadd.svg",
+		"order-ascending": {
+			"light": "src/icon/order-ascending-light.svg",
+			"dark": "src/icon/order-ascending-dark.svg"
+		},
+		"order-descending": {
+			"light": "src/icon/order-descending-light.svg",
+			"dark": "src/icon/order-descending-dark.svg"
+		},
+		"time-ascending": {
+			"light": "src/icon/time-ascending-light.svg",
+			"dark": "src/icon/time-ascending-dark.svg"
+		},
+		"time-descending": {
+			"light": "src/icon/time-descending-light.svg",
+			"dark": "src/icon/time-descending-dark.svg"
+		}
+	},
 	"contributes": {
 		"notebooks": [
 			{
@@ -39,7 +58,7 @@
 				{
 					"id": "notepadd",
 					"title": "NotePADD Bridge",
-					"icon": "src/notepadd-icon.svg"
+					"icon": "$(notepadd)"
 				}
 			]
 		},
@@ -49,19 +68,19 @@
 					"id": "notepadd.activeEvents",
 					"contextualTitle": "NotePADD",
 					"name": "Active Events",
-					"icon": "src/notepadd-icon.svg"
+					"icon": "$(notepadd)"
 				},
 				{
 					"id": "notepadd.pastAlarms",
 					"contextualTitle": "NotePADD",
 					"name": "Past Alarms",
-					"icon": "src/notepadd-icon.svg"
+					"icon": "$(notepadd)"
 				},
 				{
 					"id": "notepadd.directives",
 					"contextualTitle": "NotePADD",
 					"name": "Directives",
-					"icon": "src/notepadd-icon.svg"
+					"icon": "$(notepadd)"
 				}
 			]
 		},
@@ -98,40 +117,28 @@
 				"command": "notepadd.activeEvents.sortFromTimeAscending",
 				"title": "Sort…",
 				"category": "NotePADD Active Events",
-				"icon": {
-					"light": "src/view/time-ascending-light.svg",
-					"dark": "src/view/time-ascending-dark.svg"
-				},
+				"icon": "$(time-ascending)",
 				"enablement": "notepadd.activeEvents.sortBy == 'timeAscending' || !notepadd.activeEvents.sortBy"
 			},
 			{
 				"command": "notepadd.activeEvents.sortFromTimeDescending",
 				"title": "Sort…",
 				"category": "NotePADD Active Events",
-				"icon": {
-					"light": "src/view/time-descending-light.svg",
-					"dark": "src/view/time-descending-dark.svg"
-				},
+				"icon": "$(time-descending)",
 				"enablement": "notepadd.activeEvents.sortBy == 'timeDescending'"
 			},
 			{
 				"command": "notepadd.activeEvents.sortFromOrderAscending",
 				"title": "Sort…",
 				"category": "NotePADD Active Events",
-				"icon": {
-					"light": "src/view/order-ascending-light.svg",
-					"dark": "src/view/order-ascending-dark.svg"
-				},
+				"icon": "$(order-ascending)",
 				"enablement": "notepadd.activeEvents.sortBy == 'orderAscending'"
 			},
 			{
 				"command": "notepadd.activeEvents.sortFromOrderDescending",
 				"title": "Sort…",
 				"category": "NotePADD Active Events",
-				"icon": {
-					"light": "src/view/order-descending-light.svg",
-					"dark": "src/view/order-descending-dark.svg"
-				},
+				"icon": "$(order-descending)",
 				"enablement": "notepadd.activeEvents.sortBy == 'orderDescending'"
 			},
 			{
@@ -158,20 +165,14 @@
 				"command": "notepadd.pastAlarms.sortFromTimeAscending",
 				"title": "Sort by Time, Descending",
 				"category": "NotePADD Past Alarms",
-				"icon": {
-					"light": "src/view/time-ascending-light.svg",
-					"dark": "src/view/time-ascending-dark.svg"
-				},
+				"icon": "$(time-ascending)",
 				"enablement": "notepadd.pastAlarms.sortBy == 'timeAscending'"
 			},
 			{
 				"command": "notepadd.pastAlarms.sortFromTimeDescending",
 				"title": "Sort by Time, Ascending",
 				"category": "NotePADD Past Alarms",
-				"icon": {
-					"light": "src/view/time-descending-light.svg",
-					"dark": "src/view/time-descending-dark.svg"
-				},
+				"icon": "$(time-descending)",
 				"enablement": "notepadd.pastAlarms.sortBy != 'timeAscending'"
 			},
 			{
@@ -184,40 +185,28 @@
 				"command": "notepadd.directives.sortFromTimeAscending",
 				"title": "Sort…",
 				"category": "NotePADD Directives",
-				"icon": {
-					"light": "src/view/time-ascending-light.svg",
-					"dark": "src/view/time-ascending-dark.svg"
-				},
+				"icon": "$(time-ascending)",
 				"enablement": "notepadd.directives.sortBy == 'timeAscending' || !notepadd.directives.sortBy"
 			},
 			{
 				"command": "notepadd.directives.sortFromTimeDescending",
 				"title": "Sort…",
 				"category": "NotePADD Directives",
-				"icon": {
-					"light": "src/view/time-descending-light.svg",
-					"dark": "src/view/time-descending-dark.svg"
-				},
+				"icon": "$(time-descending)",
 				"enablement": "notepadd.directives.sortBy == 'timeDescending'"
 			},
 			{
 				"command": "notepadd.directives.sortFromOrderAscending",
 				"title": "Sort…",
 				"category": "NotePADD Directives",
-				"icon": {
-					"light": "src/view/order-ascending-light.svg",
-					"dark": "src/view/order-ascending-dark.svg"
-				},
+				"icon": "$(order-ascending)",
 				"enablement": "notepadd.directives.sortBy == 'orderAscending'"
 			},
 			{
 				"command": "notepadd.directives.sortFromOrderDescending",
 				"title": "Sort…",
 				"category": "NotePADD Directives",
-				"icon": {
-					"light": "src/view/order-descending-light.svg",
-					"dark": "src/view/order-descending-dark.svg"
-				},
+				"icon": "$(order-descending)",
 				"enablement": "notepadd.directives.sortBy == 'orderDescending'"
 			},
 			{

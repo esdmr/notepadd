@@ -3,7 +3,7 @@ import {readFile} from 'node:fs/promises';
 import {builtinModules} from 'node:module';
 import type {PackageJson} from 'type-fest';
 import {normalizePath, type Plugin, type Rollup} from 'vite';
-import type {ExtensionManifest} from './types.ts';
+import type {ExtensionManifest, ThemePath} from './types.ts';
 
 type View = NonNullable<
 	NonNullable<
@@ -11,7 +11,10 @@ type View = NonNullable<
 	>['explorer']
 >[number];
 
-export type VsCodePackageJson = PackageJson & ExtensionManifest;
+export type VsCodePackageJson = PackageJson &
+	ExtensionManifest & {
+		icons?: Record<string, string | ThemePath>;
+	};
 
 export type ViteVsCodeOptions<T extends VsCodePackageJson = VsCodePackageJson> =
 	{
@@ -71,9 +74,127 @@ async function resolveAndEmit(
 	});
 }
 
+function parseIcon(icon: string | ThemePath, name?: string) {
+	if (typeof icon === 'string') {
+		const match = /^\$\((.*)\)$/.exec(icon);
+
+		return match
+			? ({type: 'alias', name: match[1]!} as const)
+			: ({type: 'path', path: icon} as const);
+	}
+
+	assert(
+		icon.light && icon.dark,
+		`Icon ${JSON.stringify(name ?? icon)} does not have both a light and a dark theme`,
+	);
+
+	return {
+		type: 'themed',
+		paths: {
+			light: icon.light,
+			dark: icon.dark,
+		},
+	} as const;
+}
+
+function getIcon(
+	reference: string | ThemePath,
+	icons: NonNullable<VsCodePackageJson['icons']>,
+) {
+	const parsedReference = parseIcon(reference);
+
+	assert(
+		parsedReference.type === 'alias',
+		`Reference ${JSON.stringify(reference)} does not match "$(...)"`,
+	);
+
+	const icon = icons[parsedReference.name];
+	if (!icon) return parsedReference;
+
+	const parsed = parseIcon(icon);
+
+	switch (parsed.type) {
+		case 'alias': {
+			return parsed;
+		}
+
+		case 'path': {
+			return {
+				...parsed,
+				path: `icon.${parsedReference.name}.svg`,
+				originalPath: parsed.path,
+			} as const;
+		}
+
+		case 'themed': {
+			return {
+				type: 'themed',
+				paths: {
+					light: `icon.${parsedReference.name}.light.svg`,
+					dark: `icon.${parsedReference.name}.dark.svg`,
+				},
+				originalPaths: parsed.paths,
+			} as const;
+		}
+	}
+}
+
 async function extractIcons(
 	context: Rollup.PluginContext,
+	icons: NonNullable<VsCodePackageJson['icons']>,
+) {
+	for (const name of Object.keys(icons)) {
+		const icon = getIcon(`$(${name})`, icons);
+
+		switch (icon.type) {
+			case 'alias': {
+				assert(
+					!(icon.name in icons),
+					`Icon ${JSON.stringify(name)} refers to another icon ${JSON.stringify(icon.name)} which is also defined`,
+				);
+				break;
+			}
+
+			case 'path': {
+				assert(
+					icon.originalPath.endsWith('.svg'),
+					`Non-SVG icon ${JSON.stringify(name)} is defined`,
+				);
+
+				await resolveAndEmit(context, icon.path, icon.originalPath);
+
+				break;
+			}
+
+			case 'themed': {
+				assert(
+					icon.originalPaths.light.endsWith('.svg') &&
+						icon.originalPaths.dark.endsWith('.svg'),
+					`Non-SVG dark icon ${JSON.stringify(name)} is defined`,
+				);
+
+				await resolveAndEmit(
+					context,
+					icon.paths.light,
+					icon.originalPaths.light,
+				);
+
+				await resolveAndEmit(
+					context,
+					icon.paths.dark,
+					icon.originalPaths.dark,
+				);
+
+				break;
+			}
+		}
+	}
+}
+
+async function fixIcons(
+	context: Rollup.PluginContext,
 	contributes: NonNullable<VsCodePackageJson['contributes']>,
+	icons: NonNullable<VsCodePackageJson['icons']>,
 ) {
 	for (const viewContainer of new Set(
 		[
@@ -81,9 +202,14 @@ async function extractIcons(
 			contributes.viewsContainers?.panel ?? [],
 		].flat(),
 	)) {
-		const fileName = `viewContainer.${viewContainer.id}.svg`;
-		await resolveAndEmit(context, fileName, viewContainer.icon);
-		viewContainer.icon = fileName;
+		const icon = getIcon(viewContainer.icon, icons);
+
+		assert(
+			icon.type === 'path',
+			`View container ${JSON.stringify(viewContainer.id)} refers to an icon which does not have a theme-independent path`,
+		);
+
+		viewContainer.icon = icon.path;
 	}
 
 	for (const views of Object.values<View[]>(
@@ -91,9 +217,14 @@ async function extractIcons(
 	)) {
 		for (const view of views) {
 			if (!view.icon) continue;
-			const fileName = `view.${view.id}.svg`;
-			await resolveAndEmit(context, fileName, view.icon);
-			view.icon = fileName;
+			const icon = getIcon(view.icon, icons);
+
+			assert(
+				icon.type === 'path',
+				`View ${JSON.stringify(view.id)} refers to an icon which does not have a theme-independent path`,
+			);
+
+			view.icon = icon.path;
 		}
 	}
 
@@ -104,26 +235,23 @@ async function extractIcons(
 			: []) {
 		if (!command.icon) continue;
 
-		if (typeof command.icon === 'string') {
-			if (/^\$\(.*\)$/.test(command.icon)) continue;
+		const icon = getIcon(command.icon, icons);
 
-			const fileName = `command.${command.command}.svg`;
-			await resolveAndEmit(context, fileName, command.icon);
-			command.icon = fileName;
+		switch (icon.type) {
+			case 'alias': {
+				command.icon = `$(${icon.name})`;
+				break;
+			}
 
-			continue;
-		}
+			case 'path': {
+				command.icon = icon.path;
+				break;
+			}
 
-		if (command.icon.light) {
-			const fileName = `command.${command.command}.light.svg`;
-			await resolveAndEmit(context, fileName, command.icon.light);
-			command.icon.light = fileName;
-		}
-
-		if (command.icon.dark) {
-			const fileName = `command.${command.command}.dark.svg`;
-			await resolveAndEmit(context, fileName, command.icon.dark);
-			command.icon.dark = fileName;
+			case 'themed': {
+				command.icon = icon.paths;
+				break;
+			}
 		}
 	}
 }
@@ -160,13 +288,13 @@ export function vscode<T extends VsCodePackageJson = VsCodePackageJson>({
 			};
 		},
 		async resolveId(source) {
-			if (source.startsWith('command-icon:')) {
+			if (source.startsWith('icon:')) {
 				return '\0' + source;
 			}
 		},
 		async load(id, options) {
-			if (id.startsWith('\0command-icon:')) {
-				const commandName = id.slice(14);
+			if (id.startsWith('\0icon:')) {
+				const iconName = id.slice(6);
 
 				const resolution = await resolveAndNormalize(
 					this,
@@ -176,47 +304,21 @@ export function vscode<T extends VsCodePackageJson = VsCodePackageJson>({
 
 				const packageJson = JSON.parse(text) as T;
 
-				assert(
-					packageJson.contributes,
-					'Extension does not contribute anything',
-				);
+				const icon = getIcon(`$(${iconName})`, packageJson.icons ?? {});
 
-				const commands = Array.isArray(packageJson.contributes.commands)
-					? packageJson.contributes.commands
-					: packageJson.contributes.commands
-						? [packageJson.contributes.commands]
-						: [];
-
-				const command = commands.find((i) => i.command === commandName);
-
-				assert(
-					command,
-					`Extension does not contribute the command ${JSON.stringify(commandName)}`,
-				);
-
-				assert(
-					command.icon,
-					`Command ${JSON.stringify(commandName)} does not have an icon`,
-				);
-
-				if (typeof command.icon === 'string') {
-					if (/^\$\(.*\)$/.test(command.icon)) {
-						return `import {ThemeIcon} from 'vscode';\nexport default new ThemeIcon(${JSON.stringify(command.icon.slice(2, -1))});`;
+				switch (icon.type) {
+					case 'alias': {
+						return `import {ThemeIcon} from 'vscode';\nexport default new ThemeIcon(${JSON.stringify(icon.name)});`;
 					}
 
-					const fileName = `command.${command.command}.svg`;
+					case 'path': {
+						return `export default ${JSON.stringify(icon.path)};`;
+					}
 
-					return `export default ${JSON.stringify(fileName)};`;
+					case 'themed': {
+						return `export default ${JSON.stringify(icon.paths)};`;
+					}
 				}
-
-				return `export default ${JSON.stringify({
-					light:
-						command.icon.light &&
-						`command.${command.command}.light.svg`,
-					dark:
-						command.icon.dark &&
-						`command.${command.command}.dark.svg`,
-				})};`;
 			}
 		},
 		async generateBundle(options, bundle) {
@@ -231,9 +333,11 @@ export function vscode<T extends VsCodePackageJson = VsCodePackageJson>({
 					let packageJson = JSON.parse(text) as T;
 					packageJson.main = entryChunk.fileName;
 
-					if (packageJson.contributes) {
-						await extractIcons(this, packageJson.contributes);
-					}
+					const icons = packageJson.icons ?? {};
+					delete packageJson.icons;
+
+					await extractIcons(this, icons);
+					await fixIcons(this, packageJson.contributes ?? {}, icons);
 
 					for (const f of packageJsonTransformers) {
 						packageJson = (await f(packageJson)) ?? packageJson;

@@ -1,7 +1,7 @@
-import orderAscendingIcon from 'command-icon:notepadd.directives.sortFromOrderAscending';
-import orderDescendingIcon from 'command-icon:notepadd.directives.sortFromOrderDescending';
-import timeAscendingIcon from 'command-icon:notepadd.directives.sortFromTimeAscending';
-import timeDescendingIcon from 'command-icon:notepadd.directives.sortFromTimeDescending';
+import orderAscendingIcon from 'icon:order-ascending';
+import orderDescendingIcon from 'icon:order-descending';
+import timeAscendingIcon from 'icon:time-ascending';
+import timeDescendingIcon from 'icon:time-descending';
 import {
 	commands,
 	ConfigurationTarget,
