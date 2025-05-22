@@ -12,6 +12,7 @@ import {
 	type TreeDataProvider,
 	type TreeItem,
 } from 'vscode';
+import type {DirectiveState} from 'notepadd-timekeeper';
 import {
 	bridgeSocket,
 	onTimekeeperStalled,
@@ -32,13 +33,20 @@ const sortBySchema = v.picklist([
 	'orderDescending',
 ]);
 
-export type SortBy = v.InferOutput<typeof sortBySchema>;
+export type DirectivesSortBy = v.InferOutput<typeof sortBySchema>;
 
-const stableSortBy = new Set<SortBy>(['orderAscending', 'orderDescending']);
+const stableSortBy = new Set<DirectivesSortBy>([
+	'orderAscending',
+	'orderDescending',
+]);
 
 export class DirectivesView
 	implements TreeDataProvider<DirectivesTreeItem>, Disposable
 {
+	protected readonly _items = new Map<string, BridgeDirective>();
+	protected readonly _configPrefix: string = 'notepadd.view.directives';
+	protected readonly _contextPrefix: string = 'notepadd.directives';
+	protected readonly _logPrefix: string = '[NotePADD/Bridge/Directives]';
 	private readonly _treeView;
 
 	private readonly _handlers = [
@@ -47,6 +55,8 @@ export class DirectivesView
 			this._items.clear();
 
 			for (const state of states) {
+				if (!this._filterState(state)) continue;
+
 				this._items.set(
 					state.directive.toString(),
 					new BridgeDirective(state),
@@ -56,25 +66,21 @@ export class DirectivesView
 			this._stalled = false;
 			this._setStatus();
 			this._didChangeTreeData.fire();
-			output.trace('[NotePADD/Bridge/Directives]', 'Updated all.');
+			output.trace(this._logPrefix, 'Updated all.');
 		}),
 		onTimekeeperTriggered.event((state) => {
-			if (!this._connection) return;
+			if (!this._connection || !this._filterState(state)) return;
 
 			const hash = state.directive.toString();
 			const treeItem = this._items.get(hash);
 
 			if (!treeItem) {
 				output.error(
-					'[NotePADD/Bridge/Directives]',
+					this._logPrefix,
 					'Bug: Unknown directive was triggered:',
 					hash,
 				);
-				output.trace(
-					'[NotePADD/Bridge/Directives]',
-					'Items:',
-					inspect(this._items),
-				);
+				output.trace(this._logPrefix, 'Items:', inspect(this._items));
 				return;
 			}
 
@@ -85,32 +91,29 @@ export class DirectivesView
 				stableSortBy.has(this._configSortBy) ? treeItem : undefined,
 			);
 
-			output.trace('[NotePADD/Bridge/Directives]', 'Updated one.');
+			output.trace(this._logPrefix, 'Updated one.');
 		}),
 		onTimekeeperStalled.event(() => {
 			this._stalled = true;
 			this._setStatus();
 			this._didChangeTreeData.fire();
-			output.trace('[NotePADD/Bridge/Directives]', 'Marked as stalled.');
+			output.trace(this._logPrefix, 'Marked as stalled.');
 		}),
 		workspace.onDidChangeConfiguration(async (event) => {
-			if (event.affectsConfiguration('notepadd.view.directives')) {
-				output.trace(
-					'[NotePADD/Bridge/Directives]',
-					'Configuration changed.',
-				);
+			if (event.affectsConfiguration(this._configPrefix)) {
+				output.trace(this._logPrefix, 'Configuration changed.');
 
 				this._didChangeTreeData.fire();
 
 				await commands.executeCommand(
 					'setContext',
-					'notepadd.directives.sortBy',
+					`${this._contextPrefix}.sortBy`,
 					this._configSortBy,
 				);
 
 				await commands.executeCommand(
 					'setContext',
-					'notepadd.directives.viewAsTree',
+					`${this._contextPrefix}.viewAsTree`,
 					this._configViewAsTree,
 				);
 			}
@@ -121,7 +124,7 @@ export class DirectivesView
 		return v.parse(
 			sortBySchema,
 			workspace
-				.getConfiguration('notepadd.view.directives')
+				.getConfiguration(this._configPrefix)
 				.get<string>('sortBy'),
 		);
 	}
@@ -129,7 +132,7 @@ export class DirectivesView
 	private get _configViewAsTree() {
 		return Boolean(
 			workspace
-				.getConfiguration('notepadd.view.directives')
+				.getConfiguration(this._configPrefix)
 				.get<boolean>('viewAsTree'),
 		);
 	}
@@ -145,10 +148,9 @@ export class DirectivesView
 
 	private _connection: Disposable | undefined;
 	private _stalled = true;
-	private readonly _items = new Map<string, BridgeDirective>();
 
-	constructor() {
-		this._treeView = window.createTreeView('notepadd.directives', {
+	constructor(viewId = 'notepadd.directives') {
+		this._treeView = window.createTreeView(viewId, {
 			treeDataProvider: this,
 			showCollapseAll: true,
 		});
@@ -163,13 +165,13 @@ export class DirectivesView
 	async initialize() {
 		await commands.executeCommand(
 			'setContext',
-			'notepadd.directives.sortBy',
+			`${this._contextPrefix}.sortBy`,
 			this._configSortBy,
 		);
 
 		await commands.executeCommand(
 			'setContext',
-			'notepadd.directives.viewAsTree',
+			`${this._contextPrefix}.viewAsTree`,
 			this._configViewAsTree,
 		);
 
@@ -202,7 +204,7 @@ export class DirectivesView
 		}
 
 		output.trace(
-			'[NotePADD/Bridge/Directives]',
+			this._logPrefix,
 			`Generating a ${this._configViewAsTree ? 'tree' : 'list'}, sorted by ${this._configSortBy}`,
 		);
 
@@ -277,17 +279,25 @@ export class DirectivesView
 			: children;
 	}
 
+	protected _filterState(state: DirectiveState): boolean {
+		return true;
+	}
+
+	protected _getItems(): Map<string, BridgeDirective> {
+		return this._items;
+	}
+
 	private _setConnected(connected: boolean) {
 		const changed = Boolean(connected) !== Boolean(this._connection);
 
 		if (connected && !this._connection) {
 			this._connection = bridgeSocket.connect();
-			output.debug('[NotePADD/Bridge/Directives]', 'Connected.');
+			output.debug(this._logPrefix, 'Connected.');
 		} else if (!connected && this._connection) {
 			this._connection.dispose();
 			this._connection = undefined;
 			this._items.clear();
-			output.debug('[NotePADD/Bridge/Directives]', 'Disconnected.');
+			output.debug(this._logPrefix, 'Disconnected.');
 		}
 
 		if (changed) {

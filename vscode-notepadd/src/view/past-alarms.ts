@@ -1,11 +1,14 @@
 import {
+	commands,
 	EventEmitter,
 	window,
+	workspace,
 	type Disposable,
 	type ProviderResult,
 	type TreeDataProvider,
 	type TreeItem,
 } from 'vscode';
+import {v} from 'notepadd-core';
 import {
 	bridgeSocket,
 	onTimekeeperStalled,
@@ -17,9 +20,17 @@ import {BridgeInstance} from '../tree-item/instance.ts';
 
 type PastAlarmsTreeItem = BridgeInstance;
 
+const sortBySchema = v.picklist(['timeAscending', 'timeDescending']);
+
+export type InstancesSortBy = v.InferOutput<typeof sortBySchema>;
+
 export class PastAlarmsView
 	implements TreeDataProvider<PastAlarmsTreeItem>, Disposable
 {
+	protected readonly _items: PastAlarmsTreeItem[] = [];
+	protected readonly _configPrefix: string = 'notepadd.view.pastAlarms';
+	protected readonly _contextPrefix: string = 'notepadd.pastAlarms';
+	protected readonly _logPrefix: string = '[NotePADD/Bridge/Past Alarms]';
 	private readonly _treeView;
 
 	private readonly _handlers = [
@@ -28,7 +39,7 @@ export class PastAlarmsView
 			this._stalled = false;
 			this._setStatus();
 			this._didChangeTreeData.fire();
-			output.trace('[NotePADD/Bridge/Past Alarms]', 'Marked as running.');
+			output.trace(this._logPrefix, 'Marked as running.');
 		}),
 		onTimekeeperTriggered.event((state) => {
 			if (state.instance.currentState !== 'pulse') return;
@@ -41,13 +52,26 @@ export class PastAlarmsView
 
 			this._setStatus();
 			this._didChangeTreeData.fire();
-			output.trace('[NotePADD/Bridge/Past Alarms]', 'Updated.');
+			output.trace(this._logPrefix, 'Updated.');
 		}),
 		onTimekeeperStalled.event(() => {
 			this._stalled = true;
 			this._setStatus();
 			this._didChangeTreeData.fire();
-			output.trace('[NotePADD/Bridge/Past Alarms]', 'Marked as stalled.');
+			output.trace(this._logPrefix, 'Marked as stalled.');
+		}),
+		workspace.onDidChangeConfiguration(async (event) => {
+			if (event.affectsConfiguration(this._configPrefix)) {
+				output.trace(this._logPrefix, 'Configuration changed.');
+
+				this._didChangeTreeData.fire();
+
+				await commands.executeCommand(
+					'setContext',
+					`${this._contextPrefix}.sortBy`,
+					this._configSortBy,
+				);
+			}
 		}),
 	];
 
@@ -62,10 +86,9 @@ export class PastAlarmsView
 
 	private _connection: Disposable | undefined;
 	private _stalled = true;
-	private readonly _items: PastAlarmsTreeItem[] = [];
 
-	constructor() {
-		this._treeView = window.createTreeView('notepadd.pastAlarms', {
+	constructor(viewId = 'notepadd.pastAlarms') {
+		this._treeView = window.createTreeView(viewId, {
 			treeDataProvider: this,
 		});
 		this._handlers.push(
@@ -74,6 +97,25 @@ export class PastAlarmsView
 			}),
 		);
 		this._setConnected(this._treeView.visible);
+	}
+
+	private get _configSortBy() {
+		return v.parse(
+			sortBySchema,
+			workspace
+				.getConfiguration(this._configPrefix)
+				.get<string>('sortBy'),
+		);
+	}
+
+	async initialize() {
+		await commands.executeCommand(
+			'setContext',
+			`${this._contextPrefix}.sortBy`,
+			this._configSortBy,
+		);
+
+		return this;
 	}
 
 	dispose() {
@@ -93,7 +135,10 @@ export class PastAlarmsView
 		element?: PastAlarmsTreeItem | undefined,
 	): ProviderResult<PastAlarmsTreeItem[]> {
 		if (element !== undefined) return;
-		return this._items;
+
+		return this._configSortBy === 'timeAscending'
+			? this._items.slice().reverse()
+			: this._items;
 	}
 
 	private _setConnected(connected: boolean) {
@@ -101,12 +146,12 @@ export class PastAlarmsView
 
 		if (connected && !this._connection) {
 			this._connection = bridgeSocket.connect();
-			output.debug('[NotePADD/Bridge/Past Alarms]', 'Connected.');
+			output.debug(this._logPrefix, 'Connected.');
 		} else if (!connected && this._connection) {
 			this._connection.dispose();
 			this._connection = undefined;
 			this._items.length = 0;
-			output.debug('[NotePADD/Bridge/Past Alarms]', 'Disconnected.');
+			output.debug(this._logPrefix, 'Disconnected.');
 		}
 
 		if (changed) {

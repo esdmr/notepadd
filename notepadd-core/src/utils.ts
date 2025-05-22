@@ -59,6 +59,56 @@ export function mapRecord<
 	) as Record<K2, V2>;
 }
 
+export function filterMap<K1, V1, K2 extends K1, V2 extends V1>(
+	map: Map<K1, V1>,
+	predicate: (entry: [K1, V1]) => entry is [K2, V2],
+): Map<K2, V2>;
+
+export function filterMap<K, V>(
+	map: Map<K, V>,
+	predicate: (entry: [K, V]) => unknown,
+): Map<K, V>;
+
+export function filterMap(
+	map: Map<unknown, unknown>,
+	predicate: (entry: [unknown, unknown]) => unknown,
+) {
+	const filtered = new Map<unknown, unknown>();
+
+	for (const entry of map) {
+		if (predicate(entry)) {
+			filtered.set(entry[0], entry[1]);
+		}
+	}
+
+	return filtered;
+}
+
+export function filterSet<V1, V2 extends V1>(
+	set: Set<V1>,
+	predicate: (value: V1) => value is V2,
+): Set<V2>;
+
+export function filterSet<V>(
+	set: Set<V>,
+	predicate: (value: V) => unknown,
+): Set<V>;
+
+export function filterSet(
+	set: Set<unknown>,
+	predicate: (value: unknown) => unknown,
+) {
+	const filtered = new Set<unknown>();
+
+	for (const value of set) {
+		if (predicate(value)) {
+			filtered.add(value);
+		}
+	}
+
+	return filtered;
+}
+
 const uriSafeChars = new Set([
 	// From RFC 2396:
 	//     uric = reserved | unreserved | escaped

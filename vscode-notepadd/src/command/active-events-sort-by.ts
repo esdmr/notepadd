@@ -1,7 +1,7 @@
-import orderAscendingIcon from 'command-icon:notepadd.directives.sortFromOrderAscending';
-import orderDescendingIcon from 'command-icon:notepadd.directives.sortFromOrderDescending';
-import timeAscendingIcon from 'command-icon:notepadd.directives.sortFromTimeAscending';
-import timeDescendingIcon from 'command-icon:notepadd.directives.sortFromTimeDescending';
+import orderAscendingIcon from 'command-icon:notepadd.activeEvents.sortFromOrderAscending';
+import orderDescendingIcon from 'command-icon:notepadd.activeEvents.sortFromOrderDescending';
+import timeAscendingIcon from 'command-icon:notepadd.activeEvents.sortFromTimeAscending';
+import timeDescendingIcon from 'command-icon:notepadd.activeEvents.sortFromTimeDescending';
 import {
 	commands,
 	ConfigurationTarget,
@@ -19,7 +19,7 @@ type SortByQuickPickItem = QuickPickItem & {
 	value: DirectivesSortBy;
 };
 
-export function setupDirectivesSortByCommands(context: ExtensionContext) {
+export function setupActiveEventsSortByCommands(context: ExtensionContext) {
 	const generateIcon = (
 		icon: typeof timeAscendingIcon,
 	): QuickPickItem['iconPath'] => {
@@ -73,25 +73,25 @@ export function setupDirectivesSortByCommands(context: ExtensionContext) {
 		if (!result) return;
 
 		await workspace
-			.getConfiguration('notepadd.view.directives')
+			.getConfiguration('notepadd.view.activeEvents')
 			.update('sortBy', result?.value, ConfigurationTarget.Global);
 	};
 
 	return Disposable.from(
 		commands.registerCommand(
-			'notepadd.directives.sortFromTimeAscending',
+			'notepadd.activeEvents.sortFromTimeAscending',
 			handler('timeAscending'),
 		),
 		commands.registerCommand(
-			'notepadd.directives.sortFromTimeDescending',
+			'notepadd.activeEvents.sortFromTimeDescending',
 			handler('timeDescending'),
 		),
 		commands.registerCommand(
-			'notepadd.directives.sortFromOrderAscending',
+			'notepadd.activeEvents.sortFromOrderAscending',
 			handler('orderAscending'),
 		),
 		commands.registerCommand(
-			'notepadd.directives.sortFromOrderDescending',
+			'notepadd.activeEvents.sortFromOrderDescending',
 			handler('orderDescending'),
 		),
 	);

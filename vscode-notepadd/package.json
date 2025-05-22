@@ -95,6 +95,92 @@
 				"category": "NotePADD"
 			},
 			{
+				"command": "notepadd.activeEvents.sortFromTimeAscending",
+				"title": "Sort…",
+				"category": "NotePADD Active Events",
+				"icon": {
+					"light": "src/view/time-ascending-light.svg",
+					"dark": "src/view/time-ascending-dark.svg"
+				},
+				"enablement": "notepadd.activeEvents.sortBy == 'timeAscending' || !notepadd.activeEvents.sortBy"
+			},
+			{
+				"command": "notepadd.activeEvents.sortFromTimeDescending",
+				"title": "Sort…",
+				"category": "NotePADD Active Events",
+				"icon": {
+					"light": "src/view/time-descending-light.svg",
+					"dark": "src/view/time-descending-dark.svg"
+				},
+				"enablement": "notepadd.activeEvents.sortBy == 'timeDescending'"
+			},
+			{
+				"command": "notepadd.activeEvents.sortFromOrderAscending",
+				"title": "Sort…",
+				"category": "NotePADD Active Events",
+				"icon": {
+					"light": "src/view/order-ascending-light.svg",
+					"dark": "src/view/order-ascending-dark.svg"
+				},
+				"enablement": "notepadd.activeEvents.sortBy == 'orderAscending'"
+			},
+			{
+				"command": "notepadd.activeEvents.sortFromOrderDescending",
+				"title": "Sort…",
+				"category": "NotePADD Active Events",
+				"icon": {
+					"light": "src/view/order-descending-light.svg",
+					"dark": "src/view/order-descending-dark.svg"
+				},
+				"enablement": "notepadd.activeEvents.sortBy == 'orderDescending'"
+			},
+			{
+				"command": "notepadd.activeEvents.viewAsList",
+				"title": "View as List",
+				"category": "NotePADD Active Events",
+				"icon": "$(list-tree)",
+				"enablement": "notepadd.activeEvents.viewAsTree"
+			},
+			{
+				"command": "notepadd.activeEvents.viewAsTree",
+				"title": "View as Tree",
+				"category": "NotePADD Active Events",
+				"icon": "$(list-flat)",
+				"enablement": "!notepadd.activeEvents.viewAsTree"
+			},
+			{
+				"command": "notepadd.activeEvents.find",
+				"title": "Find or Filter",
+				"category": "NotePADD Active Events",
+				"icon": "$(search)"
+			},
+			{
+				"command": "notepadd.pastAlarms.sortFromTimeAscending",
+				"title": "Sort by Time, Descending",
+				"category": "NotePADD Past Alarms",
+				"icon": {
+					"light": "src/view/time-ascending-light.svg",
+					"dark": "src/view/time-ascending-dark.svg"
+				},
+				"enablement": "notepadd.pastAlarms.sortBy == 'timeAscending'"
+			},
+			{
+				"command": "notepadd.pastAlarms.sortFromTimeDescending",
+				"title": "Sort by Time, Ascending",
+				"category": "NotePADD Past Alarms",
+				"icon": {
+					"light": "src/view/time-descending-light.svg",
+					"dark": "src/view/time-descending-dark.svg"
+				},
+				"enablement": "notepadd.pastAlarms.sortBy != 'timeAscending'"
+			},
+			{
+				"command": "notepadd.pastAlarms.find",
+				"title": "Find or Filter",
+				"category": "NotePADD Past Alarms",
+				"icon": "$(search)"
+			},
+			{
 				"command": "notepadd.directives.sortFromTimeAscending",
 				"title": "Sort…",
 				"category": "NotePADD Directives",
@@ -149,18 +235,6 @@
 				"enablement": "!notepadd.directives.viewAsTree"
 			},
 			{
-				"command": "notepadd.activeEvents.find",
-				"title": "Find or Filter",
-				"category": "NotePADD Active Events",
-				"icon": "$(search)"
-			},
-			{
-				"command": "notepadd.pastAlarms.find",
-				"title": "Find or Filter",
-				"category": "NotePADD Past Alarms",
-				"icon": "$(search)"
-			},
-			{
 				"command": "notepadd.directives.find",
 				"title": "Find or Filter",
 				"category": "NotePADD Directives",
@@ -176,6 +250,56 @@
 				}
 			],
 			"view/title": [
+				{
+					"group": "navigation",
+					"command": "notepadd.activeEvents.sortFromTimeAscending",
+					"when": "view == 'notepadd.activeEvents' && (notepadd.activeEvents.sortBy == 'timeAscending' || !notepadd.activeEvents.sortBy)"
+				},
+				{
+					"group": "navigation",
+					"command": "notepadd.activeEvents.sortFromTimeDescending",
+					"when": "view == 'notepadd.activeEvents' && notepadd.activeEvents.sortBy == 'timeDescending'"
+				},
+				{
+					"group": "navigation",
+					"command": "notepadd.activeEvents.sortFromOrderAscending",
+					"when": "view == 'notepadd.activeEvents' && notepadd.activeEvents.sortBy == 'orderAscending'"
+				},
+				{
+					"group": "navigation",
+					"command": "notepadd.activeEvents.sortFromOrderDescending",
+					"when": "view == 'notepadd.activeEvents' && notepadd.activeEvents.sortBy == 'orderDescending'"
+				},
+				{
+					"group": "navigation",
+					"command": "notepadd.activeEvents.viewAsList",
+					"when": "view == 'notepadd.activeEvents' && notepadd.activeEvents.viewAsTree"
+				},
+				{
+					"group": "navigation",
+					"command": "notepadd.activeEvents.viewAsTree",
+					"when": "view == 'notepadd.activeEvents' && !notepadd.activeEvents.viewAsTree"
+				},
+				{
+					"group": "navigation",
+					"command": "notepadd.activeEvents.find",
+					"when": "view == 'notepadd.activeEvents'"
+				},
+				{
+					"group": "navigation",
+					"command": "notepadd.pastAlarms.sortFromTimeAscending",
+					"when": "view == 'notepadd.pastAlarms' && notepadd.pastAlarms.sortBy == 'timeAscending'"
+				},
+				{
+					"group": "navigation",
+					"command": "notepadd.pastAlarms.sortFromTimeDescending",
+					"when": "view == 'notepadd.pastAlarms' && notepadd.pastAlarms.sortBy != 'timeAscending'"
+				},
+				{
+					"group": "navigation",
+					"command": "notepadd.pastAlarms.find",
+					"when": "view == 'notepadd.pastAlarms'"
+				},
 				{
 					"group": "navigation",
 					"command": "notepadd.directives.sortFromTimeAscending",
@@ -205,16 +329,6 @@
 					"group": "navigation",
 					"command": "notepadd.directives.viewAsTree",
 					"when": "view == 'notepadd.directives' && !notepadd.directives.viewAsTree"
-				},
-				{
-					"group": "navigation",
-					"command": "notepadd.activeEvents.find",
-					"when": "view == 'notepadd.activeEvents'"
-				},
-				{
-					"group": "navigation",
-					"command": "notepadd.pastAlarms.find",
-					"when": "view == 'notepadd.pastAlarms'"
 				},
 				{
 					"group": "navigation",
@@ -277,6 +391,37 @@
 					},
 					"default": [],
 					"description": "Arguments passed to plantuml.jar"
+				},
+				"notepadd.view.activeEvents.viewAsTree": {
+					"type": "boolean",
+					"scope": "application",
+					"ignoreSync": true,
+					"default": false,
+					"description": "Should the active events panel be shown as a tree"
+				},
+				"notepadd.view.activeEvents.sortBy": {
+					"type": "string",
+					"scope": "application",
+					"ignoreSync": true,
+					"default": "timeAscending",
+					"enum": [
+						"timeAscending",
+						"timeDescending",
+						"orderAscending",
+						"orderDescending"
+					],
+					"description": "How should the active events panel be sorted"
+				},
+				"notepadd.view.pastAlarms.sortBy": {
+					"type": "string",
+					"scope": "application",
+					"ignoreSync": true,
+					"default": "timeDescending",
+					"enum": [
+						"timeAscending",
+						"timeDescending"
+					],
+					"description": "How should the past alarms panel be sorted"
 				},
 				"notepadd.view.directives.viewAsTree": {
 					"type": "boolean",

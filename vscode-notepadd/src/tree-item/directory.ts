@@ -1,6 +1,6 @@
 import path from 'node:path';
 import {ThemeIcon, TreeItem, TreeItemCollapsibleState, type Uri} from 'vscode';
-import type {SortBy} from '../view/directives.ts';
+import type {DirectivesSortBy} from '../view/directives.ts';
 import type {BridgeFile} from './file.ts';
 
 export class BridgeDirectory extends TreeItem {
@@ -14,7 +14,7 @@ export class BridgeDirectory extends TreeItem {
 		this.iconPath = ThemeIcon.Folder;
 	}
 
-	updateOrder(sortBy: SortBy) {
+	updateOrder(sortBy: DirectivesSortBy) {
 		switch (sortBy) {
 			case 'timeAscending':
 			case 'timeDescending': {
