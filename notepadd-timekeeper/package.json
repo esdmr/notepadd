@@ -6,14 +6,14 @@
 		".": "./src/index.ts",
 		"./service": "./src/service.ts"
 	},
-	"devDependencies": {
-		"@types/node": "20.17.32",
-		"type-fest": "4.40.1"
-	},
-	"packageManager": "pnpm@9.15.9",
 	"dependencies": {
 		"notepadd-core": "workspace:*",
 		"temporal-polyfill": "0.3.0",
 		"uint8array-extras": "1.4.0"
-	}
+	},
+	"devDependencies": {
+		"@types/node": "20.17.32",
+		"type-fest": "4.40.1"
+	},
+	"packageManager": "pnpm@9.15.9"
 }
