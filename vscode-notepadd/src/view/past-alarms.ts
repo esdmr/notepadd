@@ -65,7 +65,7 @@ export class PastAlarmsView
 	private readonly _items: PastAlarmsTreeItem[] = [];
 
 	constructor() {
-		this._treeView = window.createTreeView('notepadd-past-alarms', {
+		this._treeView = window.createTreeView('notepadd.pastAlarms', {
 			treeDataProvider: this,
 		});
 		this._handlers.push(

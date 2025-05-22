@@ -148,7 +148,7 @@ export class DirectivesView
 	private readonly _items = new Map<string, BridgeDirective>();
 
 	constructor() {
-		this._treeView = window.createTreeView('notepadd-directives', {
+		this._treeView = window.createTreeView('notepadd.directives', {
 			treeDataProvider: this,
 			showCollapseAll: true,
 		});

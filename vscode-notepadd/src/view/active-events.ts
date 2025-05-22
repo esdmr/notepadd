@@ -94,7 +94,7 @@ export class ActiveEventsView
 	private readonly _items = new Map<string, ActiveEventsTreeItem>();
 
 	constructor() {
-		this._treeView = window.createTreeView('notepadd-active-events', {
+		this._treeView = window.createTreeView('notepadd.activeEvents', {
 			treeDataProvider: this,
 		});
 		this._handlers.push(

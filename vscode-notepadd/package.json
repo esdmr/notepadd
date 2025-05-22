@@ -46,19 +46,19 @@
 		"views": {
 			"notepadd": [
 				{
-					"id": "notepadd-active-events",
+					"id": "notepadd.activeEvents",
 					"contextualTitle": "NotePADD",
 					"name": "Active Events",
 					"icon": "src/notepadd-icon.svg"
 				},
 				{
-					"id": "notepadd-past-alarms",
+					"id": "notepadd.pastAlarms",
 					"contextualTitle": "NotePADD",
 					"name": "Past Alarms",
 					"icon": "src/notepadd-icon.svg"
 				},
 				{
-					"id": "notepadd-directives",
+					"id": "notepadd.directives",
 					"contextualTitle": "NotePADD",
 					"name": "Directives",
 					"icon": "src/notepadd-icon.svg"
@@ -149,13 +149,13 @@
 				"enablement": "!notepadd.directives.viewAsTree"
 			},
 			{
-				"command": "notepadd.active-events.find",
+				"command": "notepadd.activeEvents.find",
 				"title": "Find or Filter",
 				"category": "NotePADD Active Events",
 				"icon": "$(search)"
 			},
 			{
-				"command": "notepadd.past-alarms.find",
+				"command": "notepadd.pastAlarms.find",
 				"title": "Find or Filter",
 				"category": "NotePADD Past Alarms",
 				"icon": "$(search)"
@@ -179,47 +179,47 @@
 				{
 					"group": "navigation",
 					"command": "notepadd.directives.sortFromTimeAscending",
-					"when": "view == 'notepadd-directives' && (notepadd.directives.sortBy == 'timeAscending' || !notepadd.directives.sortBy)"
+					"when": "view == 'notepadd.directives' && (notepadd.directives.sortBy == 'timeAscending' || !notepadd.directives.sortBy)"
 				},
 				{
 					"group": "navigation",
 					"command": "notepadd.directives.sortFromTimeDescending",
-					"when": "view == 'notepadd-directives' && notepadd.directives.sortBy == 'timeDescending'"
+					"when": "view == 'notepadd.directives' && notepadd.directives.sortBy == 'timeDescending'"
 				},
 				{
 					"group": "navigation",
 					"command": "notepadd.directives.sortFromOrderAscending",
-					"when": "view == 'notepadd-directives' && notepadd.directives.sortBy == 'orderAscending'"
+					"when": "view == 'notepadd.directives' && notepadd.directives.sortBy == 'orderAscending'"
 				},
 				{
 					"group": "navigation",
 					"command": "notepadd.directives.sortFromOrderDescending",
-					"when": "view == 'notepadd-directives' && notepadd.directives.sortBy == 'orderDescending'"
+					"when": "view == 'notepadd.directives' && notepadd.directives.sortBy == 'orderDescending'"
 				},
 				{
 					"group": "navigation",
 					"command": "notepadd.directives.viewAsList",
-					"when": "view == 'notepadd-directives' && notepadd.directives.viewAsTree"
+					"when": "view == 'notepadd.directives' && notepadd.directives.viewAsTree"
 				},
 				{
 					"group": "navigation",
 					"command": "notepadd.directives.viewAsTree",
-					"when": "view == 'notepadd-directives' && !notepadd.directives.viewAsTree"
+					"when": "view == 'notepadd.directives' && !notepadd.directives.viewAsTree"
 				},
 				{
 					"group": "navigation",
-					"command": "notepadd.active-events.find",
-					"when": "view == 'notepadd-active-events'"
+					"command": "notepadd.activeEvents.find",
+					"when": "view == 'notepadd.activeEvents'"
 				},
 				{
 					"group": "navigation",
-					"command": "notepadd.past-alarms.find",
-					"when": "view == 'notepadd-past-alarms'"
+					"command": "notepadd.pastAlarms.find",
+					"when": "view == 'notepadd.pastAlarms'"
 				},
 				{
 					"group": "navigation",
 					"command": "notepadd.directives.find",
-					"when": "view == 'notepadd-directives'"
+					"when": "view == 'notepadd.directives'"
 				}
 			]
 		},
