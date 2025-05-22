@@ -1,6 +1,7 @@
 {
-	"name": "notepadd",
+	"name": "vscode-notepadd",
 	"displayName": "NotePADD",
+	"extensionName": "notepadd",
 	"version": "0.1.0",
 	"private": true,
 	"description": "Note-taking and dashboard tool.",

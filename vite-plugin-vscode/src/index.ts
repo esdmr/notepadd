@@ -14,6 +14,7 @@ type View = NonNullable<
 export type VsCodePackageJson = PackageJson &
 	ExtensionManifest & {
 		icons?: Record<string, string | ThemePath>;
+		extensionName?: string;
 	};
 
 export type ViteVsCodeOptions<T extends VsCodePackageJson = VsCodePackageJson> =
@@ -332,6 +333,11 @@ export function vscode<T extends VsCodePackageJson = VsCodePackageJson>({
 				async (text) => {
 					let packageJson = JSON.parse(text) as T;
 					packageJson.main = entryChunk.fileName;
+
+					if (packageJson.extensionName) {
+						packageJson.name = packageJson.extensionName;
+						delete packageJson.extensionName;
+					}
 
 					const icons = packageJson.icons ?? {};
 					delete packageJson.icons;
