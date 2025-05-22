@@ -10,7 +10,6 @@ import {
 } from 'vscode';
 import {v} from 'notepadd-core';
 import {
-	bridgeSocket,
 	onTimekeeperStalled,
 	onTimekeeperTriggered,
 	onTimekeeperUpdated,
@@ -35,7 +34,6 @@ export class PastAlarmsView
 
 	private readonly _handlers = [
 		onTimekeeperUpdated.event(() => {
-			if (!this._connection) return;
 			this._stalled = false;
 			this._setStatus();
 			this._didChangeTreeData.fire();
@@ -46,6 +44,7 @@ export class PastAlarmsView
 
 			this._items.unshift(new BridgeInstance(state));
 
+			// TODO: Make configurable.
 			if (this._items.length > 50) {
 				this._items.length = 50;
 			}
@@ -84,19 +83,12 @@ export class PastAlarmsView
 		return this._didChangeTreeData.event;
 	}
 
-	private _connection: Disposable | undefined;
 	private _stalled = true;
 
 	constructor(viewId = 'notepadd.pastAlarms') {
 		this._treeView = window.createTreeView(viewId, {
 			treeDataProvider: this,
 		});
-		this._handlers.push(
-			this._treeView.onDidChangeVisibility((event) => {
-				this._setConnected(event.visible);
-			}),
-		);
-		this._setConnected(this._treeView.visible);
 	}
 
 	private get _configSortBy() {
@@ -119,7 +111,6 @@ export class PastAlarmsView
 	}
 
 	dispose() {
-		this._connection?.dispose();
 		this._treeView.dispose();
 
 		for (const handler of this._handlers) {
@@ -139,26 +130,6 @@ export class PastAlarmsView
 		return this._configSortBy === 'timeAscending'
 			? this._items.slice().reverse()
 			: this._items;
-	}
-
-	private _setConnected(connected: boolean) {
-		const changed = Boolean(connected) !== Boolean(this._connection);
-
-		if (connected && !this._connection) {
-			this._connection = bridgeSocket.connect();
-			output.debug(this._logPrefix, 'Connected.');
-		} else if (!connected && this._connection) {
-			this._connection.dispose();
-			this._connection = undefined;
-			this._items.length = 0;
-			output.debug(this._logPrefix, 'Disconnected.');
-		}
-
-		if (changed) {
-			this._stalled = true;
-			this._setStatus();
-			this._didChangeTreeData.fire();
-		}
 	}
 
 	private _setStatus() {
