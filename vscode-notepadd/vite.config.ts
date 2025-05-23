@@ -35,10 +35,10 @@ export default defineConfig((env) => ({
 				},
 			],
 			copyPaths: {
-				// eslint-disable-next-line @typescript-eslint/naming-convention
+				/* eslint-disable @typescript-eslint/naming-convention */
 				'README.md': '../README.md',
-				// eslint-disable-next-line @typescript-eslint/naming-convention
 				'LICENSE.txt': '../LICENSE.txt',
+				/* eslint-enable @typescript-eslint/naming-convention */
 			},
 		}),
 	],

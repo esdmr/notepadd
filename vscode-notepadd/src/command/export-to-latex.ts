@@ -42,8 +42,9 @@ async function fetchImageFromNetworkWithoutRetries(
 ): Promise<Image> {
 	const response = await fetch(convertUriToUrl(uri), {
 		headers: {
-			// eslint-disable-next-line @typescript-eslint/naming-convention
+			/* eslint-disable @typescript-eslint/naming-convention */
 			Accept: 'application/pdf, application/postscript;q=0.9, image/svg+xml;q=0.9, image/png;q=0.8, image/jpeg;q=0.7, image/*;q=0.6',
+			/* eslint-enable @typescript-eslint/naming-convention */
 		},
 		signal,
 	});
