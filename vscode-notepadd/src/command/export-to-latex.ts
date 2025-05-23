@@ -21,6 +21,7 @@ import {
 } from 'vscode';
 import {output} from '../output.ts';
 import {convertUriToUrl} from '../utils.ts';
+import { convertVscodeNotebookToNotePadd } from '../notebook/notepadd.serializer.ts';
 
 const fetchMaxRetry = 5;
 
@@ -241,11 +242,6 @@ export function setupExportToLatexCommand(): Disposable {
 			);
 		}
 
-		// FIXME: Replace with the VS Code Notebook Serializer (to NotePADD IR).
-		await notebook.save();
-
-		const source = await workspace.fs.readFile(notebook.uri);
-
 		const dirname = Uri.joinPath(notebook.uri, '..');
 		const jobName = path.basename(notebook.uri.fsPath, '.np.md');
 
@@ -259,7 +255,7 @@ export function setupExportToLatexCommand(): Disposable {
 		} catch {}
 
 		const files = exportNotebookToLatex(
-			deserializeNotePadd(source),
+			convertVscodeNotebookToNotePadd(notebook),
 			jobName,
 		);
 
