@@ -19,7 +19,9 @@ type SortByQuickPickItem = QuickPickItem & {
 	value: DirectivesSortBy;
 };
 
-export function setupDirectivesSortByCommands(context: ExtensionContext) {
+export function setupDirectivesSortByCommands(
+	context: ExtensionContext,
+): Disposable {
 	const generateIcon = (
 		icon: typeof timeAscendingIcon,
 	): QuickPickItem['iconPath'] => {

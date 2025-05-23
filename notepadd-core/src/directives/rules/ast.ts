@@ -3,7 +3,7 @@ export abstract class SyntaxNode<Children extends readonly any[]> {
 	constructor(protected readonly _children: Children) {}
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention
-	toJSON() {
+	toJSON(): unknown {
 		return {
 			_type: this.constructor.name,
 			...this,

@@ -19,7 +19,7 @@ export class PlainDateLiteralNode extends SyntaxNode<
 	readonly month = this._children[3];
 	readonly day = this._children[5];
 
-	toPlainDate(_today: Temporal.PlainDate) {
+	toPlainDate(_today: Temporal.PlainDate): Temporal.PlainDate {
 		// TODO: Make configurable.
 		return Temporal.PlainDate.from({
 			calendar: this.calendar?.calendar,

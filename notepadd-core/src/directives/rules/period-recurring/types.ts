@@ -53,7 +53,7 @@ export class RecurringPeriod {
 	}
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention
-	toJSON() {
+	toJSON(): unknown {
 		return {
 			...this,
 			_recurringInstant: undefined,
@@ -61,11 +61,11 @@ export class RecurringPeriod {
 		};
 	}
 
-	toString() {
+	toString(): string {
 		return `R/${this.first.toString()}/${this.interval.toString()}/${this.end?.toString()}`;
 	}
 
-	getInstance(now: Temporal.ZonedDateTime) {
+	getInstance(now: Temporal.ZonedDateTime): Instance {
 		const instance = this._recurringInstant.getInstance(now);
 
 		if (!instance.previous) {
@@ -94,7 +94,7 @@ export class RecurringPeriod {
 		}
 	}
 
-	getNextInstance(instance: Instance) {
+	getNextInstance(instance: Instance): Instance {
 		if (!instance.next) return instance;
 
 		if (instance.currentState === 'low') {

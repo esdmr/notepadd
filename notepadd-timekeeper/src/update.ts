@@ -88,7 +88,10 @@ function* updateFile(fileUrl: string, content: string): Generator<UpdateDelta> {
 	states.length = notebook.cells.length;
 }
 
-function applyUpdateDelta(delta: UpdateDelta, now: Temporal.ZonedDateTime) {
+function applyUpdateDelta(
+	delta: UpdateDelta,
+	now: Temporal.ZonedDateTime,
+): void {
 	for (const [hash] of delta.deleted) {
 		const state = directives.get(hash);
 		if (!state) continue;
@@ -118,7 +121,7 @@ function applyUpdateDelta(delta: UpdateDelta, now: Temporal.ZonedDateTime) {
 	}
 }
 
-export function processUpdate(message: UpdateMessage) {
+export function processUpdate(message: UpdateMessage): void {
 	const now = Temporal.Now.zonedDateTimeISO();
 
 	for (const [fileUrl, content] of Object.entries(message.changed)) {
@@ -146,12 +149,12 @@ export function processUpdate(message: UpdateMessage) {
 	}
 }
 
-export function resetTimeouts() {
+export function resetTimeouts(): void {
 	for (const [_hash, state] of directives) {
 		onTimeout(state);
 	}
 }
 
-export function getDirectiveStates() {
+export function getDirectiveStates(): DirectiveState[] {
 	return [...directives.values()];
 }

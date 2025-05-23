@@ -7,7 +7,10 @@ import {Directive} from './rules/types.ts';
 
 export const directiveMimeType = 'application/x-notepadd+json';
 
-export function parseDirective(text: string, now?: Temporal.ZonedDateTime) {
+export function parseDirective(
+	text: string,
+	now?: Temporal.ZonedDateTime,
+): {directive: Directive; ast: unknown} {
 	const parser = new Parser(grammar);
 
 	parser.feed(text);
@@ -23,13 +26,14 @@ export function parseDirective(text: string, now?: Temporal.ZonedDateTime) {
 		);
 	}
 
+	// TODO: replace with just the directive.
 	return {
 		directive: results[0]!.toDirective(now),
 		ast: results[0]! as unknown,
 	};
 }
 
-export function deserializeDirective(text: string) {
+export function deserializeDirective(text: string): Directive {
 	return v.parse(Directive.schema, JSON.parse(text));
 }
 

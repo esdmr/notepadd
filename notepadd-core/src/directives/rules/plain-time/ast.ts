@@ -12,7 +12,7 @@ export type PlainTimeChildNode =
 export class PlainTimeNode extends SyntaxNode<[PlainTimeChildNode]> {
 	readonly time = this._children[0];
 
-	toPlainTime(now: Temporal.PlainTime) {
+	toPlainTime(now: Temporal.PlainTime): Temporal.PlainTime {
 		return this.time.toPlainTime(now);
 	}
 }

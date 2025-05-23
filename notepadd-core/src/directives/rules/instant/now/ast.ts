@@ -8,7 +8,7 @@ export class InstantNowNode extends SyntaxNode<
 > {
 	readonly timeZone = this._children[1];
 
-	toInstant(now: Temporal.ZonedDateTime) {
+	toInstant(now: Temporal.ZonedDateTime): Temporal.ZonedDateTime {
 		if (this.timeZone) {
 			now = now.withTimeZone(this.timeZone.toTimeZone());
 		}

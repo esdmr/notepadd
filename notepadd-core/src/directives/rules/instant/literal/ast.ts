@@ -11,7 +11,7 @@ export class InstantLiteralNode extends SyntaxNode<
 	readonly time = this._children[1];
 	readonly timeZone = this._children[2];
 
-	toInstant(now: Temporal.ZonedDateTime) {
+	toInstant(now: Temporal.ZonedDateTime): Temporal.ZonedDateTime {
 		if (this.timeZone) {
 			now = now.withTimeZone(this.timeZone.toTimeZone());
 		}

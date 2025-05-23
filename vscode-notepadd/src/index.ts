@@ -19,7 +19,7 @@ import {PastAlarmsView} from './view/past-alarms.ts';
 
 const asyncSubscriptions: AsyncDisposable[] = [];
 
-export async function activate(context: ExtensionContext) {
+export async function activate(context: ExtensionContext): Promise<void> {
 	try {
 		context.subscriptions.push(
 			output,
@@ -45,7 +45,7 @@ export async function activate(context: ExtensionContext) {
 	}
 }
 
-export async function deactivate() {
+export async function deactivate(): Promise<void> {
 	for (const disposable of asyncSubscriptions) {
 		await disposable.asyncDispose();
 	}

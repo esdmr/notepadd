@@ -82,12 +82,12 @@ export class Timekeeper implements AsyncDisposable {
 		this._updateStatus();
 	}
 
-	initialize() {
+	initialize(): this {
 		this.start();
 		return this;
 	}
 
-	start() {
+	start(): void {
 		if (this._process) return;
 
 		this._process = execaNode(timekeeperPath, execaOptions);
@@ -178,7 +178,7 @@ export class Timekeeper implements AsyncDisposable {
 		this._updateStatus();
 	}
 
-	async stop() {
+	async stop(): Promise<void> {
 		if (!this._process) return;
 
 		onTimekeeperStalled.fire();
@@ -193,12 +193,12 @@ export class Timekeeper implements AsyncDisposable {
 		clearTimeout(timeout);
 	}
 
-	async restart() {
+	async restart(): Promise<void> {
 		await this.stop();
 		this.start();
 	}
 
-	async asyncDispose() {
+	async asyncDispose(): Promise<void> {
 		for (const item of this._handlers) {
 			item.dispose();
 		}
@@ -206,7 +206,7 @@ export class Timekeeper implements AsyncDisposable {
 		await this.stop();
 	}
 
-	private _queueUpdate() {
+	private _queueUpdate(): void {
 		if (!this._process) return;
 
 		if (this._timeout) {
@@ -230,7 +230,7 @@ export class Timekeeper implements AsyncDisposable {
 		}, updateDebounceDelay);
 	}
 
-	private _clearQueue() {
+	private _clearQueue(): void {
 		this._queue.clear();
 
 		if (this._timeout) {
@@ -238,7 +238,7 @@ export class Timekeeper implements AsyncDisposable {
 		}
 	}
 
-	private _updateStatus() {
+	private _updateStatus(): void {
 		onStatusUpdated.fire({
 			timekeeperHealth: this._health,
 		});

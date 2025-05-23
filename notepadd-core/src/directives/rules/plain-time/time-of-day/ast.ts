@@ -5,7 +5,7 @@ import {SyntaxNode} from '../../ast.ts';
 export class PlainTimeOfDayNode extends SyntaxNode<[MooToken]> {
 	readonly timeOfDay = this._children[0].type;
 
-	toPlainTime(_now: Temporal.PlainTime) {
+	toPlainTime(_now: Temporal.PlainTime): Temporal.PlainTime {
 		// TODO: Make configurable.
 		switch (this.timeOfDay) {
 			case 'midnight': {

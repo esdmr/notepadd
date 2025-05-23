@@ -4,10 +4,11 @@ import {
 	Uri,
 	window,
 	workspace,
+	type Disposable,
 	type NotebookDocumentShowOptions,
 } from 'vscode';
 
-export function setupOpenNotebookCommand() {
+export function setupOpenNotebookCommand(): Disposable {
 	return commands.registerCommand(
 		'notepadd.openNotebook',
 		async (fileUrl: string) => {

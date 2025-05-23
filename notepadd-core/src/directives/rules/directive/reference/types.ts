@@ -16,7 +16,7 @@ export class Reference {
 
 	constructor(readonly target: string) {}
 
-	toString() {
+	toString(): string {
 		return `reference <${this.target}>`;
 	}
 }

@@ -7,7 +7,7 @@ import type {DirectiveState} from './types.ts';
 
 const maxTimeoutDelay = 0x7f_ff_ff_ff;
 
-export function onTimeout(state: DirectiveState) {
+export function onTimeout(state: DirectiveState): void {
 	state.clearTimeout();
 	if (!state.instance.next) return;
 

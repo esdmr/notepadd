@@ -3,7 +3,7 @@ import type {Temporal} from 'temporal-polyfill';
 import {SyntaxNode} from '../../ast.ts';
 
 export class PlainTimeNowNode extends SyntaxNode<[MooToken, MooToken]> {
-	toPlainTime(now: Temporal.PlainTime) {
+	toPlainTime(now: Temporal.PlainTime): Temporal.PlainTime {
 		return now;
 	}
 }

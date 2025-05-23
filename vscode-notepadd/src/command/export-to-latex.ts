@@ -11,7 +11,14 @@ import {
 	isMimeTypeVectorImage,
 } from 'notepadd-core';
 import {uint8ArrayToString} from 'uint8array-extras';
-import {commands, ProgressLocation, Uri, window, workspace} from 'vscode';
+import {
+	commands,
+	ProgressLocation,
+	Uri,
+	window,
+	workspace,
+	type Disposable,
+} from 'vscode';
 import {output} from '../output.ts';
 import {convertUriToUrl} from '../utils.ts';
 
@@ -217,7 +224,7 @@ async function convertImage(image: Image): Promise<Image> {
 	return convertRasterImage(image);
 }
 
-export function setupExportToLatexCommand() {
+export function setupExportToLatexCommand(): Disposable {
 	return commands.registerCommand('notepadd.exportToLatex', async () => {
 		const notebook = window.activeNotebookEditor?.notebook;
 

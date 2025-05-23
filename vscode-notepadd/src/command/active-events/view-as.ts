@@ -1,6 +1,6 @@
 import {commands, ConfigurationTarget, Disposable, workspace} from 'vscode';
 
-export function setupActiveEventsViewAsCommands() {
+export function setupActiveEventsViewAsCommands(): Disposable {
 	const handler = (value: boolean) => async () => {
 		await workspace
 			.getConfiguration('notepadd.view.activeEvents')

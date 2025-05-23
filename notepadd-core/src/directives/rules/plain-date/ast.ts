@@ -8,7 +8,7 @@ export type PlainDateChildNode = PlainDateKeywordNode | PlainDateLiteralNode;
 export class PlainDateNode extends SyntaxNode<[PlainDateChildNode]> {
 	readonly date = this._children[0];
 
-	toPlainDate(today: Temporal.PlainDate) {
+	toPlainDate(today: Temporal.PlainDate): Temporal.PlainDate {
 		return this.date.toPlainDate(today);
 	}
 }

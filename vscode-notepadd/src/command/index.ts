@@ -13,7 +13,7 @@ import {setupStopTimekeeperCommand} from './timekeeper/stop.ts';
 import {setupExportToLatexCommand} from './export-to-latex.ts';
 import {setupOpenNotebookCommand} from './open-notebook.ts';
 
-export function setupCommands(context: ExtensionContext) {
+export function setupCommands(context: ExtensionContext): Disposable {
 	return Disposable.from(
 		setupActiveEventsFindCommand(),
 		setupActiveEventsSortByCommands(context),

@@ -17,12 +17,12 @@ export class BidiNode implements TextDirective {
 	}
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention
-	toJSON() {
+	toJSON(): unknown {
 		return {...this, parent: undefined};
 	}
 }
 
-function adjustBidiLevel(cursor: BidiNode, newLevel: number) {
+function adjustBidiLevel(cursor: BidiNode, newLevel: number): BidiNode {
 	while (cursor.level > newLevel) {
 		if (!cursor.parent) {
 			throw new RangeError(
@@ -47,7 +47,7 @@ const isolatePlaceholder = '-';
 export function generateBidiNode(
 	nodes: readonly PhrasingContent[],
 	baseDirection?: 'ltr' | 'rtl' | 'auto',
-) {
+): BidiNode {
 	const text = nodes
 		.map((i) => (i.type === 'text' ? i.value : isolatePlaceholder))
 		.join('');

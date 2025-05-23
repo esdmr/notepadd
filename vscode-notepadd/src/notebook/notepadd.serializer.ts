@@ -22,11 +22,11 @@ export class NotePaddSerializer implements NotebookSerializer, Disposable {
 		this,
 	);
 
-	dispose() {
+	dispose(): void {
 		this._registry.dispose();
 	}
 
-	deserializeNotebook(content: Uint8Array) {
+	deserializeNotebook(content: Uint8Array): NotebookData {
 		const data = deserializeNotePadd(content);
 
 		const notebook = new NotebookData(
@@ -61,7 +61,7 @@ export class NotePaddSerializer implements NotebookSerializer, Disposable {
 		return notebook;
 	}
 
-	serializeNotebook(notebook: NotebookData) {
+	serializeNotebook(notebook: NotebookData): Uint8Array {
 		return serializeNotePadd({
 			cells: notebook.cells.map<NotePaddCell>((i) => ({
 				type: i.kind === NotebookCellKind.Code ? 'code' : 'markup',

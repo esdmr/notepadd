@@ -31,7 +31,7 @@ export type NotePaddOutput = {
 export type NotePaddOutputItems = Record<string, Uint8Array>;
 export type NotePaddMetadata = Record<string, unknown>;
 
-export function getLastCell(context: NotePadd) {
+export function getLastCell(context: NotePadd): NotePaddCell {
 	const lastCell = context.cells.at(-1);
 	if (lastCell) return lastCell;
 
@@ -45,7 +45,7 @@ export function getLastCell(context: NotePadd) {
 	return dummyCell;
 }
 
-export function getLastOutput(context: NotePadd) {
+export function getLastOutput(context: NotePadd): NotePaddOutput {
 	const lastCell = getLastCell(context);
 	lastCell.outputs ??= [];
 

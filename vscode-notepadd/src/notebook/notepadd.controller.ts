@@ -43,14 +43,14 @@ export class NotePaddController implements Disposable {
 		this._controller.supportedLanguages = ['notepadd', 'plantuml'];
 	}
 
-	dispose() {
+	dispose(): void {
 		this._controller.dispose();
 	}
 
 	async executeDirective(
 		cell: NotebookCell,
 		execution: NotebookCellExecution,
-	) {
+	): Promise<void> {
 		// TODO: Optionally enable AST debug via config.
 		const {directive, ast} = parseDirective(
 			cell.document.getText(),
@@ -74,7 +74,7 @@ export class NotePaddController implements Disposable {
 	async executePlantUml(
 		cell: NotebookCell,
 		execution: NotebookCellExecution,
-	) {
+	): Promise<void> {
 		const config = workspace.getConfiguration(
 			'notepadd.plantuml',
 			cell.document,
@@ -216,7 +216,7 @@ export class NotePaddController implements Disposable {
 		cells: NotebookCell[],
 		notebook: NotebookDocument,
 		controller: NotebookController,
-	) {
+	): Promise<void> {
 		for (const cell of cells) {
 			// FIXME: Pressing the ‘Stop execution’ button should stop all
 			// cells.

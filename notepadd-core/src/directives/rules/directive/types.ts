@@ -43,19 +43,19 @@ export class Directive {
 		readonly comment: readonly string[] = [],
 	) {}
 
-	getInstance(now: Temporal.ZonedDateTime) {
+	getInstance(now: Temporal.ZonedDateTime): Instance {
 		return this.directive.getInstance?.(now) ?? emptyInstance;
 	}
 
-	getNextInstance(instance: Instance) {
+	getNextInstance(instance: Instance): Instance {
 		return this.directive.getNextInstance?.(instance) ?? emptyInstance;
 	}
 
-	getLabel() {
+	getLabel(): string | undefined {
 		return this.comment[0];
 	}
 
-	toString() {
+	toString(): string {
 		return `${this.directive.toString()}\n${this.comment.join('\n')}`;
 	}
 }

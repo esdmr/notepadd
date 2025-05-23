@@ -12,7 +12,7 @@ const seed = 0x0b_b1_08_36;
  */
 const mem = new Uint32Array(3);
 
-export function* getContentDigest(content: Uint8Array) {
+export function* getContentDigest(content: Uint8Array): Generator<string> {
 	// The Crypto API is asynchronous, but this function must remain
 	// synchronous. This is an implementation of Murmur3 non-cryptographic hash
 	// function.

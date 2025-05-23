@@ -20,17 +20,17 @@ function addOutput(
 	context: NotePadd,
 	mimeType: string,
 	body: Uint8Array | string,
-) {
+): void {
 	getLastOutput(context).items[mimeType] =
 		typeof body === 'string' ? stringToUint8Array(body) : body;
 }
 
-function addOutputUri(context: NotePadd, source: string) {
+function addOutputUri(context: NotePadd, source: string): void {
 	const media = parseDataUrl(source);
 	if (media) addOutput(context, media.mimeType.essence, media.body);
 }
 
-function addOutputHtml(context: NotePadd, node: hast.RootContent) {
+function addOutputHtml(context: NotePadd, node: hast.RootContent): void {
 	if (node.type !== 'element') return;
 
 	switch (node.tagName) {
@@ -73,7 +73,7 @@ function addOutputHtml(context: NotePadd, node: hast.RootContent) {
 }
 
 // eslint-disable-next-line complexity
-function addOutputMarkdown(context: NotePadd, node: mdast.RootContent) {
+function addOutputMarkdown(context: NotePadd, node: mdast.RootContent): void {
 	switch (node.type) {
 		case 'html': {
 			const root = html.parse(node.value);
@@ -174,7 +174,7 @@ function deserializeCodeMetadata(
 }
 
 // eslint-disable-next-line complexity
-function addCell(context: NotePadd, node: mdast.RootContent) {
+function addCell(context: NotePadd, node: mdast.RootContent): void {
 	switch (node.type) {
 		case 'code': {
 			context.cells.push({

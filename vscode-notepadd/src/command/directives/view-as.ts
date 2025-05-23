@@ -1,6 +1,6 @@
 import {commands, ConfigurationTarget, Disposable, workspace} from 'vscode';
 
-export function setupDirectivesViewAsCommands() {
+export function setupDirectivesViewAsCommands(): Disposable {
 	const handler = (value: boolean) => async () => {
 		await workspace
 			.getConfiguration('notepadd.view.directives')

@@ -4,7 +4,7 @@ import {SyntaxNode} from '../ast.ts';
 export class LinkTargetNode extends SyntaxNode<[MooToken]> {
 	readonly href = this._children[0].value;
 
-	toUrl(base?: string | URL) {
+	toUrl(base?: string | URL): URL {
 		return new URL(this.href, base);
 	}
 }

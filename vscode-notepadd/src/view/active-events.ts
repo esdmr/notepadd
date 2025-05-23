@@ -1,5 +1,6 @@
 import {filterMap} from 'notepadd-core';
 import type {DirectiveState} from 'notepadd-timekeeper';
+import type {BridgeDirective} from '../tree-item/directive.ts';
 import {DirectivesView} from './directives.ts';
 
 export class ActiveEventsView extends DirectivesView {
@@ -20,7 +21,7 @@ export class ActiveEventsView extends DirectivesView {
 		return state.instance.currentState !== 'pulse';
 	}
 
-	protected override _getItems() {
+	protected override _getItems(): Map<string, BridgeDirective> {
 		return filterMap(
 			this._items,
 			([, directive]) =>

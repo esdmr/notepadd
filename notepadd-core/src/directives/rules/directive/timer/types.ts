@@ -21,7 +21,7 @@ export class Timer {
 
 	constructor(readonly when: Temporal.Duration) {}
 
-	toString() {
+	toString(): string {
 		return `timer ${this.when.toString()}`;
 	}
 }

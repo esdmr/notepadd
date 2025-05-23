@@ -11,7 +11,7 @@ export class PeriodWithDurationNode extends SyntaxNode<
 	readonly start = this._children[0];
 	readonly duration = this._children[2];
 
-	toPeriod(now: Temporal.ZonedDateTime) {
+	toPeriod(now: Temporal.ZonedDateTime): Period {
 		return new Period(
 			this.start.toInstant(now),
 			this.duration.toDuration(),

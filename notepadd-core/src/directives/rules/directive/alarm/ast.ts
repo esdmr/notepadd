@@ -11,7 +11,7 @@ export class AlarmNode extends SyntaxNode<
 > {
 	readonly when = this._children[1];
 
-	toDirective(now: Temporal.ZonedDateTime) {
+	toDirective(now: Temporal.ZonedDateTime): OneShotAlarm | RecurringAlarm {
 		if (this.when instanceof InstantRecurringNode) {
 			return new RecurringAlarm(this.when.toRecurringInstant(now));
 		}

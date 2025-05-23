@@ -4,15 +4,15 @@ import {SyntaxNode} from '../../ast.ts';
 export class UnsignedIntegerNode extends SyntaxNode<[MooToken]> {
 	readonly value = this._children[0].value;
 
-	toBigInt() {
+	toBigInt(): bigint {
 		return BigInt(this.value);
 	}
 
-	toNumber() {
+	toNumber(): number {
 		return Number(this.toBigInt());
 	}
 
-	override toString() {
+	override toString(): string {
 		return this.toBigInt().toString();
 	}
 }

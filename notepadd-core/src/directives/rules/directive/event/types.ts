@@ -18,15 +18,15 @@ export class OneShotEvent {
 
 	constructor(readonly when: Period) {}
 
-	getInstance(now: Temporal.ZonedDateTime) {
+	getInstance(now: Temporal.ZonedDateTime): Instance {
 		return this.when.getInstance(now);
 	}
 
-	getNextInstance(instance: Instance) {
+	getNextInstance(instance: Instance): Instance {
 		return this.when.getNextInstance(instance);
 	}
 
-	toString() {
+	toString(): string {
 		return `event ${this.when.toString()}`;
 	}
 }
@@ -44,15 +44,15 @@ export class RecurringEvent {
 
 	constructor(readonly when: RecurringPeriod) {}
 
-	getInstance(now: Temporal.ZonedDateTime) {
+	getInstance(now: Temporal.ZonedDateTime): Instance {
 		return this.when.getInstance(now);
 	}
 
-	getNextInstance(instance: Instance) {
+	getNextInstance(instance: Instance): Instance {
 		return this.when.getNextInstance(instance);
 	}
 
-	toString() {
+	toString(): string {
 		return `event ${this.when.toString()}`;
 	}
 }

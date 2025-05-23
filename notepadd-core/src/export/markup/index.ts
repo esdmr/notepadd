@@ -251,7 +251,7 @@ export function createExportContext(notebook: NotePadd): NotePaddExportContext {
 export function exportNotebook<T extends NotePaddExportFormatTypes>(
 	format: NotePaddExportFormat<T>,
 	context: T['Context'],
-) {
+): T['Root'] {
 	return format.onRoot(context, (context) =>
 		context.notebook.cells.flatMap((i) =>
 			exportNotebookCell(i, format, context),

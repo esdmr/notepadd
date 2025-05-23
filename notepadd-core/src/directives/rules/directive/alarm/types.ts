@@ -21,17 +21,17 @@ export class OneShotAlarm {
 
 	constructor(readonly when: Temporal.ZonedDateTime) {}
 
-	getInstance(now: Temporal.ZonedDateTime) {
+	getInstance(now: Temporal.ZonedDateTime): Instance {
 		return Temporal.ZonedDateTime.compare(now, this.when) < 0
 			? new Instance(undefined, this.when)
 			: new Instance(this.when, undefined);
 	}
 
-	getNextInstance(instance: Instance) {
+	getNextInstance(instance: Instance): Instance {
 		return new Instance(this.when, undefined);
 	}
 
-	toString() {
+	toString(): string {
 		return `alarm ${this.when.toString()}`;
 	}
 }
@@ -49,15 +49,15 @@ export class RecurringAlarm {
 
 	constructor(readonly when: RecurringInstant) {}
 
-	getInstance(now: Temporal.ZonedDateTime) {
+	getInstance(now: Temporal.ZonedDateTime): Instance {
 		return this.when.getInstance(now);
 	}
 
-	getNextInstance(instance: Instance) {
+	getNextInstance(instance: Instance): Instance {
 		return this.when.getNextInstance(instance);
 	}
 
-	toString() {
+	toString(): string {
 		return `alarm ${this.when.toString()}`;
 	}
 }

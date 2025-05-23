@@ -10,7 +10,7 @@ export class TimeZoneOffsetNode extends SyntaxNode<
 	readonly hours = this._children[1];
 	readonly minutes = this._children[3];
 
-	toTimeZone() {
+	toTimeZone(): string {
 		const hours = this.hours.toString().padStart(2, '0');
 		const minutes = this.minutes.toString().padStart(2, '0');
 		return `${this.sign.negative ? '-' : '+'}${hours}:${minutes}`;

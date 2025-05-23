@@ -53,19 +53,19 @@ export class DirectiveState {
 		readonly sources = new Set<string>(),
 	) {}
 
-	setTimeout(ms: number, callback: (state: this) => void) {
+	setTimeout(ms: number, callback: (state: this) => void): void {
 		this.clearTimeout();
 		this._lastTimeout = setTimeout(callback, ms, this);
 	}
 
-	clearTimeout() {
+	clearTimeout(): void {
 		if (this._lastTimeout === undefined) return;
 		clearTimeout(this._lastTimeout);
 		this._lastTimeout = undefined;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention
-	toJSON() {
+	toJSON(): unknown {
 		return {
 			_type: this._type,
 			directive: this.directive,

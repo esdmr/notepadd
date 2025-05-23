@@ -9,7 +9,7 @@ export class DurationNode extends SyntaxNode<
 	readonly date = this._children[0][0];
 	readonly time = this._children[0][1];
 
-	toDuration() {
+	toDuration(): Temporal.Duration {
 		return Temporal.Duration.from({
 			years: this.date?.years?.toNumber(),
 			months: this.date?.months?.toNumber(),

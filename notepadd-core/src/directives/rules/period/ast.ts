@@ -3,6 +3,7 @@ import {SyntaxNode} from '../ast.ts';
 import type {PeriodWholeDayNode} from './whole-day/ast.ts';
 import type {PeriodWithDurationNode} from './with-duration/ast.ts';
 import type {PeriodWithEndNode} from './with-end/ast.ts';
+import type {Period} from './types.ts';
 
 export type PeriodChildNode =
 	| PeriodWholeDayNode
@@ -12,7 +13,7 @@ export type PeriodChildNode =
 export class PeriodNode extends SyntaxNode<[PeriodChildNode]> {
 	readonly period = this._children[0];
 
-	toPeriod(now: Temporal.ZonedDateTime) {
+	toPeriod(now: Temporal.ZonedDateTime): Period {
 		return this.period.toPeriod(now);
 	}
 }

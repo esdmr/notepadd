@@ -50,7 +50,7 @@ export class BridgeDirective extends TreeItem {
 		}
 	}
 
-	setState(state: DirectiveState) {
+	setState(state: DirectiveState): void {
 		if (state.directive.toString() !== this.directive.toString()) {
 			throw new Error(
 				'Bug: Directive state does not belong to this bridge item',

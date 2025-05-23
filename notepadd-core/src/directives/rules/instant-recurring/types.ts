@@ -41,11 +41,11 @@ export class RecurringInstant {
 		}
 	}
 
-	toString() {
+	toString(): string {
 		return `R/${this.first.toString()}/${this.interval.toString()}/${this.end?.toString()}`;
 	}
 
-	getInstance(now: Temporal.ZonedDateTime) {
+	getInstance(now: Temporal.ZonedDateTime): Instance {
 		switch (this._checkBounds(now)) {
 			case -1: {
 				// Edge case for before recurrence starts, because the following
@@ -88,7 +88,7 @@ export class RecurringInstant {
 		);
 	}
 
-	getNextInstance(instance: Instance) {
+	getNextInstance(instance: Instance): Instance {
 		if (!instance.next) return instance;
 
 		const next = instance.next.add(this.interval);
@@ -99,7 +99,9 @@ export class RecurringInstant {
 		);
 	}
 
-	private _checkBounds(instant: Temporal.ZonedDateTime) {
+	private _checkBounds(
+		instant: Temporal.ZonedDateTime,
+	): Temporal.ComparisonResult {
 		return Temporal.ZonedDateTime.compare(instant, this.first) < 0
 			? -1
 			: this.end && Temporal.ZonedDateTime.compare(this.end, instant) < 0
@@ -107,7 +109,9 @@ export class RecurringInstant {
 				: 0;
 	}
 
-	private _estimateInstanceImprecise(now: Temporal.ZonedDateTime) {
+	private _estimateInstanceImprecise(
+		now: Temporal.ZonedDateTime,
+	): Temporal.ZonedDateTime {
 		const smallestUnit = getSmallestDurationUnit(this.interval);
 
 		// This is ‘estimated’ because it represents the interval between the first
@@ -133,7 +137,9 @@ export class RecurringInstant {
 		);
 	}
 
-	private _estimateInstancePrecise(now: Temporal.ZonedDateTime) {
+	private _estimateInstancePrecise(
+		now: Temporal.ZonedDateTime,
+	): Temporal.ZonedDateTime {
 		let guessedInstant = this._estimateInstanceImprecise(now);
 
 		const errorDirection = Temporal.ZonedDateTime.compare(

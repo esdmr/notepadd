@@ -8,16 +8,16 @@ export class SignedIntegerNode extends SyntaxNode<
 	readonly sign = this._children[0];
 	readonly magnitude = this._children[1];
 
-	toBigInt() {
+	toBigInt(): bigint {
 		const magnitude = this.magnitude.toBigInt();
 		return this.sign?.negative ? -magnitude : magnitude;
 	}
 
-	toNumber() {
+	toNumber(): number {
 		return Number(this.toBigInt());
 	}
 
-	override toString() {
+	override toString(): string {
 		return this.toBigInt().toString();
 	}
 }

@@ -23,11 +23,11 @@ const latexAlignments: Record<NonNullable<AlignType>, string> = {
 	right: 'r',
 };
 
-function joinBlockNodes(nodes: string[]) {
+function joinBlockNodes(nodes: string[]): string {
 	return nodes.join('\n\n');
 }
 
-function joinPhrasingNodes(nodes: string[]) {
+function joinPhrasingNodes(nodes: string[]): string {
 	return nodes.join('');
 }
 
@@ -68,7 +68,7 @@ type NotePaddExportLatexContext = NotePaddExportContext & {
 function shouldOverwrite(
 	oldFile: NotePaddExportLatexFile | undefined,
 	newFile: NotePaddExportLatexFile,
-) {
+): boolean {
 	if (!oldFile) return true;
 	if (
 		oldFile.type !== 'raw' ||
@@ -90,7 +90,7 @@ function addFileByDigest(
 	file: NotePaddExportLatexFile,
 	prefix = '',
 	suffix = '',
-) {
+): string | undefined {
 	let content;
 
 	switch (file.type) {

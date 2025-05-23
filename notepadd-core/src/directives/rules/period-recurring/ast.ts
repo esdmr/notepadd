@@ -13,7 +13,7 @@ export class PeriodRecurringNode extends SyntaxNode<
 	readonly interval = this._children[2];
 	readonly end = this._children[3];
 
-	toRecurringPeriod(now: Temporal.ZonedDateTime) {
+	toRecurringPeriod(now: Temporal.ZonedDateTime): RecurringPeriod {
 		return new RecurringPeriod(
 			this.first?.toPeriod(now),
 			this.interval.toDuration(),

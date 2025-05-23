@@ -7,7 +7,7 @@ import {Timer} from './types.ts';
 export class TimerNode extends SyntaxNode<[MooToken, DurationNode]> {
 	readonly when = this._children[1];
 
-	toDirective(_now: Temporal.ZonedDateTime) {
+	toDirective(_now: Temporal.ZonedDateTime): Timer {
 		return new Timer(this.when.toDuration());
 	}
 }

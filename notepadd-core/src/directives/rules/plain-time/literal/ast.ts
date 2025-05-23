@@ -9,7 +9,7 @@ export class PlainTimeLiteralNode extends SyntaxNode<
 	readonly hour = this._children[0];
 	readonly minute = this._children[2];
 
-	toPlainTime(_now: Temporal.PlainTime) {
+	toPlainTime(_now: Temporal.PlainTime): Temporal.PlainTime {
 		return new Temporal.PlainTime(
 			this.hour.toNumber(),
 			this.minute.toNumber(),

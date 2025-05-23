@@ -120,7 +120,7 @@ export class DirectivesView
 		}),
 	];
 
-	private get _configSortBy() {
+	private get _configSortBy(): DirectivesSortBy {
 		return v.parse(
 			sortBySchema,
 			workspace
@@ -129,7 +129,7 @@ export class DirectivesView
 		);
 	}
 
-	private get _configViewAsTree() {
+	private get _configViewAsTree(): boolean {
 		return Boolean(
 			workspace
 				.getConfiguration(this._configPrefix)
@@ -142,6 +142,7 @@ export class DirectivesView
 		void | DirectivesTreeItem | DirectivesTreeItem[] | undefined
 	>();
 
+	// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 	get onDidChangeTreeData() {
 		return this._didChangeTreeData.event;
 	}
@@ -162,7 +163,7 @@ export class DirectivesView
 		this._setConnected(this._treeView.visible);
 	}
 
-	async initialize() {
+	async initialize(): Promise<this> {
 		await commands.executeCommand(
 			'setContext',
 			`${this._contextPrefix}.sortBy`,
@@ -178,7 +179,7 @@ export class DirectivesView
 		return this;
 	}
 
-	dispose() {
+	dispose(): void {
 		this._connection?.dispose();
 		this._treeView.dispose();
 
@@ -287,7 +288,7 @@ export class DirectivesView
 		return this._items;
 	}
 
-	private _setConnected(connected: boolean) {
+	private _setConnected(connected: boolean): void {
 		const changed = Boolean(connected) !== Boolean(this._connection);
 
 		if (connected && !this._connection) {
@@ -307,7 +308,7 @@ export class DirectivesView
 		}
 	}
 
-	private _setStatus() {
+	private _setStatus(): void {
 		if (this._stalled) {
 			this._treeView.message =
 				'Cannot update: Timekeeper is not running.';

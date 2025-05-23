@@ -9,7 +9,7 @@ export class InstantLaterNode extends SyntaxNode<
 	readonly time = this._children[0];
 	readonly timeZone = this._children[1];
 
-	toInstant(now: Temporal.ZonedDateTime) {
+	toInstant(now: Temporal.ZonedDateTime): Temporal.ZonedDateTime {
 		if (this.timeZone) {
 			now = now.withTimeZone(this.timeZone.toTimeZone());
 		}

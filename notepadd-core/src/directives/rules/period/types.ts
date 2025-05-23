@@ -33,17 +33,17 @@ export class Period {
 		}
 	}
 
-	toString() {
+	toString(): string {
 		return `P/${this.start.toString()}/${this.endOrDuration.toString()}`;
 	}
 
-	getEnd() {
+	getEnd(): Temporal.ZonedDateTime {
 		return this.endOrDuration instanceof Temporal.ZonedDateTime
 			? this.endOrDuration
 			: this.start.add(this.endOrDuration);
 	}
 
-	getDuration() {
+	getDuration(): Temporal.Duration {
 		return this.endOrDuration instanceof Temporal.Duration
 			? this.endOrDuration
 			: this.start.until(
@@ -51,7 +51,7 @@ export class Period {
 				);
 	}
 
-	checkBounds(instance: Temporal.ZonedDateTime) {
+	checkBounds(instance: Temporal.ZonedDateTime): Temporal.ComparisonResult {
 		const end = this.getEnd();
 
 		const isBeforeStart =
@@ -61,7 +61,7 @@ export class Period {
 		return isBeforeStart ? -1 : isAfterEnd ? 1 : 0;
 	}
 
-	getInstance(now: Temporal.ZonedDateTime) {
+	getInstance(now: Temporal.ZonedDateTime): Instance {
 		switch (this.checkBounds(now)) {
 			case -1: {
 				return new Instance(undefined, this.start, 'low');
@@ -77,7 +77,7 @@ export class Period {
 		}
 	}
 
-	getNextInstance(instance: Instance) {
+	getNextInstance(instance: Instance): Instance {
 		return instance.currentState === 'low'
 			? new Instance(this.start, this.getEnd(), 'high')
 			: new Instance(this.getEnd(), undefined, 'low');

@@ -7,7 +7,7 @@ import {Reference} from './types.ts';
 export class ReferenceNode extends SyntaxNode<[MooToken, LinkTargetNode]> {
 	readonly target = this._children[1];
 
-	toDirective(_now: Temporal.ZonedDateTime) {
+	toDirective(_now: Temporal.ZonedDateTime): Reference {
 		return new Reference(this.target.href);
 	}
 }

@@ -9,7 +9,7 @@ export function isNullish(value: unknown): value is null | undefined {
 
 export function filterNullishValues<K extends PropertyKey, V>(
 	record: Record<K, V | null | undefined>,
-) {
+): Record<K, V> {
 	return filterRecord(record, (i): i is [K, V] => !isNullish(i[1]));
 }
 
@@ -31,7 +31,7 @@ export function filterRecord<K extends PropertyKey, V>(
 export function filterRecord(
 	record: Record<PropertyKey, unknown>,
 	predicate: (entry: [PropertyKey, unknown]) => unknown,
-) {
+): Record<PropertyKey, unknown> {
 	return Object.fromEntries(
 		Object.entries(record).filter((i) => predicate(i)),
 	);
@@ -42,7 +42,10 @@ export function mapRecord<
 	V1,
 	K2 extends PropertyKey,
 	V2,
->(record: Record<K1, V1>, mapper: (entry: [K1, V1]) => [K2, V2]) {
+>(
+	record: Record<K1, V1>,
+	mapper: (entry: [K1, V1]) => [K2, V2],
+): Record<K2, V2> {
 	return Object.fromEntries(
 		Object.entries(record).map((i) => mapper(i as [K1, V1])),
 	) as Record<K2, V2>;
@@ -61,7 +64,7 @@ export function filterMap<K, V>(
 export function filterMap(
 	map: Map<unknown, unknown>,
 	predicate: (entry: [unknown, unknown]) => unknown,
-) {
+): Map<unknown, unknown> {
 	const filtered = new Map<unknown, unknown>();
 
 	for (const entry of map) {
@@ -86,7 +89,7 @@ export function filterSet<V>(
 export function filterSet(
 	set: Set<unknown>,
 	predicate: (value: unknown) => unknown,
-) {
+): Set<unknown> {
 	const filtered = new Set<unknown>();
 
 	for (const value of set) {
@@ -143,13 +146,13 @@ const uriSafeChars = new Set([
  */
 const uriSafeRegExp = /^[;/?:@&=+$,a-zA-Z0-9-_.!~*'()]*$/u;
 
-export function isUriSafe(body: Uint8Array | string) {
+export function isUriSafe(body: Uint8Array | string): boolean {
 	return typeof body === 'string'
 		? uriSafeRegExp.test(body)
 		: body.every((i) => uriSafeChars.has(i));
 }
 
-export function isBinary(body: Uint8Array | string) {
+export function isBinary(body: Uint8Array | string): boolean {
 	return typeof body === 'string' ? body.includes('\0') : body.includes(0);
 }
 
@@ -200,7 +203,9 @@ export function getDiscriminator<K extends string>(class_: {
 	return class_.schema.entries._type.literal;
 }
 
-export function getSmallestDurationUnit(duration: Temporal.Duration) {
+export function getSmallestDurationUnit(
+	duration: Temporal.Duration,
+): Temporal.TotalUnit<Temporal.DateTimeUnit> {
 	if (duration.nanoseconds !== 0) return 'nanoseconds';
 	if (duration.microseconds !== 0) return 'microseconds';
 	if (duration.milliseconds !== 0) return 'milliseconds';
@@ -216,7 +221,7 @@ export function getSmallestDurationUnit(duration: Temporal.Duration) {
 export function multiplyDuration(
 	duration: Temporal.Duration,
 	coefficient: number,
-) {
+): Temporal.Duration {
 	if (coefficient === 1) return duration;
 	if (coefficient === -1) return duration.negated();
 
@@ -238,11 +243,14 @@ export function minDuration(
 	one: Temporal.Duration,
 	two: Temporal.Duration,
 	relativeTo: Temporal.ZonedDateTime,
-) {
+): Temporal.Duration {
 	return Temporal.Duration.compare(one, two, {relativeTo}) < 0 ? one : two;
 }
 
-export function splitUint8Array(buffer: Uint8Array, substring: Uint8Array) {
+export function splitUint8Array(
+	buffer: Uint8Array,
+	substring: Uint8Array,
+): Uint8Array[] {
 	const parts = [];
 
 	while (buffer.length > 0) {

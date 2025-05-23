@@ -14,14 +14,14 @@ const builtinMimeTypeOfLangIds: Record<string, string> = {
 	notepadd: directiveMimeType,
 };
 
-export function getMimeTypeOfLangId(langId: string) {
+export function getMimeTypeOfLangId(langId: string): string {
 	return builtinMimeTypeOfLangIds[langId] ?? `text/x-${langId}`;
 }
 
 export function getMimeTypeOfMarkdownLang(
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	mdLang: string | null | undefined,
-) {
+): string {
 	// TODO: Remove this function for v1. Output code blocks now use `meta` to
 	// store the MIME type.
 	const [langId = 'plaintext', mime] = mdLang?.split(' ', 2) ?? [];
@@ -36,7 +36,7 @@ const builtinLangIdOfMimeTypes = mapRecord(
 
 const mimeSubTypeLangIdRegExp = /^(?:x[-.]|vnd[-.])?(?:[^+]+\+)*([^+]+)$/;
 
-export function getLangIdOfMimeType(mime: string) {
+export function getLangIdOfMimeType(mime: string): string {
 	const mimeType = new MIMEType(mime);
 
 	return (
@@ -76,7 +76,9 @@ const builtinMimeTypeOfFileExtensions: Record<string, string> = {
 	webp: 'image/webp',
 };
 
-export function getMimeTypeOfFileExtension(extension: string) {
+export function getMimeTypeOfFileExtension(
+	extension: string,
+): string | undefined {
 	return builtinMimeTypeOfFileExtensions[extension.toLowerCase()];
 }
 
@@ -90,7 +92,9 @@ const builtinPreferredFileExtensionOfMimeTypes: Record<string, string> = {
 	/* eslint-enable @typescript-eslint/naming-convention */
 };
 
-export function getPreferredFileExtensionOfMimeType(mime: string) {
+export function getPreferredFileExtensionOfMimeType(
+	mime: string,
+): string | undefined {
 	const mimeType = new MIMEType(mime);
 	return builtinPreferredFileExtensionOfMimeTypes[mimeType.essence];
 }
@@ -101,7 +105,7 @@ const builtinVectorMimeTypes = new Set([
 	'image/svg+xml',
 ]);
 
-export function isMimeTypeVectorImage(mime: string) {
+export function isMimeTypeVectorImage(mime: string): boolean {
 	const mimeType = new MIMEType(mime);
 	return builtinVectorMimeTypes.has(mimeType.essence);
 }

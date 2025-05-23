@@ -1,4 +1,10 @@
-import {Disposable, EventEmitter, Uri, type CancellationToken} from 'vscode';
+import {
+	Disposable,
+	EventEmitter,
+	Uri,
+	type CancellationToken,
+	type Event,
+} from 'vscode';
 
 export type AsyncDisposable = {
 	asyncDispose(): Promise<any>;
@@ -7,7 +13,7 @@ export type AsyncDisposable = {
 export class AsyncEventEmitter<T> implements Disposable {
 	private readonly _handlers: Array<(value: T) => Promise<void>> = [];
 
-	readonly event = (handler: (value: T) => Promise<void>) => {
+	readonly event = (handler: (value: T) => Promise<void>): Disposable => {
 		this._handlers.push(handler);
 
 		return new Disposable(() => {
@@ -15,7 +21,7 @@ export class AsyncEventEmitter<T> implements Disposable {
 		});
 	};
 
-	async fire(value: T) {
+	async fire(value: T): Promise<void> {
 		for (const handler of this._handlers) {
 			try {
 				await handler(value);
@@ -25,7 +31,7 @@ export class AsyncEventEmitter<T> implements Disposable {
 		}
 	}
 
-	dispose() {
+	dispose(): void {
 		this._handlers.length = 0;
 	}
 }
@@ -34,7 +40,7 @@ export class TokenWrapper implements Disposable {
 	private readonly _controller = new AbortController();
 	private _registry: Disposable | undefined;
 
-	get signal() {
+	get signal(): AbortSignal {
 		return this._controller.signal;
 	}
 
@@ -50,7 +56,7 @@ export class TokenWrapper implements Disposable {
 		}
 	}
 
-	dispose() {
+	dispose(): void {
 		this._registry?.dispose();
 		this._registry = undefined;
 	}
@@ -63,19 +69,19 @@ export class VirtualSocket {
 	// eslint-disable-next-line unicorn/prefer-event-target
 	private readonly _didDisconnect = new EventEmitter<void>();
 
-	get connected() {
+	get connected(): boolean {
 		return this._connections > 0;
 	}
 
-	get onDidConnect() {
+	get onDidConnect(): Event<void> {
 		return this._didConnect.event;
 	}
 
-	get onDidDisconnect() {
+	get onDidDisconnect(): Event<void> {
 		return this._didDisconnect.event;
 	}
 
-	connect() {
+	connect(): Disposable {
 		let connected = true;
 		this._connections++;
 		this._didConnect.fire();
@@ -89,10 +95,10 @@ export class VirtualSocket {
 	}
 }
 
-export function convertUriToUrl(uri: Uri) {
+export function convertUriToUrl(uri: Uri): URL {
 	return new URL(uri.toString(true));
 }
 
-export function convertUrlToUri(url: URL) {
+export function convertUrlToUri(url: URL): Uri {
 	return Uri.parse(url.href, true);
 }

@@ -12,7 +12,7 @@ export class InstantRecurringNode extends SyntaxNode<
 	readonly interval = this._children[2];
 	readonly end = this._children[3];
 
-	toRecurringInstant(now: Temporal.ZonedDateTime) {
+	toRecurringInstant(now: Temporal.ZonedDateTime): RecurringInstant {
 		const duration = this.interval.toDuration();
 
 		return new RecurringInstant(

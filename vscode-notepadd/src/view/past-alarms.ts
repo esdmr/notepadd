@@ -79,6 +79,7 @@ export class PastAlarmsView
 		void | PastAlarmsTreeItem | PastAlarmsTreeItem[] | undefined
 	>();
 
+	// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 	get onDidChangeTreeData() {
 		return this._didChangeTreeData.event;
 	}
@@ -91,7 +92,7 @@ export class PastAlarmsView
 		});
 	}
 
-	private get _configSortBy() {
+	private get _configSortBy(): InstancesSortBy {
 		return v.parse(
 			sortBySchema,
 			workspace
@@ -100,7 +101,7 @@ export class PastAlarmsView
 		);
 	}
 
-	async initialize() {
+	async initialize(): Promise<this> {
 		await commands.executeCommand(
 			'setContext',
 			`${this._contextPrefix}.sortBy`,
@@ -110,7 +111,7 @@ export class PastAlarmsView
 		return this;
 	}
 
-	dispose() {
+	dispose(): void {
 		this._treeView.dispose();
 
 		for (const handler of this._handlers) {
@@ -132,7 +133,7 @@ export class PastAlarmsView
 			: this._items;
 	}
 
-	private _setStatus() {
+	private _setStatus(): void {
 		if (this._stalled) {
 			this._treeView.message =
 				'Cannot update: Timekeeper is not running.';

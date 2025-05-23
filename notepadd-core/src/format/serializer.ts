@@ -20,7 +20,7 @@ import type {
 } from './types.ts';
 import {getLangIdOfMimeType} from './mime.ts';
 
-function toOutputUri(mimeType: string, body: Uint8Array | string) {
+function toOutputUri(mimeType: string, body: Uint8Array | string): string {
 	if (isUriSafe(body)) {
 		return `data:${mimeType},${typeof body === 'string' ? body : uint8ArrayToString(body)}`;
 	}
@@ -75,14 +75,16 @@ function toOutputHtml(
 	};
 }
 
-function toAttributeMetadata(metadata: NotePaddMetadata | undefined) {
+function toAttributeMetadata(
+	metadata: NotePaddMetadata | undefined,
+): Record<string, string> {
 	return mapRecord(filterNullishValues(metadata ?? {}), ([k, v]) => [
 		k,
 		JSON.stringify(v),
 	]);
 }
 
-function toCodeMetadata(metadata: NotePaddMetadata | undefined) {
+function toCodeMetadata(metadata: NotePaddMetadata | undefined): string {
 	return JSON.stringify(metadata);
 }
 
@@ -224,7 +226,7 @@ function* toCell(
 	}
 }
 
-export function serializeNotePadd(data: NotePadd) {
+export function serializeNotePadd(data: NotePadd): Uint8Array {
 	const md: mdast.Root = {
 		type: 'root',
 		children: [],

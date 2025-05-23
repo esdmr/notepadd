@@ -7,7 +7,7 @@ import {
 } from 'vscode';
 import {onStatusUpdated, type NotepaddStatus} from '../bus.ts';
 
-export function setupNotepaddStatus() {
+export function setupNotepaddStatus(): Disposable {
 	const statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
 
 	let lastStatus: Required<NotepaddStatus> = {

@@ -12,7 +12,7 @@ export type InstantChildNode =
 export class InstantNode extends SyntaxNode<[InstantChildNode]> {
 	readonly instant = this._children[0];
 
-	toInstant(now: Temporal.ZonedDateTime) {
+	toInstant(now: Temporal.ZonedDateTime): Temporal.ZonedDateTime {
 		return this.instant.toInstant(now);
 	}
 }

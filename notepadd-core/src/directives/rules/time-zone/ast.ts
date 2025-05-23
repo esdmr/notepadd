@@ -11,7 +11,7 @@ export type TimeZoneChildNode =
 export class TimeZoneNode extends SyntaxNode<[TimeZoneChildNode]> {
 	readonly timeZone = this._children[0];
 
-	toTimeZone() {
+	toTimeZone(): string {
 		return this.timeZone.toTimeZone();
 	}
 }

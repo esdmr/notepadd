@@ -4,7 +4,7 @@ import type {NotePaddExportContext} from './types.ts';
 export function collectMarkdownDefinitionNode(
 	node: Root | RootContent,
 	context: NotePaddExportContext,
-) {
+): void {
 	if ('children' in node) {
 		for (const child of node.children) {
 			collectMarkdownDefinitionNode(child, context);

@@ -10,7 +10,7 @@ export class EventNode extends SyntaxNode<
 > {
 	readonly when = this._children[1];
 
-	toDirective(now: Temporal.ZonedDateTime) {
+	toDirective(now: Temporal.ZonedDateTime): OneShotEvent | RecurringEvent {
 		if (this.when instanceof PeriodRecurringNode) {
 			return new RecurringEvent(this.when.toRecurringPeriod(now));
 		}

@@ -1,7 +1,7 @@
 import {commands, ConfigurationTarget, Disposable, workspace} from 'vscode';
 import type {InstancesSortBy} from '../../view/past-alarms.ts';
 
-export function setupPastAlarmsSortByCommands() {
+export function setupPastAlarmsSortByCommands(): Disposable {
 	const handler = (value: InstancesSortBy) => async () => {
 		await workspace
 			.getConfiguration('notepadd.view.pastAlarms')

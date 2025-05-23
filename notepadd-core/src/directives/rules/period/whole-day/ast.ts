@@ -11,7 +11,7 @@ export class PeriodWholeDayNode extends SyntaxNode<
 	readonly date = this._children[0];
 	readonly timeZone = this._children[3];
 
-	toPeriod(now: Temporal.ZonedDateTime) {
+	toPeriod(now: Temporal.ZonedDateTime): Period {
 		return new Period(
 			this.date
 				.toPlainDate(now.toPlainDate())

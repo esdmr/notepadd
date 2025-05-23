@@ -13,7 +13,7 @@ export class BridgeFile extends TreeItem {
 		this.iconPath = ThemeIcon.File;
 	}
 
-	updateOrder(sortBy: DirectivesSortBy) {
+	updateOrder(sortBy: DirectivesSortBy): void {
 		for (const [key, child] of this.children) {
 			switch (sortBy) {
 				case 'timeAscending':
@@ -49,7 +49,7 @@ export class BridgeFile extends TreeItem {
 		}
 	}
 
-	getChildren() {
+	getChildren(): BridgeDirective[] {
 		return [...this.children]
 			.sort(([a], [b]) => this.orders.get(a)! - this.orders.get(b)!)
 			.map(([, v]) => v);

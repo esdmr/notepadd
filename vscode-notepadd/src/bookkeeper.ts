@@ -31,7 +31,7 @@ export class Bookkeeper implements Disposable {
 		this._updateStatus();
 	}
 
-	async initialize() {
+	async initialize(): Promise<this> {
 		if (this._initializing && this._watcher) {
 			throw new Error(
 				'Bug: Tried to initialize bookkeeper multiple times',
@@ -52,7 +52,7 @@ export class Bookkeeper implements Disposable {
 		return this;
 	}
 
-	dispose() {
+	dispose(): void {
 		for (const item of this._handlers) {
 			item.dispose();
 		}
@@ -61,7 +61,7 @@ export class Bookkeeper implements Disposable {
 		this._cache.clear();
 	}
 
-	private async _populateCache() {
+	private async _populateCache(): Promise<void> {
 		const files = await workspace.findFiles(filePattern);
 
 		for (const item of files) {
@@ -75,7 +75,7 @@ export class Bookkeeper implements Disposable {
 		}
 	}
 
-	private async _setupWatcher() {
+	private async _setupWatcher(): Promise<void> {
 		this._watcher = workspace.createFileSystemWatcher(filePattern);
 
 		this._watcher.onDidCreate((uri) => {
@@ -91,7 +91,7 @@ export class Bookkeeper implements Disposable {
 		});
 	}
 
-	private async _updateFile(uri: Uri) {
+	private async _updateFile(uri: Uri): Promise<void> {
 		const content = await workspace.fs.readFile(uri);
 		const text = uint8ArrayToString(content);
 		const fileUrl = uri.toString();
@@ -99,13 +99,13 @@ export class Bookkeeper implements Disposable {
 		onBookkeeperUpdated.fire([fileUrl, text]);
 	}
 
-	private _deleteFile(uri: Uri) {
+	private _deleteFile(uri: Uri): void {
 		const fileUrl = uri.toString();
 		this._cache.delete(fileUrl);
 		onBookkeeperUpdated.fire([fileUrl, '']);
 	}
 
-	private _updateStatus() {
+	private _updateStatus(): void {
 		let health: NotepaddStatus['bookkeeperHealth'];
 
 		if (this._watcher) {
