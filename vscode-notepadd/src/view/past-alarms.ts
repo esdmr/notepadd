@@ -33,13 +33,14 @@ export class PastAlarmsView
 	private readonly _treeView;
 
 	private readonly _handlers = [
-		onTimekeeperUpdated.event(() => {
+		onTimekeeperUpdated.event(async () => {
 			this._stalled = false;
-			this._setStatus();
-			this._didChangeTreeData.fire();
 			output.trace(this._logPrefix, 'Marked as running.');
+
+			await this._setStatus();
+			this._didChangeTreeData.fire();
 		}),
-		onTimekeeperTriggered.event((state) => {
+		onTimekeeperTriggered.event(async (state) => {
 			if (state.instance.currentState !== 'pulse') return;
 
 			this._items.unshift(new BridgeInstance(state));
@@ -49,36 +50,35 @@ export class PastAlarmsView
 				this._items.length = 50;
 			}
 
-			this._setStatus();
-			this._didChangeTreeData.fire();
 			output.trace(this._logPrefix, 'Updated.');
-		}),
-		onTimekeeperStalled.event(() => {
-			this._stalled = true;
-			this._setStatus();
+
+			await this._setStatus();
 			this._didChangeTreeData.fire();
+		}),
+		onTimekeeperStalled.event(async () => {
+			this._stalled = true;
 			output.trace(this._logPrefix, 'Marked as stalled.');
+
+			await this._setStatus();
+			this._didChangeTreeData.fire();
 		}),
 		workspace.onDidChangeConfiguration(async (event) => {
 			if (event.affectsConfiguration(this._configPrefix)) {
 				output.trace(this._logPrefix, 'Configuration changed.');
 
+				await this._setStatus();
 				this._didChangeTreeData.fire();
-
-				await commands.executeCommand(
-					'setContext',
-					`${this._contextPrefix}.sortBy`,
-					this._configSortBy,
-				);
 			}
 		}),
-		commands.registerCommand('notepadd.pastAlarms.clear', () => {
+		commands.registerCommand('notepadd.pastAlarms.clear', async () => {
 			this._items.length = 0;
+
+			await this._setStatus();
 			this._didChangeTreeData.fire();
 		}),
 		commands.registerCommand(
 			'notepadd.pastAlarms.dismiss',
-			(
+			async (
 				currentTarget: PastAlarmsTreeItem,
 				allTargets: readonly PastAlarmsTreeItem[] = [currentTarget],
 			) => {
@@ -93,6 +93,7 @@ export class PastAlarmsView
 					this._items.splice(index, 1);
 				}
 
+				await this._setStatus();
 				this._didChangeTreeData.fire();
 			},
 		),
@@ -127,12 +128,7 @@ export class PastAlarmsView
 	}
 
 	async initialize(): Promise<this> {
-		await commands.executeCommand(
-			'setContext',
-			`${this._contextPrefix}.sortBy`,
-			this._configSortBy,
-		);
-
+		await this._setStatus();
 		return this;
 	}
 
@@ -154,11 +150,15 @@ export class PastAlarmsView
 		if (element !== undefined) return;
 
 		return this._configSortBy === 'timeAscending'
-			? this._items.slice().reverse()
-			: this._items;
+			? this._getItems().slice().reverse()
+			: this._getItems();
 	}
 
-	private _setStatus(): void {
+	protected _getItems(): BridgeInstance[] {
+		return this._items;
+	}
+
+	protected async _setStatus(): Promise<void> {
 		if (this._stalled) {
 			this._treeView.message =
 				'Cannot update: Timekeeper is not running.';
@@ -166,5 +166,17 @@ export class PastAlarmsView
 		}
 
 		this._treeView.message = '';
+
+		await commands.executeCommand(
+			'setContext',
+			`${this._contextPrefix}.notEmpty`,
+			this._getItems().length > 0,
+		);
+
+		await commands.executeCommand(
+			'setContext',
+			`${this._contextPrefix}.sortBy`,
+			this._configSortBy,
+		);
 	}
 }

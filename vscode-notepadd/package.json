@@ -49,68 +49,70 @@
 				"title": "Sort…",
 				"category": "NotePADD Active Events",
 				"icon": "$(time-ascending)",
-				"enablement": "notepadd.activeEvents.sortBy == 'timeAscending' || !notepadd.activeEvents.sortBy"
+				"enablement": "notepadd.activeEvents.sortBy == 'timeAscending' && notepadd.activeEvents.notEmpty"
 			},
 			{
 				"command": "notepadd.activeEvents.sortFromTimeDescending",
 				"title": "Sort…",
 				"category": "NotePADD Active Events",
 				"icon": "$(time-descending)",
-				"enablement": "notepadd.activeEvents.sortBy == 'timeDescending'"
+				"enablement": "notepadd.activeEvents.sortBy == 'timeDescending' && notepadd.activeEvents.notEmpty"
 			},
 			{
 				"command": "notepadd.activeEvents.sortFromOrderAscending",
 				"title": "Sort…",
 				"category": "NotePADD Active Events",
 				"icon": "$(order-ascending)",
-				"enablement": "notepadd.activeEvents.sortBy == 'orderAscending'"
+				"enablement": "notepadd.activeEvents.sortBy == 'orderAscending' && notepadd.activeEvents.notEmpty"
 			},
 			{
 				"command": "notepadd.activeEvents.sortFromOrderDescending",
 				"title": "Sort…",
 				"category": "NotePADD Active Events",
 				"icon": "$(order-descending)",
-				"enablement": "notepadd.activeEvents.sortBy == 'orderDescending'"
+				"enablement": "notepadd.activeEvents.sortBy == 'orderDescending' && notepadd.activeEvents.notEmpty"
 			},
 			{
 				"command": "notepadd.activeEvents.viewAsList",
 				"title": "View as List",
 				"category": "NotePADD Active Events",
 				"icon": "$(list-tree)",
-				"enablement": "notepadd.activeEvents.viewAsTree"
+				"enablement": "notepadd.activeEvents.viewAsTree && notepadd.activeEvents.notEmpty"
 			},
 			{
 				"command": "notepadd.activeEvents.viewAsTree",
 				"title": "View as Tree",
 				"category": "NotePADD Active Events",
 				"icon": "$(list-flat)",
-				"enablement": "!notepadd.activeEvents.viewAsTree"
+				"enablement": "!notepadd.activeEvents.viewAsTree && notepadd.activeEvents.notEmpty"
 			},
 			{
 				"command": "notepadd.activeEvents.find",
-				"title": "Find or Filter",
+				"title": "Find",
 				"category": "NotePADD Active Events",
-				"icon": "$(search)"
+				"icon": "$(search)",
+				"enablement": "notepadd.activeEvents.notEmpty"
 			},
 			{
 				"command": "notepadd.pastAlarms.sortFromTimeAscending",
 				"title": "Sort by Time, Descending",
 				"category": "NotePADD Past Alarms",
 				"icon": "$(time-ascending)",
-				"enablement": "notepadd.pastAlarms.sortBy == 'timeAscending'"
+				"enablement": "notepadd.pastAlarms.sortBy == 'timeAscending' && notepadd.pastAlarms.notEmpty"
 			},
 			{
 				"command": "notepadd.pastAlarms.sortFromTimeDescending",
 				"title": "Sort by Time, Ascending",
 				"category": "NotePADD Past Alarms",
 				"icon": "$(time-descending)",
-				"enablement": "notepadd.pastAlarms.sortBy != 'timeAscending'"
+				"enablement": "notepadd.pastAlarms.sortBy == 'timeDescending' && notepadd.pastAlarms.notEmpty"
 			},
 			{
 				"command": "notepadd.pastAlarms.find",
-				"title": "Find or Filter",
+				"title": "Find",
 				"category": "NotePADD Past Alarms",
-				"icon": "$(search)"
+				"icon": "$(search)",
+				"enablement": "notepadd.pastAlarms.notEmpty"
 			},
 			{
 				"command": "notepadd.pastAlarms.dismiss",
@@ -122,55 +124,57 @@
 				"command": "notepadd.pastAlarms.clear",
 				"title": "Clear",
 				"category": "NotePADD Past Alarms",
-				"icon": "$(clear-all)"
+				"icon": "$(clear-all)",
+				"enablement": "notepadd.pastAlarms.notEmpty"
 			},
 			{
 				"command": "notepadd.directives.sortFromTimeAscending",
 				"title": "Sort…",
 				"category": "NotePADD Directives",
 				"icon": "$(time-ascending)",
-				"enablement": "notepadd.directives.sortBy == 'timeAscending' || !notepadd.directives.sortBy"
+				"enablement": "notepadd.directives.sortBy == 'timeAscending' && notepadd.directives.notEmpty"
 			},
 			{
 				"command": "notepadd.directives.sortFromTimeDescending",
 				"title": "Sort…",
 				"category": "NotePADD Directives",
 				"icon": "$(time-descending)",
-				"enablement": "notepadd.directives.sortBy == 'timeDescending'"
+				"enablement": "notepadd.directives.sortBy == 'timeDescending' && notepadd.directives.notEmpty"
 			},
 			{
 				"command": "notepadd.directives.sortFromOrderAscending",
 				"title": "Sort…",
 				"category": "NotePADD Directives",
 				"icon": "$(order-ascending)",
-				"enablement": "notepadd.directives.sortBy == 'orderAscending'"
+				"enablement": "notepadd.directives.sortBy == 'orderAscending' && notepadd.directives.notEmpty"
 			},
 			{
 				"command": "notepadd.directives.sortFromOrderDescending",
 				"title": "Sort…",
 				"category": "NotePADD Directives",
 				"icon": "$(order-descending)",
-				"enablement": "notepadd.directives.sortBy == 'orderDescending'"
+				"enablement": "notepadd.directives.sortBy == 'orderDescending' && notepadd.directives.notEmpty"
 			},
 			{
 				"command": "notepadd.directives.viewAsList",
 				"title": "View as List",
 				"category": "NotePADD Directives",
 				"icon": "$(list-tree)",
-				"enablement": "notepadd.directives.viewAsTree"
+				"enablement": "notepadd.directives.viewAsTree && notepadd.directives.notEmpty"
 			},
 			{
 				"command": "notepadd.directives.viewAsTree",
 				"title": "View as Tree",
 				"category": "NotePADD Directives",
 				"icon": "$(list-flat)",
-				"enablement": "!notepadd.directives.viewAsTree"
+				"enablement": "!notepadd.directives.viewAsTree && notepadd.directives.notEmpty"
 			},
 			{
 				"command": "notepadd.directives.find",
-				"title": "Find or Filter",
+				"title": "Find",
 				"category": "NotePADD Directives",
-				"icon": "$(search)"
+				"icon": "$(search)",
+				"enablement": "notepadd.directives.notEmpty"
 			}
 		],
 		"configuration": {
@@ -438,7 +442,12 @@
 					"icon": "$(notepadd)"
 				}
 			]
-		}
+		},
+		"viewsWelcome": [
+			{"view": "notepadd.activeEvents", "contents": "No event is currently active."},
+			{"view": "notepadd.pastAlarms", "contents": "Alarms have yet to happen in this session."},
+			{"view": "notepadd.directives", "contents": "No directive is issued yet."}
+		]
 	},
 	"activationEvents": [
 		"onNotebook:notepadd",

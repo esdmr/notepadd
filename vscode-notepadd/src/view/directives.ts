@@ -56,10 +56,37 @@ export class DirectivesView
 	protected readonly _configPrefix: string = 'notepadd.view.directives';
 	protected readonly _contextPrefix: string = 'notepadd.directives';
 	protected readonly _logPrefix: string = '[NotePADD/Bridge/Directives]';
-	private readonly _treeView;
+	protected readonly _treeView;
+
+	protected get _configSortBy(): DirectivesSortBy {
+		return v.parse(
+			sortBySchema,
+			workspace
+				.getConfiguration(this._configPrefix)
+				.get<string>('sortBy'),
+		);
+	}
+
+	protected get _configViewAsTree(): boolean {
+		return Boolean(
+			workspace
+				.getConfiguration(this._configPrefix)
+				.get<boolean>('viewAsTree'),
+		);
+	}
+
+	// eslint-disable-next-line unicorn/prefer-event-target
+	protected readonly _didChangeTreeData = new EventEmitter<
+		void | DirectivesTreeItem | DirectivesTreeItem[] | undefined
+	>();
+
+	// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+	get onDidChangeTreeData() {
+		return this._didChangeTreeData.event;
+	}
 
 	private readonly _handlers = [
-		onTimekeeperUpdated.event((states) => {
+		onTimekeeperUpdated.event(async (states) => {
 			if (!this._connection) return;
 			this._items.clear();
 
@@ -73,11 +100,12 @@ export class DirectivesView
 			}
 
 			this._stalled = false;
-			this._setStatus();
-			this._didChangeTreeData.fire();
 			output.trace(this._logPrefix, 'Updated all.');
+
+			await this._setStatus();
+			this._didChangeTreeData.fire();
 		}),
-		onTimekeeperTriggered.event((state) => {
+		onTimekeeperTriggered.event(async (state) => {
 			if (!this._connection || !this._filterState(state)) return;
 
 			const hash = state.directive.toString();
@@ -94,67 +122,30 @@ export class DirectivesView
 			}
 
 			treeItem.setState(state);
-			this._setStatus();
+			output.trace(this._logPrefix, 'Updated one.');
+
+			await this._setStatus();
 
 			this._didChangeTreeData.fire(
 				stableSortBy.has(this._configSortBy) ? treeItem : undefined,
 			);
-
-			output.trace(this._logPrefix, 'Updated one.');
 		}),
-		onTimekeeperStalled.event(() => {
+		onTimekeeperStalled.event(async () => {
 			this._stalled = true;
-			this._setStatus();
-			this._didChangeTreeData.fire();
 			output.trace(this._logPrefix, 'Marked as stalled.');
+
+			await this._setStatus();
+			this._didChangeTreeData.fire();
 		}),
 		workspace.onDidChangeConfiguration(async (event) => {
 			if (event.affectsConfiguration(this._configPrefix)) {
 				output.trace(this._logPrefix, 'Configuration changed.');
 
+				await this._setStatus();
 				this._didChangeTreeData.fire();
-
-				await commands.executeCommand(
-					'setContext',
-					`${this._contextPrefix}.sortBy`,
-					this._configSortBy,
-				);
-
-				await commands.executeCommand(
-					'setContext',
-					`${this._contextPrefix}.viewAsTree`,
-					this._configViewAsTree,
-				);
 			}
 		}),
 	];
-
-	private get _configSortBy(): DirectivesSortBy {
-		return v.parse(
-			sortBySchema,
-			workspace
-				.getConfiguration(this._configPrefix)
-				.get<string>('sortBy'),
-		);
-	}
-
-	private get _configViewAsTree(): boolean {
-		return Boolean(
-			workspace
-				.getConfiguration(this._configPrefix)
-				.get<boolean>('viewAsTree'),
-		);
-	}
-
-	// eslint-disable-next-line unicorn/prefer-event-target
-	private readonly _didChangeTreeData = new EventEmitter<
-		void | DirectivesTreeItem | DirectivesTreeItem[] | undefined
-	>();
-
-	// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-	get onDidChangeTreeData() {
-		return this._didChangeTreeData.event;
-	}
 
 	private _connection: Disposable | undefined;
 	private _stalled = true;
@@ -166,27 +157,17 @@ export class DirectivesView
 			canSelectMany: true,
 			dragAndDropController: this,
 		});
+
 		this._handlers.push(
-			this._treeView.onDidChangeVisibility((event) => {
-				this._setConnected(event.visible);
+			this._treeView.onDidChangeVisibility(async (event) => {
+				await this._setConnected(event.visible);
 			}),
 		);
-		this._setConnected(this._treeView.visible);
 	}
 
 	async initialize(): Promise<this> {
-		await commands.executeCommand(
-			'setContext',
-			`${this._contextPrefix}.sortBy`,
-			this._configSortBy,
-		);
-
-		await commands.executeCommand(
-			'setContext',
-			`${this._contextPrefix}.viewAsTree`,
-			this._configViewAsTree,
-		);
-
+		await this._setConnected(this._treeView.visible);
+		await this._setStatus();
 		return this;
 	}
 
@@ -223,7 +204,7 @@ export class DirectivesView
 		if (!this._configViewAsTree) {
 			const root = new BridgeFile(Uri.from({scheme: 'placeholder'}));
 
-			for (const [hash, directive] of this._items) {
+			for (const [hash, directive] of this._getItems()) {
 				root.children.set(
 					Uri.from({scheme: 'placeholder', path: hash}).toString(
 						true,
@@ -240,7 +221,7 @@ export class DirectivesView
 		const directories = new Map<string, BridgeDirectory>();
 		const root = new BridgeDirectory(Uri.from({scheme: 'placeholder'}));
 
-		for (const item of this._items.values()) {
+		for (const item of this._getItems().values()) {
 			if (!item.lastState) continue;
 
 			for (const source of item.lastState.sources) {
@@ -315,7 +296,35 @@ export class DirectivesView
 		return this._items;
 	}
 
-	private _setConnected(connected: boolean): void {
+	protected async _setStatus(): Promise<void> {
+		if (this._stalled) {
+			this._treeView.message =
+				'Cannot update: Timekeeper is not running.';
+			return;
+		}
+
+		this._treeView.message = '';
+
+		await commands.executeCommand(
+			'setContext',
+			`${this._contextPrefix}.notEmpty`,
+			this._getItems().size > 0,
+		);
+
+		await commands.executeCommand(
+			'setContext',
+			`${this._contextPrefix}.sortBy`,
+			this._configSortBy,
+		);
+
+		await commands.executeCommand(
+			'setContext',
+			`${this._contextPrefix}.viewAsTree`,
+			this._configViewAsTree,
+		);
+	}
+
+	private async _setConnected(connected: boolean): Promise<void> {
 		const changed = Boolean(connected) !== Boolean(this._connection);
 
 		if (connected && !this._connection) {
@@ -330,18 +339,9 @@ export class DirectivesView
 
 		if (changed) {
 			this._stalled = true;
-			this._setStatus();
+
+			await this._setStatus();
 			this._didChangeTreeData.fire();
 		}
-	}
-
-	private _setStatus(): void {
-		if (this._stalled) {
-			this._treeView.message =
-				'Cannot update: Timekeeper is not running.';
-			return;
-		}
-
-		this._treeView.message = '';
 	}
 }

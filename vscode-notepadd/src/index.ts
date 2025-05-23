@@ -29,8 +29,8 @@ export async function activate(context: ExtensionContext): Promise<void> {
 			setupBridgeNotification(),
 			new NotePaddSerializer(),
 			new NotePaddController(),
-			new ActiveEventsView(),
-			new PastAlarmsView(),
+			await new ActiveEventsView().initialize(),
+			await new PastAlarmsView().initialize(),
 			await new DirectivesView().initialize(),
 			await new Bookkeeper().initialize(),
 		);
