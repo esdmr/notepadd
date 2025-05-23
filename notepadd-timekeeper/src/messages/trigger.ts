@@ -1,4 +1,5 @@
-import {getDiscriminator, transformFallible, v} from 'notepadd-core';
+import {getDiscriminator, transformFallible} from 'notepadd-core';
+import * as v from 'valibot';
 import {DirectiveState} from '../types.ts';
 
 export class TriggerMessage {

@@ -1,14 +1,12 @@
 #!/usr/bin/env node
 import process from 'node:process';
-import {v} from 'notepadd-core';
+import * as v from 'valibot';
 import {
 	BookkeeperMessage,
 	DiscoveryMessage,
 	TimekeeperMessage,
-	UpdateMessage,
 } from './messages/index.ts';
 import {ListMessage} from './messages/list.ts';
-import {TerminateMessage} from './messages/terminate.ts';
 import {output} from './output.ts';
 import {getDirectiveStates, processUpdate, resetTimeouts} from './update.ts';
 

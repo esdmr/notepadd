@@ -1,4 +1,5 @@
-import {getDiscriminator, transformFallible, v} from 'notepadd-core';
+import {getDiscriminator, transformFallible} from 'notepadd-core';
+import * as v from 'valibot';
 import {DiscoveryMessage} from './discovery.ts';
 import {ListMessage} from './list.ts';
 import {LogMessage} from './log.ts';

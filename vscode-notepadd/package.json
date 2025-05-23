@@ -425,7 +425,8 @@
 		"execa": "9.3.1",
 		"notepadd-core": "workspace:*",
 		"notepadd-timekeeper": "workspace:*",
-		"uint8array-extras": "1.4.0"
+		"uint8array-extras": "1.4.0",
+		"valibot": "0.42.1"
 	},
 	"devDependencies": {
 		"@types/node": "20.17.32",

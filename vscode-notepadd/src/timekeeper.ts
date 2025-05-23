@@ -1,7 +1,7 @@
 import {createInterface} from 'node:readline';
 import process from 'node:process';
 import {execaNode, type Options, type ResultPromise} from 'execa';
-import {v} from 'notepadd-core';
+import * as v from 'valibot';
 import {
 	BookkeeperMessage,
 	TimekeeperMessage,

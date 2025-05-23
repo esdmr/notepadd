@@ -3,8 +3,8 @@ import {
 	getDiscriminator,
 	Instance,
 	transformFallible,
-	v,
 } from 'notepadd-core';
+import * as v from 'valibot';
 
 export class CellState {
 	constructor(

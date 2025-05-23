@@ -8,7 +8,7 @@ import {
 	type TreeDataProvider,
 	type TreeItem,
 } from 'vscode';
-import {v} from 'notepadd-core';
+import * as v from 'valibot';
 import {
 	onTimekeeperStalled,
 	onTimekeeperTriggered,

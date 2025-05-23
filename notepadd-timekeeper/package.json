@@ -9,11 +9,11 @@
 	"dependencies": {
 		"notepadd-core": "workspace:*",
 		"temporal-polyfill": "0.3.0",
-		"uint8array-extras": "1.4.0"
+		"uint8array-extras": "1.4.0",
+		"valibot": "0.42.1"
 	},
 	"devDependencies": {
-		"@types/node": "20.17.32",
-		"type-fest": "4.40.1"
+		"@types/node": "20.17.32"
 	},
 	"packageManager": "pnpm@9.15.9"
 }

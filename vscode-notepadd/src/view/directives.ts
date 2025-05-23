@@ -1,5 +1,5 @@
 import {inspect} from 'node:util';
-import {v} from 'notepadd-core';
+import * as v from 'valibot';
 import {
 	commands,
 	EventEmitter,
