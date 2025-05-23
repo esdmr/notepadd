@@ -113,6 +113,18 @@
 				"icon": "$(search)"
 			},
 			{
+				"command": "notepadd.pastAlarms.dismiss",
+				"title": "Dismiss",
+				"category": "NotePADD Past Alarms",
+				"icon": "$(close)"
+			},
+			{
+				"command": "notepadd.pastAlarms.clear",
+				"title": "Clear",
+				"category": "NotePADD Past Alarms",
+				"icon": "$(clear-all)"
+			},
+			{
 				"command": "notepadd.directives.sortFromTimeAscending",
 				"title": "Sort…",
 				"category": "NotePADD Directives",
@@ -338,6 +350,11 @@
 				},
 				{
 					"group": "navigation",
+					"command": "notepadd.pastAlarms.clear",
+					"when": "view == 'notepadd.pastAlarms'"
+				},
+				{
+					"group": "navigation",
 					"command": "notepadd.directives.sortFromTimeAscending",
 					"when": "view == 'notepadd.directives' && (notepadd.directives.sortBy == 'timeAscending' || !notepadd.directives.sortBy)"
 				},
@@ -370,6 +387,13 @@
 					"group": "navigation",
 					"command": "notepadd.directives.find",
 					"when": "view == 'notepadd.directives'"
+				}
+			],
+			"view/item/context": [
+				{
+					"group": "inline",
+					"command": "notepadd.pastAlarms.dismiss",
+					"when": "view == 'notepadd.pastAlarms'"
 				}
 			]
 		},

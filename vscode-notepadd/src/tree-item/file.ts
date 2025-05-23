@@ -11,6 +11,7 @@ export class BridgeFile extends TreeItem {
 		super(uri, TreeItemCollapsibleState.Expanded);
 		this.href = uri.toString(true);
 		this.iconPath = ThemeIcon.File;
+		this.contextValue = 'file';
 	}
 
 	updateOrder(sortBy: DirectivesSortBy): void {

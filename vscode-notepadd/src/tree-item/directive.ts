@@ -44,6 +44,7 @@ export class BridgeDirective extends TreeItem {
 		this.id = id;
 		this.directive = data.directive;
 		this.iconPath = new ThemeIcon(icons[data.directive.directive._type]);
+		this.contextValue = 'directive';
 
 		if (data instanceof DirectiveState) {
 			this.setState(data);

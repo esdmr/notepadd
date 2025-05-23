@@ -18,5 +18,7 @@ export class BridgeInstance extends BridgeDirective {
 		this.description = state.instance.previous?.toLocaleString('en-GB', {
 			calendar: state.instance.previous.calendarId,
 		});
+
+		this.contextValue = 'instance';
 	}
 }

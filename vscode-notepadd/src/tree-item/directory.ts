@@ -12,6 +12,7 @@ export class BridgeDirectory extends TreeItem {
 		super(uri, TreeItemCollapsibleState.Expanded);
 		this.href = uri.toString(true);
 		this.iconPath = ThemeIcon.Folder;
+		this.contextValue = 'directory';
 	}
 
 	updateOrder(sortBy: DirectivesSortBy): void {

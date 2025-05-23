@@ -72,6 +72,30 @@ export class PastAlarmsView
 				);
 			}
 		}),
+		commands.registerCommand('notepadd.pastAlarms.clear', () => {
+			this._items.length = 0;
+			this._didChangeTreeData.fire();
+		}),
+		commands.registerCommand(
+			'notepadd.pastAlarms.dismiss',
+			(
+				currentTarget: PastAlarmsTreeItem,
+				allTargets: readonly PastAlarmsTreeItem[] = [currentTarget],
+			) => {
+				for (const target of allTargets) {
+					const index = this._items.indexOf(target);
+					// If the user clicks the dismiss button repeatedly while
+					// vscode has not rendered the new tree state yet, we might
+					// get repeated command calls, which causes the target to
+					// not be in the item anymore. Just skip it, as it is mostly
+					// harmless.
+					if (index === -1) continue;
+					this._items.splice(index, 1);
+				}
+
+				this._didChangeTreeData.fire();
+			},
+		),
 	];
 
 	// eslint-disable-next-line unicorn/prefer-event-target
