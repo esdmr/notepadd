@@ -21,7 +21,7 @@ import {
 } from 'vscode';
 import {output} from '../output.ts';
 import {convertUriToUrl} from '../utils.ts';
-import { convertVscodeNotebookToNotePadd } from '../notebook/notepadd.serializer.ts';
+import {convertVscodeNotebookToNotePadd} from '../notebook/notepadd.serializer.ts';
 
 const fetchMaxRetry = 5;
 
