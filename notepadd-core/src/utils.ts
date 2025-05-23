@@ -7,21 +7,10 @@ export function isNullish(value: unknown): value is null | undefined {
 	return value === null || value === undefined;
 }
 
-export function includes<T>(
-	collection: readonly T[] | ReadonlySet<T> | ReadonlyMap<T, unknown>,
-	value: unknown,
-): value is T {
-	return 'includes' in collection
-		? collection.includes(value as T)
-		: collection.has(value as T);
-}
-
 export function filterNullishValues<K extends PropertyKey, V>(
-	object: Record<K, V | null | undefined>,
+	record: Record<K, V | null | undefined>,
 ) {
-	return Object.fromEntries(
-		Object.entries(object).filter((i) => !isNullish(i[1])),
-	) as Record<K, V>;
+	return filterRecord(record, (i): i is [K, V] => !isNullish(i[1]));
 }
 
 export function filterRecord<
@@ -30,21 +19,21 @@ export function filterRecord<
 	K2 extends K1,
 	V2 extends V1,
 >(
-	object: Record<K1, V1>,
+	record: Record<K1, V1>,
 	predicate: (entry: [K1, V1]) => entry is [K2, V2],
 ): Record<K2, V2>;
 
 export function filterRecord<K extends PropertyKey, V>(
-	object: Record<K, V>,
+	record: Record<K, V>,
 	predicate: (entry: [K, V]) => unknown,
 ): Record<K, V>;
 
 export function filterRecord(
-	object: Record<PropertyKey, unknown>,
+	record: Record<PropertyKey, unknown>,
 	predicate: (entry: [PropertyKey, unknown]) => unknown,
 ) {
 	return Object.fromEntries(
-		Object.entries(object).filter((i) => predicate(i)),
+		Object.entries(record).filter((i) => predicate(i)),
 	);
 }
 
@@ -53,9 +42,9 @@ export function mapRecord<
 	V1,
 	K2 extends PropertyKey,
 	V2,
->(object: Record<K1, V1>, mapper: (entry: [K1, V1]) => [K2, V2]) {
+>(record: Record<K1, V1>, mapper: (entry: [K1, V1]) => [K2, V2]) {
 	return Object.fromEntries(
-		Object.entries(object).map((i) => mapper(i as [K1, V1])),
+		Object.entries(record).map((i) => mapper(i as [K1, V1])),
 	) as Record<K2, V2>;
 }
 
