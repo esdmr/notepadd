@@ -89,6 +89,7 @@ export class PastAlarmsView
 	constructor(viewId = 'notepadd.pastAlarms') {
 		this._treeView = window.createTreeView(viewId, {
 			treeDataProvider: this,
+			canSelectMany: true,
 		});
 	}
 

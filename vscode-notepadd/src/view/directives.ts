@@ -1,18 +1,22 @@
 import {inspect} from 'node:util';
+import type {DirectiveState} from 'notepadd-timekeeper';
 import * as v from 'valibot';
 import {
 	commands,
+	DataTransferItem,
 	EventEmitter,
 	ThemeIcon,
 	Uri,
 	window,
 	workspace,
+	type CancellationToken,
+	type DataTransfer,
 	type Disposable,
 	type ProviderResult,
 	type TreeDataProvider,
+	type TreeDragAndDropController,
 	type TreeItem,
 } from 'vscode';
-import type {DirectiveState} from 'notepadd-timekeeper';
 import {
 	bridgeSocket,
 	onTimekeeperStalled,
@@ -41,8 +45,13 @@ const stableSortBy = new Set<DirectivesSortBy>([
 ]);
 
 export class DirectivesView
-	implements TreeDataProvider<DirectivesTreeItem>, Disposable
+	implements
+		TreeDataProvider<DirectivesTreeItem>,
+		TreeDragAndDropController<DirectivesTreeItem>,
+		Disposable
 {
+	readonly dragMimeTypes: readonly string[] = ['text/uri-list'];
+	readonly dropMimeTypes: readonly string[] = [];
 	protected readonly _items = new Map<string, BridgeDirective>();
 	protected readonly _configPrefix: string = 'notepadd.view.directives';
 	protected readonly _contextPrefix: string = 'notepadd.directives';
@@ -154,6 +163,8 @@ export class DirectivesView
 		this._treeView = window.createTreeView(viewId, {
 			treeDataProvider: this,
 			showCollapseAll: true,
+			canSelectMany: true,
+			dragAndDropController: this,
 		});
 		this._handlers.push(
 			this._treeView.onDidChangeVisibility((event) => {
@@ -278,6 +289,22 @@ export class DirectivesView
 		return children.length === 1 && workspace.workspaceFolders?.length === 1
 			? children[0]!.getChildren()
 			: children;
+	}
+
+	handleDrag(
+		source: readonly DirectivesTreeItem[],
+		dataTransfer: DataTransfer,
+		token: CancellationToken,
+	): void {
+		dataTransfer.set(
+			'text/uri-list',
+			new DataTransferItem(
+				source
+					.filter((i) => i instanceof BridgeFile)
+					.map((i) => i.uri.toString())
+					.join('\r\n'),
+			),
+		);
 	}
 
 	protected _filterState(state: DirectiveState): boolean {
