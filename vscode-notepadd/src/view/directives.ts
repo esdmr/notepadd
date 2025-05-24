@@ -147,7 +147,7 @@ export class DirectivesView
 		}),
 	];
 
-	private _connection: Disposable | undefined;
+	private readonly _connection = bridgeSocket.connect();
 	private _stalled = true;
 
 	constructor(viewId = 'notepadd.directives') {
@@ -157,22 +157,15 @@ export class DirectivesView
 			canSelectMany: true,
 			dragAndDropController: this,
 		});
-
-		this._handlers.push(
-			this._treeView.onDidChangeVisibility(async (event) => {
-				await this._setConnected(event.visible);
-			}),
-		);
 	}
 
 	async initialize(): Promise<this> {
-		await this._setConnected(this._treeView.visible);
 		await this._setStatus();
 		return this;
 	}
 
 	dispose(): void {
-		this._connection?.dispose();
+		this._connection.dispose();
 		this._treeView.dispose();
 
 		for (const handler of this._handlers) {
@@ -322,26 +315,5 @@ export class DirectivesView
 			`${this._contextPrefix}.viewAsTree`,
 			this._configViewAsTree,
 		);
-	}
-
-	private async _setConnected(connected: boolean): Promise<void> {
-		const changed = Boolean(connected) !== Boolean(this._connection);
-
-		if (connected && !this._connection) {
-			this._connection = bridgeSocket.connect();
-			output.debug(this._logPrefix, 'Connected.');
-		} else if (!connected && this._connection) {
-			this._connection.dispose();
-			this._connection = undefined;
-			this._items.clear();
-			output.debug(this._logPrefix, 'Disconnected.');
-		}
-
-		if (changed) {
-			this._stalled = true;
-
-			await this._setStatus();
-			this._didChangeTreeData.fire();
-		}
 	}
 }

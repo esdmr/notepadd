@@ -28,4 +28,20 @@ export class ActiveEventsView extends DirectivesView {
 				directive.lastState?.instance.currentState === 'high',
 		);
 	}
+
+	protected override async _setStatus(): Promise<void> {
+		await super._setStatus();
+
+		const {size} = this._getItems();
+
+		if (size === 0) {
+			this._treeView.badge = undefined;
+			return;
+		}
+
+		this._treeView.badge = {
+			tooltip: `${size} active ${size === 1 ? 'event' : 'events'}`,
+			value: size,
+		};
+	}
 }
