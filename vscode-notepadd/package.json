@@ -462,7 +462,7 @@
 		"valibot": "0.42.1"
 	},
 	"devDependencies": {
-		"@types/node": "20.17.41",
+		"@types/node": "20.17.43",
 		"@types/vscode": "1.91.0",
 		"@vscode/vsce": "3.3.2",
 		"vite": "6.3.5",
