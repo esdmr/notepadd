@@ -2,7 +2,10 @@
 	"name": "vite-plugin-nearley",
 	"version": "0.1.0",
 	"private": true,
-	"exports": "./src/index.ts",
+	"exports": {
+		".": "./src/index.ts",
+		"./package.json": "./package.json"
+	},
 	"devDependencies": {
 		"@esdmr/nearley": "3.0.3",
 		"@types/node": "20.17.46",

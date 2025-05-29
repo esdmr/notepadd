@@ -5,7 +5,8 @@
 	"exports": {
 		".": "./src/index.ts",
 		"./client": "./src/client.ts",
-		"./types": "./src/types.ts"
+		"./types": "./src/types.ts",
+		"./package.json": "./package.json"
 	},
 	"dependencies": {
 		"type-fest": "4.40.1",

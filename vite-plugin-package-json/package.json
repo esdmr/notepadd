@@ -2,7 +2,10 @@
 	"name": "vite-plugin-package-json",
 	"version": "0.1.0",
 	"private": true,
-	"exports": "./src/index.ts",
+	"exports": {
+		".": "./src/index.ts",
+		"./package.json": "./package.json"
+	},
 	"devDependencies": {
 		"@types/node": "20.17.41",
 		"vite": "6.3.5",

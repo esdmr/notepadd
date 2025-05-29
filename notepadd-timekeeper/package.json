@@ -4,7 +4,8 @@
 	"private": true,
 	"exports": {
 		".": "./src/index.ts",
-		"./service": "./src/service.ts"
+		"./service": "./src/service.ts",
+		"./package.json": "./package.json"
 	},
 	"dependencies": {
 		"notepadd-core": "workspace:*",
