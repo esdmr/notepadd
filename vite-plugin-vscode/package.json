@@ -8,7 +8,8 @@
 		"./types": "./src/types.ts"
 	},
 	"dependencies": {
-		"type-fest": "4.40.1"
+		"type-fest": "4.40.1",
+		"vite-plugin-package-json": "workspace:*"
 	},
 	"devDependencies": {
 		"@types/node": "20.17.46",

@@ -444,9 +444,18 @@
 			]
 		},
 		"viewsWelcome": [
-			{"view": "notepadd.activeEvents", "contents": "No event is currently active."},
-			{"view": "notepadd.pastAlarms", "contents": "Alarms have yet to happen in this session."},
-			{"view": "notepadd.directives", "contents": "No directive is issued yet."}
+			{
+				"view": "notepadd.activeEvents",
+				"contents": "No event is currently active."
+			},
+			{
+				"view": "notepadd.pastAlarms",
+				"contents": "Alarms have yet to happen in this session."
+			},
+			{
+				"view": "notepadd.directives",
+				"contents": "No directive is issued yet."
+			}
 		]
 	},
 	"activationEvents": [
@@ -469,6 +478,8 @@
 		"vite-plugin-child-process": "workspace:*",
 		"vite-plugin-inspect": "0.10.6",
 		"vite-plugin-nearley": "workspace:*",
+		"vite-plugin-package-json": "workspace:*",
+		"vite-plugin-static-copy": "3.0.0",
 		"vite-plugin-vscode": "workspace:*"
 	},
 	"packageManager": "pnpm@9.15.9",

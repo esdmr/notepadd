@@ -21,11 +21,15 @@ component "notepadd" as np {
 	component "vite-plugin-nearley" as vpn
 	note bottom of vpn: APIs: Node.JS, Vite
 
+	component "vite-plugin-package-json" as vpp
+	note bottom of vpp: APIs: Node.JS, Vite
+
 	component "vscode-notepadd" as vsc {
 		component "vite.config" as vsc_vite
 		vsc_vite --(0-- vpc
 		vsc_vite --(0-- vpv
 		vsc_vite --(0-- vpn
+		vsc_vite --(0-- vpp
 		note left of vsc_vite: APIs: Node.JS, Vite
 
 		component "serializer" as vsc_serde

@@ -1,8 +1,13 @@
 import {defineConfig} from 'vite';
 import inspect from 'vite-plugin-inspect';
+import {viteStaticCopy} from 'vite-plugin-static-copy';
 import {childProcess} from '../vite-plugin-child-process/src/index.ts';
 import {nearley} from '../vite-plugin-nearley/src/index.ts';
 import {vscode} from '../vite-plugin-vscode/src/index.ts';
+import {
+	packageJson,
+	transformPackageJson,
+} from '../vite-plugin-package-json/src/index.ts';
 // Note: Vite does not build files in `node_modules`, so keep the path to vite
 // plugins relative.
 
@@ -21,25 +26,23 @@ export default defineConfig((env) => ({
 			extension: '.ts',
 		}),
 		childProcess(),
-		vscode({
-			packageJsonTransformers: [
-				(json) => {
-					delete json.private;
-					delete json.type;
-					delete json.scripts;
-					delete json.packageManager;
-					delete json.dependencies;
-					delete json.optionalDependencies;
-					delete json.devDependencies;
-					delete json.devDependenciesMeta;
-				},
+		packageJson(),
+		transformPackageJson((json) => {
+			delete json.private;
+			delete json.type;
+			delete json.scripts;
+			delete json.packageManager;
+			delete json.dependencies;
+			delete json.optionalDependencies;
+			delete json.devDependencies;
+			delete json.devDependenciesMeta;
+		}),
+		vscode(),
+		viteStaticCopy({
+			targets: [
+				{src: '../README.md', dest: '.', overwrite: true},
+				{src: '../LICENSE.txt', dest: '.', overwrite: true},
 			],
-			copyPaths: {
-				/* eslint-disable @typescript-eslint/naming-convention */
-				'README.md': '../README.md',
-				'LICENSE.txt': '../LICENSE.txt',
-				/* eslint-enable @typescript-eslint/naming-convention */
-			},
 		}),
 	],
 }));

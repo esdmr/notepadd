@@ -3,5 +3,6 @@ packages:
   - notepadd-timekeeper
   - vite-plugin-child-process
   - vite-plugin-nearley
+  - vite-plugin-package-json
   - vite-plugin-vscode
   - vscode-notepadd

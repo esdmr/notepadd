@@ -3,6 +3,12 @@ import {readFile} from 'node:fs/promises';
 import {builtinModules} from 'node:module';
 import type {PackageJson} from 'type-fest';
 import {normalizePath, type Plugin, type Rollup} from 'vite';
+import {
+	getTransformedPackageJson,
+	isTransformingPackageJson,
+	isBuildingPackageJson,
+	mutatePackageJson,
+} from '../../vite-plugin-package-json/src/index.ts';
 import type {ExtensionManifest, ThemePath} from './types.ts';
 
 type View = NonNullable<
@@ -11,46 +17,36 @@ type View = NonNullable<
 	>['explorer']
 >[number];
 
+type ParsedIcon =
+	| {type: 'alias'; name: string}
+	| {type: 'path'; sourcePath: string; buildPath: string}
+	| {
+			type: 'themed';
+			sourcePaths: {light: string; dark: string};
+			buildPaths: {light: string; dark: string};
+	  };
+
 export type VsCodePackageJson = PackageJson &
 	ExtensionManifest & {
 		icons?: Record<string, string | ThemePath>;
 		extensionName?: string;
 	};
 
-export type ViteVsCodeOptions<T extends VsCodePackageJson = VsCodePackageJson> =
-	{
-		readonly packageJsonTransformers?:
-			| ReadonlyArray<(json: T) => T | void | Promise<T | void>>
-			| undefined;
-		readonly copyPaths?: Record<string, string> | undefined;
-	};
-
-async function resolveAndNormalize(
-	context: Rollup.PluginContext,
-	...rest: Parameters<Rollup.PluginContext['resolve']>
-): Promise<Rollup.ResolvedId & {normalizedId: string}> {
-	const resolved = await context.resolve(...rest);
-	assert(resolved, `Cannot resolve ${JSON.stringify(rest[0])}`);
-	const normalizedId = normalizePath(resolved.id);
-	return {...resolved, normalizedId};
-}
-
 function findChunkForId(
 	bundle: Rollup.OutputBundle,
-	resolution: {normalizedId: string},
+	id: string,
 ): Rollup.OutputAsset | Rollup.OutputChunk {
+	const normalizedId = normalizePath(id);
+
 	const chunk = Object.values(bundle).find(
 		(chunk) =>
 			chunk.type === 'chunk' &&
 			chunk.isEntry &&
 			chunk.facadeModuleId &&
-			normalizePath(chunk.facadeModuleId) === resolution.normalizedId,
+			normalizePath(chunk.facadeModuleId) === normalizedId,
 	);
 
-	assert(
-		chunk,
-		`Cannot find entry for ${JSON.stringify(resolution.normalizedId)}`,
-	);
+	assert(chunk, `Cannot find entry for ${JSON.stringify(normalizedId)}`);
 
 	return chunk;
 }
@@ -61,11 +57,13 @@ async function resolveAndEmit(
 	source: string,
 	transformer: (
 		text: string,
-		resolution: Awaited<ReturnType<typeof resolveAndNormalize>>,
+		resolution: Rollup.ResolvedId,
 	) => string | Promise<string> = (text) => text,
 ): Promise<string> {
-	const resolution = await resolveAndNormalize(context, source);
-	const string = await readFile(resolution.id, 'utf8');
+	const resolution = await context.resolve(source);
+	assert(resolution, `Could not resolve ${JSON.stringify(source)}`);
+
+	const string = await readFile(normalizePath(resolution.id), 'utf8');
 
 	return context.emitFile({
 		type: 'asset',
@@ -74,15 +72,6 @@ async function resolveAndEmit(
 		source: await transformer(string, resolution),
 	});
 }
-
-type ParsedIcon =
-	| {type: 'alias'; name: string}
-	| {type: 'path'; sourcePath: string; buildPath: string}
-	| {
-			type: 'themed';
-			sourcePaths: {light: string; dark: string};
-			buildPaths: {light: string; dark: string};
-	  };
 
 function parseIcon(icon: string | ThemePath, name = ''): ParsedIcon {
 	if (typeof icon === 'string') {
@@ -117,7 +106,7 @@ function parseIcon(icon: string | ThemePath, name = ''): ParsedIcon {
 
 function getIcon(
 	reference: string | ThemePath,
-	icons: NonNullable<VsCodePackageJson['icons']>,
+	icons: VsCodePackageJson['icons'] = {},
 ): ParsedIcon {
 	const parsedReference = parseIcon(reference);
 
@@ -133,7 +122,7 @@ function getIcon(
 
 async function extractIcons(
 	context: Rollup.PluginContext,
-	icons: NonNullable<VsCodePackageJson['icons']>,
+	icons: VsCodePackageJson['icons'] = {},
 ): Promise<void> {
 	for (const name of Object.keys(icons)) {
 		const icon = getIcon(`$(${name})`, icons);
@@ -184,8 +173,8 @@ async function extractIcons(
 }
 
 async function fixIcons(
-	contributes: NonNullable<VsCodePackageJson['contributes']>,
-	icons: NonNullable<VsCodePackageJson['icons']>,
+	contributes: VsCodePackageJson['contributes'] = {},
+	icons: VsCodePackageJson['icons'] = {},
 ): Promise<void> {
 	for (const viewContainer of new Set(
 		[
@@ -247,10 +236,9 @@ async function fixIcons(
 	}
 }
 
-export function vscode<T extends VsCodePackageJson = VsCodePackageJson>({
-	packageJsonTransformers = [],
-	copyPaths = {},
-}: ViteVsCodeOptions<T> = {}): Plugin {
+export function vscode(): Plugin {
+	let bundle: Rollup.OutputBundle | undefined;
+
 	return {
 		name: 'vscode',
 		config(config, env) {
@@ -286,16 +274,9 @@ export function vscode<T extends VsCodePackageJson = VsCodePackageJson>({
 		async load(id, options) {
 			if (id.startsWith('\0icon:')) {
 				const iconName = id.slice(6);
-
-				const resolution = await resolveAndNormalize(
-					this,
-					'./package.json',
-				);
-				const text = await readFile(resolution.id, 'utf8');
-
-				const packageJson = JSON.parse(text) as T;
-
-				const icon = getIcon(`$(${iconName})`, packageJson.icons ?? {});
+				const packageJson =
+					await getTransformedPackageJson<VsCodePackageJson>(this);
+				const icon = getIcon(`$(${iconName})`, packageJson.icons);
 
 				switch (icon.type) {
 					case 'alias': {
@@ -312,40 +293,47 @@ export function vscode<T extends VsCodePackageJson = VsCodePackageJson>({
 				}
 			}
 		},
-		async generateBundle(options, bundle) {
-			const entryResolution = await resolveAndNormalize(this, '.');
-			const entryChunk = findChunkForId(bundle, entryResolution);
+		async transform(code, id, options) {
+			if (isTransformingPackageJson(id)) {
+				return mutatePackageJson<VsCodePackageJson>(
+					code,
+					async (json) => {
+						if (json.extensionName) {
+							json.name = json.extensionName;
+							delete json.extensionName;
+						}
 
-			await resolveAndEmit(
-				this,
-				'package.json',
-				'./package.json',
-				async (text) => {
-					let packageJson = JSON.parse(text) as T;
-					packageJson.main = entryChunk.fileName;
-
-					if (packageJson.extensionName) {
-						packageJson.name = packageJson.extensionName;
-						delete packageJson.extensionName;
-					}
-
-					const icons = packageJson.icons ?? {};
-					delete packageJson.icons;
-
-					await extractIcons(this, icons);
-					await fixIcons(packageJson.contributes ?? {}, icons);
-
-					for (const f of packageJsonTransformers) {
-						packageJson = (await f(packageJson)) ?? packageJson;
-					}
-
-					return JSON.stringify(packageJson, undefined, '\t');
-				},
-			);
-
-			for (const [destination, source] of Object.entries(copyPaths)) {
-				await resolveAndEmit(this, destination, source);
+						await extractIcons(this, json.icons);
+						await fixIcons(json.contributes, json.icons);
+						delete json.icons;
+					},
+				);
 			}
+
+			if (isBuildingPackageJson(id)) {
+				assert(
+					bundle,
+					'Cannot build package.json. Output bundle is not available yet.',
+				);
+
+				const entryResolution = await this.resolve('.');
+				assert(entryResolution, 'Could not resolve the entry point');
+
+				const entryChunk = findChunkForId(bundle, entryResolution.id);
+
+				return mutatePackageJson<VsCodePackageJson>(
+					code,
+					async (json) => {
+						json.main = entryChunk.fileName;
+					},
+				);
+			}
+		},
+		generateBundle: {
+			order: 'pre',
+			async handler(options, bundle_, isWrite) {
+				bundle = bundle_;
+			},
 		},
 	};
 }
