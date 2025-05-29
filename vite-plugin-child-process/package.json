@@ -7,7 +7,7 @@
 		"./client": "./src/client.ts"
 	},
 	"devDependencies": {
-		"@types/node": "20.17.44",
+		"@types/node": "20.17.45",
 		"vite": "6.3.5"
 	},
 	"peerDependencies": {

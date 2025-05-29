@@ -11,7 +11,7 @@
 		"type-fest": "4.40.1"
 	},
 	"devDependencies": {
-		"@types/node": "20.17.44",
+		"@types/node": "20.17.45",
 		"type-fest": "4.40.1",
 		"vite": "6.3.5"
 	},
