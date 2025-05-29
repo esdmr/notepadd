@@ -321,17 +321,14 @@ export function vscode(): Plugin {
 
 				const entryChunk = findChunkForId(bundle, entryResolution.id);
 
-				return mutatePackageJson<VsCodePackageJson>(
-					code,
-					async (json) => {
-						json.main = entryChunk.fileName;
-					},
-				);
+				return mutatePackageJson<VsCodePackageJson>(code, (json) => {
+					json.main = entryChunk.fileName;
+				});
 			}
 		},
 		generateBundle: {
 			order: 'pre',
-			async handler(options, bundle_, isWrite) {
+			handler(options, bundle_, isWrite) {
 				bundle = bundle_;
 			},
 		},
