@@ -8,6 +8,7 @@ import {
 	isTransformingPackageJson,
 	isBuildingPackageJson,
 	mutatePackageJson,
+	findChunkForId,
 } from '../../vite-plugin-package-json/src/index.ts';
 import type {ExtensionManifest, ThemePath} from './types.ts';
 
@@ -31,25 +32,6 @@ export type VsCodePackageJson = PackageJson &
 		icons?: Record<string, string | ThemePath>;
 		extensionName?: string;
 	};
-
-function findChunkForId(
-	bundle: Rollup.OutputBundle,
-	id: string,
-): Rollup.OutputAsset | Rollup.OutputChunk {
-	const normalizedId = normalizePath(id);
-
-	const chunk = Object.values(bundle).find(
-		(chunk) =>
-			chunk.type === 'chunk' &&
-			chunk.isEntry &&
-			chunk.facadeModuleId &&
-			normalizePath(chunk.facadeModuleId) === normalizedId,
-	);
-
-	assert(chunk, `Cannot find entry for ${JSON.stringify(normalizedId)}`);
-
-	return chunk;
-}
 
 async function resolveAndEmit(
 	context: Rollup.PluginContext,
@@ -316,10 +298,7 @@ export function vscode(): Plugin {
 					'Cannot build package.json. Output bundle is not available yet.',
 				);
 
-				const entryResolution = await this.resolve('.');
-				assert(entryResolution, 'Could not resolve the entry point');
-
-				const entryChunk = findChunkForId(bundle, entryResolution.id);
+				const entryChunk = await findChunkForId(this, bundle, '.');
 
 				return mutatePackageJson<VsCodePackageJson>(code, (json) => {
 					json.main = entryChunk.fileName;

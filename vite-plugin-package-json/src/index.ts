@@ -3,8 +3,19 @@ import {readFile} from 'node:fs/promises';
 import type {PackageJson} from 'type-fest';
 import {normalizePath, type Plugin, type Rollup} from 'vite';
 
-export type PackageJsonTransformer<T extends PackageJson = PackageJson> = (
+export type PackageJsonMutator<T extends PackageJson> = (
 	json: T,
+) => T | void | Promise<T | void>;
+
+export type PackageJsonTransformer<T extends PackageJson> = (
+	this: Rollup.TransformPluginContext,
+	json: T,
+) => T | void | Promise<T | void>;
+
+export type PackageJsonBuildTransformer<T extends PackageJson> = (
+	this: Rollup.TransformPluginContext,
+	json: T,
+	bundle: Rollup.OutputBundle,
 ) => T | void | Promise<T | void>;
 
 const transformedId = '\0package-json:transformed';
@@ -81,12 +92,12 @@ export async function getTransformedPackageJson<
 
 export async function mutatePackageJson<T extends PackageJson = PackageJson>(
 	code: string,
-	transformer: PackageJsonTransformer<T>,
+	mutator: PackageJsonMutator<T>,
 ): Promise<string> {
 	const json = JSON.parse(decapsulate(code)) as T;
-	const transformed = await transformer(json);
+	const mutated = await mutator(json);
 
-	return encapsulate(JSON.stringify(transformed ?? json, undefined, '\t'));
+	return encapsulate(JSON.stringify(mutated ?? json, undefined, '\t'));
 }
 
 export function transformPackageJson<T extends PackageJson = PackageJson>(
@@ -97,20 +108,66 @@ export function transformPackageJson<T extends PackageJson = PackageJson>(
 		name,
 		async transform(code, id, options) {
 			if (!isTransformingPackageJson(id)) return;
-			return mutatePackageJson(code, transformer);
+			return mutatePackageJson<T>(code, async (json) =>
+				transformer.call(this, json),
+			);
 		},
 	};
 }
 
 export function transformBuiltPackageJson<T extends PackageJson = PackageJson>(
-	transformer: PackageJsonTransformer<T>,
+	transformer: PackageJsonBuildTransformer<T>,
 	name = 'package-json-built-transform',
 ): Plugin {
+	let bundle: Rollup.OutputBundle;
+
 	return {
 		name,
 		async transform(code, id, options) {
 			if (!isBuildingPackageJson(id)) return;
-			return mutatePackageJson(code, transformer);
+
+			assert(
+				bundle,
+				'Cannot build package.json. Output bundle is not available yet.',
+			);
+
+			return mutatePackageJson<T>(code, async (json) =>
+				transformer.call(this, json, bundle),
+			);
+		},
+		generateBundle: {
+			order: 'pre',
+			handler(options, bundle_, isWrite) {
+				bundle = bundle_;
+			},
 		},
 	};
+}
+
+export async function findChunkForId(
+	context: Rollup.PluginContext,
+	bundle: Rollup.OutputBundle,
+	id: string,
+): Promise<Rollup.OutputAsset | Rollup.OutputChunk> {
+	const entryResolution = await context.resolve(id);
+
+	if (!entryResolution) {
+		context.error({id, message: 'Resolution failed.'});
+	}
+
+	const normalizedId = normalizePath(entryResolution.id);
+
+	const chunk = Object.values(bundle).find(
+		(chunk) =>
+			chunk.type === 'chunk' &&
+			chunk.isEntry &&
+			chunk.facadeModuleId &&
+			normalizePath(chunk.facadeModuleId) === normalizedId,
+	);
+
+	if (!chunk) {
+		context.error({id, message: 'No associated output chunk found.'});
+	}
+
+	return chunk;
 }
