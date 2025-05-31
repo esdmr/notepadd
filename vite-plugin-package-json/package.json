@@ -7,7 +7,7 @@
 		"./package.json": "./package.json"
 	},
 	"devDependencies": {
-		"@types/node": "20.17.41",
+		"@types/node": "20.17.45",
 		"vite": "6.3.5",
 		"vite-plugin-inspect": "0.10.6"
 	},
