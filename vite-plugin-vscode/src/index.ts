@@ -8,7 +8,7 @@ import {
 	isTransformingPackageJson,
 	isBuildingPackageJson,
 	mutatePackageJson,
-	findChunkForId,
+	findChunksForId,
 } from '../../vite-plugin-package-json/src/index.ts';
 import type {ExtensionManifest, ThemePath} from './types.ts';
 
@@ -298,7 +298,7 @@ export function vscode(): Plugin {
 					'Cannot build package.json. Output bundle is not available yet.',
 				);
 
-				const entryChunk = await findChunkForId(this, bundle, '.');
+				const [entryChunk] = await findChunksForId(this, bundle, '.');
 
 				return mutatePackageJson<VsCodePackageJson>(code, (json) => {
 					json.main = entryChunk.fileName;

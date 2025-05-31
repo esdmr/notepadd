@@ -19,7 +19,7 @@ export type PackageJsonBuildTransformer<T extends PackageJson> = (
 ) => T | void | Promise<T | void>;
 
 const transformedId = '\0package-json:transformed';
-const builtId = '\0package-json:built';
+const builtId = '\0package-json:built?';
 
 function encapsulate(code: string): string {
 	return `export default ${JSON.stringify(code)};`;
@@ -34,10 +34,12 @@ export function isTransformingPackageJson(id: string): boolean {
 }
 
 export function isBuildingPackageJson(id: string): boolean {
-	return id === builtId;
+	return id.startsWith(builtId);
 }
 
 export function packageJson(): Plugin {
+	let timesGenerated = 0;
+
 	return {
 		name: 'package-json',
 		resolveId(source, importer, options) {
@@ -62,14 +64,18 @@ export function packageJson(): Plugin {
 			}
 
 			if (isBuildingPackageJson(id)) {
-				const {code} = await this.load({id: transformedId});
-				assert('Could not load transformed package.json');
+				const module = await this.load({id: transformedId});
+				assert(module.code, 'Could not load transformed package.json');
 
-				return code;
+				return {
+					...module,
+					code: module.code,
+					ast: undefined,
+				};
 			}
 		},
 		async generateBundle(options, bundle) {
-			const {code} = await this.load({id: builtId});
+			const {code} = await this.load({id: builtId + timesGenerated++});
 			assert(code, `Could not load built package.json`);
 
 			this.emitFile({
@@ -119,7 +125,7 @@ export function transformBuiltPackageJson<T extends PackageJson = PackageJson>(
 	transformer: PackageJsonBuildTransformer<T>,
 	name = 'package-json-built-transform',
 ): Plugin {
-	let bundle: Rollup.OutputBundle;
+	let bundle: Rollup.OutputBundle | undefined;
 
 	return {
 		name,
@@ -132,23 +138,25 @@ export function transformBuiltPackageJson<T extends PackageJson = PackageJson>(
 			);
 
 			return mutatePackageJson<T>(code, async (json) =>
-				transformer.call(this, json, bundle),
+				transformer.call(this, json, bundle!),
 			);
 		},
 		generateBundle: {
 			order: 'pre',
 			handler(options, bundle_, isWrite) {
-				bundle = bundle_;
+				bundle = {...bundle, ...bundle_};
 			},
 		},
 	};
 }
 
-export async function findChunkForId(
+export async function findChunksForId(
 	context: Rollup.PluginContext,
 	bundle: Rollup.OutputBundle,
 	id: string,
-): Promise<Rollup.OutputAsset | Rollup.OutputChunk> {
+): Promise<
+	[Rollup.OutputBundle[string], ...Array<Rollup.OutputBundle[string]>]
+> {
 	const entryResolution = await context.resolve(id);
 
 	if (!entryResolution) {
@@ -157,7 +165,7 @@ export async function findChunkForId(
 
 	const normalizedId = normalizePath(entryResolution.id);
 
-	const chunk = Object.values(bundle).find(
+	const chunk = Object.values(bundle).filter(
 		(chunk) =>
 			chunk.type === 'chunk' &&
 			chunk.isEntry &&
@@ -165,9 +173,12 @@ export async function findChunkForId(
 			normalizePath(chunk.facadeModuleId) === normalizedId,
 	);
 
-	if (!chunk) {
+	if (chunk.length === 0) {
 		context.error({id, message: 'No associated output chunk found.'});
 	}
 
-	return chunk;
+	return chunk as [
+		Rollup.OutputBundle[string],
+		...Array<Rollup.OutputBundle[string]>,
+	];
 }
