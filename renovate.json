@@ -100,7 +100,8 @@
 				"@types/node"
 			],
 			"matchUpdateTypes": [
-				"major"
+				"major",
+				"patch"
 			],
 			"enabled": false
 		},
