@@ -43,6 +43,10 @@ export function nearley({
 				quiet: true,
 			});
 
+			for (const file of c.alreadyCompiled) {
+				this.addWatchFile(file);
+			}
+
 			return transformWithEsbuild(
 				Array.from(generate(c), (i) => `${i}\n`).join(''),
 				id + extension,
