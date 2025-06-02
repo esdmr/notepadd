@@ -1,0 +1,25 @@
+{
+	"name": "vite-plugin-subvite",
+	"version": "0.1.0",
+	"private": true,
+	"exports": {
+		".": "./src/index.ts",
+		"./package.json": "./package.json"
+	},
+	"devDependencies": {
+		"@types/node": "20.17.45",
+		"rollup": "^4.40.2",
+		"vite": "6.3.5",
+		"vite-plugin-package-json": "workspace:*"
+	},
+	"peerDependencies": {
+		"vite": "^5.4.0 || ^6.0.0"
+	},
+	"packageManager": "pnpm@9.15.9",
+	"dependencies": {
+		"execa": "9.3.1",
+		"resolve.exports": "2.0.3",
+		"type-fest": "4.40.1",
+		"valibot": "0.42.1"
+	}
+}

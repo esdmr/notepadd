@@ -1,15 +1,14 @@
 import {defineConfig} from 'vite';
 import inspect from 'vite-plugin-inspect';
 import {viteStaticCopy} from 'vite-plugin-static-copy';
-import {childProcess} from '../vite-plugin-child-process/src/index.ts';
-import {nearley} from '../vite-plugin-nearley/src/index.ts';
-import {vscode} from '../vite-plugin-vscode/src/index.ts';
+import {childProcess} from 'vite-plugin-child-process';
 import {
 	packageJson,
+	transformBuiltPackageJson,
 	transformPackageJson,
-} from '../vite-plugin-package-json/src/index.ts';
-// Note: Vite does not build files in `node_modules`, so keep the path to vite
-// plugins relative.
+} from 'vite-plugin-package-json';
+import {subvite} from 'vite-plugin-subvite';
+import {vscode} from 'vite-plugin-vscode';
 
 export default defineConfig((env) => ({
 	cacheDir: 'node_modules/.cache/vite',
@@ -22,9 +21,6 @@ export default defineConfig((env) => ({
 			build: true,
 			outputDir: 'node_modules/.cache/vite-inspect',
 		}),
-		nearley({
-			extension: '.ts',
-		}),
 		childProcess(),
 		packageJson(),
 		transformPackageJson((json) => {
@@ -32,11 +28,12 @@ export default defineConfig((env) => ({
 			delete json.type;
 			delete json.scripts;
 			delete json.packageManager;
-			delete json.dependencies;
-			delete json.optionalDependencies;
 			delete json.devDependencies;
-			delete json.devDependenciesMeta;
 		}),
+		transformBuiltPackageJson((json) => {
+			delete json.dependencies;
+		}),
+		subvite(),
 		vscode(),
 		viteStaticCopy({
 			targets: [

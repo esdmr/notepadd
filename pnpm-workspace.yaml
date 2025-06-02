@@ -4,5 +4,6 @@ packages:
   - vite-plugin-child-process
   - vite-plugin-nearley
   - vite-plugin-package-json
+  - vite-plugin-subvite
   - vite-plugin-vscode
   - vscode-notepadd

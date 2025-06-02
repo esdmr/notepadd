@@ -9,7 +9,7 @@ import {
 	isBuildingPackageJson,
 	mutatePackageJson,
 	findChunksForId,
-} from '../../vite-plugin-package-json/src/index.ts';
+} from 'vite-plugin-package-json';
 import type {ExtensionManifest, ThemePath} from './types.ts';
 
 type View = NonNullable<

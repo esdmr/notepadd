@@ -8,7 +8,7 @@
 		"./package.json": "./package.json"
 	},
 	"scripts": {
-		"build": "vite --configLoader runner build",
+		"vite": "vite --configLoader runner",
 		"build-directives-tsd": "nearleyc src/directives/tsd.ne -o src/directives/tsd.generated.ts"
 	},
 	"dependencies": {
@@ -43,7 +43,8 @@
 		"vite-plugin-inspect": "0.10.6",
 		"vite-plugin-nearley": "workspace:*",
 		"vite-plugin-package-json": "workspace:*",
-		"vite-plugin-static-copy": "3.0.0"
+		"vite-plugin-static-copy": "3.0.0",
+		"vite-plugin-subvite": "workspace:*"
 	},
 	"packageManager": "pnpm@9.15.9"
 }

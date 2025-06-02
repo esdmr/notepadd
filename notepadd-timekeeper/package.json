@@ -7,6 +7,9 @@
 		"./service": "./src/service.ts",
 		"./package.json": "./package.json"
 	},
+	"scripts": {
+		"vite": "vite --configLoader runner"
+	},
 	"dependencies": {
 		"notepadd-core": "workspace:*",
 		"temporal-polyfill": "0.3.0",
@@ -14,7 +17,12 @@
 		"valibot": "0.42.1"
 	},
 	"devDependencies": {
-		"@types/node": "20.17.46"
+		"@types/node": "20.17.46",
+		"vite": "6.3.5",
+		"vite-plugin-inspect": "0.10.6",
+		"vite-plugin-package-json": "workspace:*",
+		"vite-plugin-static-copy": "3.0.0",
+		"vite-plugin-subvite": "workspace:*"
 	},
 	"packageManager": "pnpm@9.15.9"
 }

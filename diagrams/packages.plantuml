@@ -4,6 +4,7 @@ component "notepadd" as np {
 	component "notepadd-core" as core {
 		component "format" as core_fmt
 		component "directives" as core_dir
+		component "export" as core_exp
 	}
 	note bottom of core: APIs: [None]
 
@@ -12,25 +13,9 @@ component "notepadd" as np {
 	time --(0-- core_fmt
 	time --(0-- core_dir
 
-	component "vite-plugin-child-process" as vpc
-	note bottom of vpc: APIs: Node.JS, Vite
-
-	component "vite-plugin-vscode" as vpv
-	note bottom of vpv: APIs: Node.JS, Vite
-
-	component "vite-plugin-nearley" as vpn
-	note bottom of vpn: APIs: Node.JS, Vite
-
-	component "vite-plugin-package-json" as vpp
-	note bottom of vpp: APIs: Node.JS, Vite
-
 	component "vscode-notepadd" as vsc {
-		component "vite.config" as vsc_vite
-		vsc_vite --(0-- vpc
-		vsc_vite --(0-- vpv
-		vsc_vite --(0-- vpn
-		vsc_vite --(0-- vpp
-		note left of vsc_vite: APIs: Node.JS, Vite
+		component "export" as vsc_exp
+		vsc_exp --(0-- core_exp
 
 		component "serializer" as vsc_serde
 		vsc_serde --(0-- core_fmt
@@ -40,6 +25,9 @@ component "notepadd" as np {
 
 		component "Bookkeeper" as vsc_book
 		vsc_book --(0-- time
+
+		component "Bridge" as vsc_bridge
+		vsc_bridge --(0-- time
 	}
 	note top of vsc: APIs: VS Code, Node.JS
 }

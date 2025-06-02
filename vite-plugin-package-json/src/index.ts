@@ -52,7 +52,7 @@ export function packageJson(): Plugin {
 		},
 		async load(id, options) {
 			if (isTransformingPackageJson(id)) {
-				const resolution = await this.resolve('package.json');
+				const resolution = await this.resolve('/package.json');
 				assert(resolution, 'Could not resolve package.json');
 
 				const code = await readFile(

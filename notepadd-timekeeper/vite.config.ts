@@ -1,6 +1,6 @@
+import {builtinModules} from 'node:module';
 import {defineConfig} from 'vite';
 import inspect from 'vite-plugin-inspect';
-import {nearley} from 'vite-plugin-nearley';
 import {
 	findChunksForId,
 	packageJson,
@@ -16,7 +16,7 @@ export default defineConfig((env) => ({
 		outDir: 'build',
 		target: ['node20', 'chrome122', 'firefox122'],
 		lib: {
-			entry: '.',
+			entry: ['.', './src/service.ts'],
 			fileName: 'index',
 			formats: ['es'],
 		},
@@ -28,9 +28,6 @@ export default defineConfig((env) => ({
 			build: !isSubvite(),
 			outputDir: 'node_modules/.cache/vite-inspect',
 		}),
-		nearley({
-			extension: '.ts',
-		}),
 		packageJson(),
 		transformPackageJson((json) => {
 			delete json.private;
@@ -40,10 +37,16 @@ export default defineConfig((env) => ({
 		}),
 		transformBuiltPackageJson(async function (json, bundle) {
 			const [entryChunk] = await findChunksForId(this, bundle, '/');
+			const [serviceChunk] = await findChunksForId(
+				this,
+				bundle,
+				'/src/service.ts',
+			);
 
 			json.exports = {
 				/* eslint-disable @typescript-eslint/naming-convention */
 				'.': './' + entryChunk.fileName,
+				'./service': './' + serviceChunk.fileName,
 				'./package.json': './package.json',
 				/* eslint-enable @typescript-eslint/naming-convention */
 			};
