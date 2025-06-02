@@ -150,7 +150,7 @@ export class PastAlarmsView
 		if (element !== undefined) return;
 
 		return this._configSortBy === 'timeAscending'
-			? this._getItems().slice().reverse()
+			? [...this._getItems()].reverse()
 			: this._getItems();
 	}
 
