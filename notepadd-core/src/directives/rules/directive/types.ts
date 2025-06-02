@@ -1,6 +1,10 @@
 import {type Temporal} from 'temporal-polyfill';
 import * as v from 'valibot';
-import {getDiscriminator, transformFallible} from '../../../utils.ts';
+import {
+	getDiscriminator,
+	leanVariant,
+	transformFallible,
+} from '../../../utils.ts';
 import {OneShotAlarm, RecurringAlarm} from './alarm/types.ts';
 import {Instance} from './base.ts';
 import {OneShotEvent, RecurringEvent} from './event/types.ts';
@@ -23,7 +27,7 @@ export class Directive {
 	static readonly schema = v.pipe(
 		v.object({
 			_type: v.literal('Directive'),
-			directive: v.variant('_type', [
+			directive: leanVariant('_type', [
 				RecurringAlarm.schema,
 				OneShotAlarm.schema,
 				Timer.schema,

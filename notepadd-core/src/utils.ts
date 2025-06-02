@@ -203,6 +203,67 @@ export function getDiscriminator<K extends string>(class_: {
 	return class_.schema.entries._type.literal;
 }
 
+type LeanVariantOption<K extends string> =
+	| v.VariantOptions<K>[number]
+	| v.BaseSchema<Readonly<Partial<Record<K, any>>>, any, v.BaseIssue<any>>;
+
+export type LeanVariantOptions<K extends string> =
+	| Array<LeanVariantOption<K>>
+	| ReadonlyArray<LeanVariantOption<K>>;
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export interface LeanVariantSchema<
+	K extends string,
+	O extends LeanVariantOptions<K>,
+	M extends v.ErrorMessage<v.VariantIssue> | undefined,
+> extends v.BaseSchema<
+		v.InferInput<O[number]>,
+		v.InferOutput<O[number]>,
+		| v.VariantIssue
+		| Exclude<
+				v.InferIssue<O[number]>,
+				{
+					type: 'loose_object' | 'object' | 'object_with_rest';
+				}
+		  >
+	> {
+	/**
+	 * The schema type.
+	 */
+	readonly type: 'variant';
+	/**
+	 * The schema reference.
+	 */
+	readonly reference: typeof v.variant;
+	/**
+	 * The expected property.
+	 */
+	readonly expects: 'Object';
+	/**
+	 * The discriminator key.
+	 */
+	readonly key: K;
+	/**
+	 * The variant options.
+	 */
+	readonly options: O;
+	/**
+	 * The error message.
+	 */
+	readonly message: M;
+}
+
+export function leanVariant<
+	const K extends string,
+	const O extends LeanVariantOptions<K>,
+>(key: K, options: O): LeanVariantSchema<K, O, undefined> {
+	return v.variant(key, options as v.VariantOptions<K>) as LeanVariantSchema<
+		K,
+		O,
+		undefined
+	>;
+}
+
 export function getSmallestDurationUnit(
 	duration: Temporal.Duration,
 ): Temporal.TotalUnit<Temporal.DateTimeUnit> {

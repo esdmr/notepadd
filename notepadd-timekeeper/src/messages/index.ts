@@ -1,4 +1,4 @@
-import {getDiscriminator, transformFallible} from 'notepadd-core';
+import {getDiscriminator, leanVariant, transformFallible} from 'notepadd-core';
 import * as v from 'valibot';
 import {DiscoveryMessage} from './discovery.ts';
 import {ListMessage} from './list.ts';
@@ -24,7 +24,7 @@ export class TimekeeperMessage {
 	static readonly schema = v.pipe(
 		v.object({
 			_type: v.literal('TimekeeperMessage'),
-			message: v.variant('_type', [
+			message: leanVariant('_type', [
 				DiscoveryMessage.schema,
 				TriggerMessage.schema,
 				LogMessage.schema,
@@ -45,7 +45,7 @@ export class BookkeeperMessage {
 	static readonly schema = v.pipe(
 		v.object({
 			_type: v.literal('BookkeeperMessage'),
-			message: v.variant('_type', [
+			message: leanVariant('_type', [
 				UpdateMessage.schema,
 				TerminateMessage.schema,
 			]),
