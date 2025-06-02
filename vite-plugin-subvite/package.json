@@ -8,7 +8,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "20.17.46",
-		"rollup": "^4.40.2",
+		"rollup": "4.40.2",
 		"vite": "6.3.5",
 		"vite-plugin-package-json": "workspace:*"
 	},
