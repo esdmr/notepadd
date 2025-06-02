@@ -14,12 +14,12 @@
 		"notepadd-core": "workspace:*",
 		"temporal-polyfill": "0.3.0",
 		"uint8array-extras": "1.4.0",
-		"valibot": "0.42.1"
+		"valibot": "1.1.0"
 	},
 	"devDependencies": {
 		"@types/node": "20.17.46",
 		"vite": "6.3.5",
-		"vite-plugin-inspect": "0.10.6",
+		"vite-plugin-inspect": "11.1.0",
 		"vite-plugin-package-json": "workspace:*",
 		"vite-plugin-static-copy": "3.0.0",
 		"vite-plugin-subvite": "workspace:*"

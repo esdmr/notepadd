@@ -145,7 +145,7 @@ export class PastAlarmsView
 	}
 
 	getChildren(
-		element?: PastAlarmsTreeItem | undefined,
+		element?: PastAlarmsTreeItem,
 	): ProviderResult<PastAlarmsTreeItem[]> {
 		if (element !== undefined) return;
 

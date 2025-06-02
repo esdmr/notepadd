@@ -15,6 +15,8 @@ export class PlainDateKeywordNode extends SyntaxNode<[MooToken]> {
 				return today.add({days: 1});
 			}
 
+			// eslint-disable-next-line unicorn/no-useless-switch-case
+			case undefined:
 			default: {
 				throw new RangeError(
 					`Bug: Unhandled date keyword: ${this.keyword}, ${this._children[0].value}`,

@@ -3,9 +3,8 @@
 	"type": "module",
 	"devDependencies": {
 		"typescript": "5.8.3",
-		"vite-node": "2.1.9",
-		"webpack": "npm:ignoredep@200.9999.0",
-		"xo": "0.60.0"
+		"vite-node": "3.2.0",
+		"xo": "1.0.5"
 	},
 	"packageManager": "pnpm@9.15.9",
 	"engines": {

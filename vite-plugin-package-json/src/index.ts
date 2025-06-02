@@ -53,7 +53,7 @@ export function packageJson(): Plugin {
 		async load(id, options) {
 			if (isTransformingPackageJson(id)) {
 				const resolution = await this.resolve('/package.json');
-				assert(resolution, 'Could not resolve package.json');
+				assert.ok(resolution, 'Could not resolve package.json');
 
 				const code = await readFile(
 					normalizePath(resolution.id),
@@ -65,7 +65,10 @@ export function packageJson(): Plugin {
 
 			if (isBuildingPackageJson(id)) {
 				const module = await this.load({id: transformedId});
-				assert(module.code, 'Could not load transformed package.json');
+				assert.ok(
+					module.code,
+					'Could not load transformed package.json',
+				);
 
 				return {
 					...module,
@@ -76,7 +79,7 @@ export function packageJson(): Plugin {
 		},
 		async generateBundle(options, bundle) {
 			const {code} = await this.load({id: builtId + timesGenerated++});
-			assert(code, `Could not load built package.json`);
+			assert.ok(code, `Could not load built package.json`);
 
 			this.emitFile({
 				type: 'asset',
@@ -92,7 +95,7 @@ export async function getTransformedPackageJson<
 	T extends PackageJson = PackageJson,
 >(context: Rollup.PluginContext): Promise<T> {
 	const {code} = await context.load({id: transformedId});
-	assert(code, `Could not load transformed package.json`);
+	assert.ok(code, `Could not load transformed package.json`);
 	return JSON.parse(decapsulate(code)) as T;
 }
 
@@ -132,7 +135,7 @@ export function transformBuiltPackageJson<T extends PackageJson = PackageJson>(
 		async transform(code, id, options) {
 			if (!isBuildingPackageJson(id)) return;
 
-			assert(
+			assert.ok(
 				bundle,
 				'Cannot build package.json. Output bundle is not available yet.',
 			);

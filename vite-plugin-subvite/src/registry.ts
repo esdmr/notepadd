@@ -71,7 +71,7 @@ export class SubviteRegistry {
 
 			const subvite = this._processes.get(name);
 
-			assert(
+			assert.ok(
 				subvite,
 				`Unreachable: We are not in a subvite, so we should have the child process for ${name}, but it seems as if we do not. If we were in a subvite, resolution would have been marked as external already, so the process and the direct dependencies collections might have diverged.`,
 			);

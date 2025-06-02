@@ -8,14 +8,13 @@
 	},
 	"devDependencies": {
 		"@types/node": "20.17.46",
-		"vite": "6.3.5",
-		"vite-plugin-inspect": "0.10.6"
+		"vite": "6.3.5"
 	},
 	"peerDependencies": {
 		"vite": "^5.4.0 || ^6.0.0"
 	},
 	"packageManager": "pnpm@9.15.9",
 	"dependencies": {
-		"type-fest": "4.40.1"
+		"type-fest": "4.41.0"
 	}
 }

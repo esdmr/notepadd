@@ -153,11 +153,12 @@ export class SubviteProcess {
 
 		if (
 			!this._lifecycle.signal.aborted ||
-			this._lifecycle.signal.reason ||
-			this._process.exitCode
+			Boolean(this._lifecycle.signal.reason) ||
+			Boolean(this._process.exitCode)
 		) {
 			this._registry.context.error({
 				message: String(
+					// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 					this._lifecycle.signal.reason ||
 						`Exited with status ${this._process.exitCode} (or bundle was not generated)`,
 				),

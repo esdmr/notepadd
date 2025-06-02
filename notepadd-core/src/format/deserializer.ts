@@ -138,7 +138,7 @@ function addOutputMarkdown(context: NotePadd, node: mdast.RootContent): void {
 }
 
 function deserializeAttributeMetadata(
-	// eslint-disable-next-line @typescript-eslint/ban-types
+	// eslint-disable-next-line @typescript-eslint/no-restricted-types
 	attributes: Record<string, string | null | undefined> | null | undefined,
 ): NotePaddMetadata | undefined {
 	try {

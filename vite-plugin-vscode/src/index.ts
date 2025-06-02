@@ -43,7 +43,7 @@ async function resolveAndEmit(
 	) => string | Promise<string> = (text) => text,
 ): Promise<string> {
 	const resolution = await context.resolve(source);
-	assert(resolution, `Could not resolve ${JSON.stringify(source)}`);
+	assert.ok(resolution, `Could not resolve ${JSON.stringify(source)}`);
 
 	const string = await readFile(normalizePath(resolution.id), 'utf8');
 
@@ -68,7 +68,7 @@ function parseIcon(icon: string | ThemePath, name = ''): ParsedIcon {
 				} as const);
 	}
 
-	assert(
+	assert.ok(
 		icon.light && icon.dark,
 		`Icon ${JSON.stringify(name)} does not have both a light and a dark theme`,
 	);
@@ -92,7 +92,7 @@ function getIcon(
 ): ParsedIcon {
 	const parsedReference = parseIcon(reference);
 
-	assert(
+	assert.ok(
 		parsedReference.type === 'alias',
 		`Reference ${JSON.stringify(reference)} does not match "$(...)"`,
 	);
@@ -111,7 +111,7 @@ async function extractIcons(
 
 		switch (icon.type) {
 			case 'alias': {
-				assert(
+				assert.ok(
 					!(icon.name in icons),
 					`Icon ${JSON.stringify(name)} refers to another icon ${JSON.stringify(icon.name)} which is also defined`,
 				);
@@ -119,7 +119,7 @@ async function extractIcons(
 			}
 
 			case 'path': {
-				assert(
+				assert.ok(
 					icon.sourcePath.endsWith('.svg'),
 					`Non-SVG icon ${JSON.stringify(name)} is defined`,
 				);
@@ -130,7 +130,7 @@ async function extractIcons(
 			}
 
 			case 'themed': {
-				assert(
+				assert.ok(
 					icon.sourcePaths.light.endsWith('.svg') &&
 						icon.sourcePaths.dark.endsWith('.svg'),
 					`Non-SVG dark icon ${JSON.stringify(name)} is defined`,
@@ -166,7 +166,7 @@ async function fixIcons(
 	)) {
 		const icon = getIcon(viewContainer.icon, icons);
 
-		assert(
+		assert.ok(
 			icon.type === 'path',
 			`View container ${JSON.stringify(viewContainer.id)} refers to an icon which does not have a theme-independent path`,
 		);
@@ -181,7 +181,7 @@ async function fixIcons(
 			if (!view.icon) continue;
 			const icon = getIcon(view.icon, icons);
 
-			assert(
+			assert.ok(
 				icon.type === 'path',
 				`View ${JSON.stringify(view.id)} refers to an icon which does not have a theme-independent path`,
 			);
@@ -293,7 +293,7 @@ export function vscode(): Plugin {
 			}
 
 			if (isBuildingPackageJson(id)) {
-				assert(
+				assert.ok(
 					bundle,
 					'Cannot build package.json. Output bundle is not available yet.',
 				);

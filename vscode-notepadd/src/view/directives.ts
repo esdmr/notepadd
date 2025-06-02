@@ -178,7 +178,7 @@ export class DirectivesView
 	}
 
 	getChildren(
-		element?: DirectivesTreeItem | undefined,
+		element?: DirectivesTreeItem,
 	): ProviderResult<DirectivesTreeItem[]> {
 		if (element instanceof BridgeDirective) return;
 

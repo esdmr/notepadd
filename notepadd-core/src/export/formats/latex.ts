@@ -178,12 +178,12 @@ const latexExportFormat: NotePaddExportFormat<{
 		}
 
 		if (!useXepersian && context.definitions.rl) {
-			const target = useBidi ? '\\RLE' : '\\empty';
+			const target = useBidi ? String.raw`\RLE` : String.raw`\empty`;
 			preamble += `\\let \\rl ${target}\n`;
 		}
 
 		if (!useXepersian && context.definitions.lr) {
-			const target = useBidi ? '\\LRE' : '\\empty';
+			const target = useBidi ? String.raw`\LRE` : String.raw`\empty`;
 			preamble += `\\let \\lr ${target}\n`;
 		}
 
@@ -193,15 +193,15 @@ const latexExportFormat: NotePaddExportFormat<{
 
 		if (context.definitions.rtl) {
 			const begin = useXepersian
-				? '\\begin{persian}'
+				? String.raw`\begin{persian}`
 				: useBidi
-					? '\\begin{RTL}'
+					? String.raw`\begin{RTL}`
 					: '';
 
 			const end = useXepersian
-				? '\\end{persian}'
+				? String.raw`\end{persian}`
 				: useBidi
-					? '\\end{RTL}'
+					? String.raw`\end{RTL}`
 					: '';
 
 			preamble += `\\newenvironment{rtl}{${begin}}{${end}}\n`;
@@ -209,15 +209,15 @@ const latexExportFormat: NotePaddExportFormat<{
 
 		if (context.definitions.ltr) {
 			const begin = useXepersian
-				? '\\begin{latin}'
+				? String.raw`\begin{latin}`
 				: useBidi
-					? '\\begin{LTR}'
+					? String.raw`\begin{LTR}`
 					: '';
 
 			const end = useXepersian
-				? '\\end{latin}'
+				? String.raw`\end{latin}`
 				: useBidi
-					? '\\end{LTR}'
+					? String.raw`\end{LTR}`
 					: '';
 
 			preamble += `\\newenvironment{ltr}{${begin}}{${end}}\n`;
@@ -271,7 +271,7 @@ const latexExportFormat: NotePaddExportFormat<{
 			)}}`;
 		}
 
-		return `\\begin{lstlisting}\n${source.replaceAll('\\end', '\\end\u{200B}')}\n\\end{lstlisting}`;
+		return `\\begin{lstlisting}\n${source.replaceAll(String.raw`\end`, '\\end\u{200B}')}\n\\end{lstlisting}`;
 	},
 	onTitle(context, getTitle, getAuthors) {
 		context.definitions.title = joinPhrasingNodes(
@@ -287,7 +287,7 @@ const latexExportFormat: NotePaddExportFormat<{
 		}).map((i) => joinPhrasingNodes(i));
 
 		if (authors.length > 0) {
-			context.definitions.author = authors.join('\\and{}');
+			context.definitions.author = authors.join(String.raw`\and{}`);
 		}
 
 		return `\\maketitle`;
@@ -412,7 +412,7 @@ const latexExportFormat: NotePaddExportFormat<{
 		const command = source
 			.split('|')
 			.map((i) => `\\lstinline|${i}|`)
-			.join('\\lstinline=|=');
+			.join(String.raw`\lstinline=|=`);
 
 		return context.moving
 			? `\\input{${addFileByDigest(

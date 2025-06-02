@@ -24,7 +24,7 @@ export function childProcess({
 					importer,
 				);
 
-				assert(resolved);
+				assert.ok(resolved);
 				return '\0' + resolved.id + suffix;
 			}
 		},

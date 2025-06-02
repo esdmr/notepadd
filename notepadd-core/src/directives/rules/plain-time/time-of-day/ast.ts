@@ -28,6 +28,8 @@ export class PlainTimeOfDayNode extends SyntaxNode<[MooToken]> {
 				return new Temporal.PlainTime(18);
 			}
 
+			// eslint-disable-next-line unicorn/no-useless-switch-case
+			case undefined:
 			default: {
 				throw new RangeError(
 					`Bug: Unhandled time of day: ${this.timeOfDay}, ${this._children[0].value}`,

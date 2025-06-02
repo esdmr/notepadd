@@ -19,7 +19,7 @@ export function getMimeTypeOfLangId(langId: string): string {
 }
 
 export function getMimeTypeOfMarkdownLang(
-	// eslint-disable-next-line @typescript-eslint/ban-types
+	// eslint-disable-next-line @typescript-eslint/no-restricted-types
 	mdLang: string | null | undefined,
 ): string {
 	// TODO: Remove this function for v1. Output code blocks now use `meta` to

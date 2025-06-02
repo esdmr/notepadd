@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-restricted-types */
 import {Temporal} from 'temporal-polyfill';
 import {indexOf} from 'uint8array-extras';
 import * as v from 'valibot';

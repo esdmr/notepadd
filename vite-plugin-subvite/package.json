@@ -8,7 +8,6 @@
 	},
 	"devDependencies": {
 		"@types/node": "20.17.46",
-		"rollup": "4.40.2",
 		"vite": "6.3.5",
 		"vite-plugin-package-json": "workspace:*"
 	},
@@ -17,9 +16,9 @@
 	},
 	"packageManager": "pnpm@9.15.9",
 	"dependencies": {
-		"execa": "9.3.1",
+		"execa": "9.6.0",
 		"resolve.exports": "2.0.3",
-		"type-fest": "4.40.1",
-		"valibot": "0.42.1"
+		"type-fest": "4.41.0",
+		"valibot": "1.1.0"
 	}
 }
