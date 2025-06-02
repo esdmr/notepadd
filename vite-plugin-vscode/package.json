@@ -9,12 +9,12 @@
 		"./package.json": "./package.json"
 	},
 	"dependencies": {
-		"type-fest": "4.40.1",
+		"type-fest": "4.41.0",
 		"vite-plugin-package-json": "workspace:*"
 	},
 	"devDependencies": {
 		"@types/node": "20.17.46",
-		"type-fest": "4.40.1",
+		"type-fest": "4.41.0",
 		"vite": "6.3.5"
 	},
 	"peerDependencies": {
