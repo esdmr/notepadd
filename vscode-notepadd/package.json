@@ -465,7 +465,7 @@
 	],
 	"dependencies": {
 		"@esdmr/nearley": "3.0.3",
-		"execa": "9.3.1",
+		"execa": "9.5.3",
 		"notepadd-core": "workspace:*",
 		"notepadd-timekeeper": "workspace:*",
 		"uint8array-extras": "1.4.0",
