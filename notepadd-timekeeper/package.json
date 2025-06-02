@@ -14,7 +14,7 @@
 		"notepadd-core": "workspace:*",
 		"temporal-polyfill": "0.3.0",
 		"uint8array-extras": "1.4.0",
-		"valibot": "0.42.1"
+		"valibot": "1.1.0"
 	},
 	"devDependencies": {
 		"@types/node": "20.17.46",
