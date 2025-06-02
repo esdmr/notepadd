@@ -19,7 +19,7 @@
 	"devDependencies": {
 		"@types/node": "20.17.46",
 		"vite": "6.3.5",
-		"vite-plugin-inspect": "0.10.6",
+		"vite-plugin-inspect": "11.0.1",
 		"vite-plugin-package-json": "workspace:*",
 		"vite-plugin-static-copy": "3.0.0",
 		"vite-plugin-subvite": "workspace:*"

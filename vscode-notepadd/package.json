@@ -477,7 +477,7 @@
 		"@vscode/vsce": "3.3.2",
 		"vite": "6.3.5",
 		"vite-plugin-child-process": "workspace:*",
-		"vite-plugin-inspect": "0.10.6",
+		"vite-plugin-inspect": "11.0.1",
 		"vite-plugin-package-json": "workspace:*",
 		"vite-plugin-static-copy": "3.0.0",
 		"vite-plugin-subvite": "workspace:*",
