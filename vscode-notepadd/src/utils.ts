@@ -1,3 +1,4 @@
+import {inspect} from 'node:util';
 import {
 	Disposable,
 	EventEmitter,
@@ -5,6 +6,7 @@ import {
 	type CancellationToken,
 	type Event,
 } from 'vscode';
+import {output} from './output.ts';
 
 export type AsyncDisposable = {
 	asyncDispose(): Promise<any>;
@@ -26,7 +28,7 @@ export class AsyncEventEmitter<T> implements Disposable {
 			try {
 				await handler(value);
 			} catch (error) {
-				console.error(error);
+				output.error(inspect(error));
 			}
 		}
 	}

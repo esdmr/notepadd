@@ -147,6 +147,7 @@ function deserializeAttributeMetadata(
 			JSON.parse(v) as unknown,
 		]);
 	} catch (error) {
+		// FIXME: Do not use console directly.
 		console.error(
 			'[NotePADD/.np.md/Deserializer]',
 			'Invalid metadata JSON ignored.',
@@ -165,6 +166,7 @@ function deserializeCodeMetadata(
 	try {
 		return v.parse(metadataSchema, JSON.parse(meta));
 	} catch (error) {
+		// FIXME: Do not use console directly.
 		console.error(
 			'[NotePADD/.np.md/Deserializer]',
 			'Invalid metadata JSON ignored.',
