@@ -13,7 +13,7 @@
 	"peerDependencies": {
 		"vite": "^5.4.0 || ^6.0.0"
 	},
-	"packageManager": "pnpm@9.15.9",
+	"packageManager": "pnpm@10.10.0",
 	"dependencies": {
 		"type-fest": "4.41.0"
 	}
