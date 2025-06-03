@@ -29,7 +29,7 @@ export const subviteIpcMessage = v.variant('_type', [
 export type SubviteIpcMessage = v.InferInput<typeof subviteIpcMessage>;
 
 export const subviteEnvironmentVariable = 'VITE_PLUGIN_SUBVITE';
-export const subviteOutputDirectory = 'node_modules/.cache/subvite';
+export const subviteOutputDirectory = '.subvite';
 
 export class SubviteProcess {
 	readonly dependents = new Set();

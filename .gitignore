@@ -5,6 +5,7 @@ node_modules/
 *.log
 *.generated.ts
 build/
+.subvite/
 types/
 .vscode/
 /*.ts

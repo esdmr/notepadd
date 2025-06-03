@@ -90,7 +90,7 @@ export function subvite({
 			},
 		},
 		async load(id, options) {
-			return registry.resolveBuild(id);
+			return registry.load(id, this);
 		},
 		async closeBundle(error) {
 			if (!isSubvite()) return;

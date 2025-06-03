@@ -100,7 +100,10 @@ export class SubviteRegistry {
 		}
 	}
 
-	async resolveBuild(id: string): Promise<Rollup.LoadResult> {
+	async load(
+		id: string,
+		context: Rollup.PluginContext = this.context,
+	): Promise<Rollup.LoadResult> {
 		if (id.startsWith('\0')) return;
 
 		for (const subvite of this._processes.values()) {
@@ -119,7 +122,7 @@ export class SubviteRegistry {
 				content = await readFile(id, 'utf8');
 			}
 
-			this.context.addWatchFile(id);
+			context.addWatchFile(id);
 
 			try {
 				map = await readFile(id + '.map', 'utf8');
