@@ -2,6 +2,7 @@
 	"name": "notepadd-timekeeper",
 	"version": "0.1.0",
 	"private": true,
+	"type": "module",
 	"exports": {
 		".": "./src/index.ts",
 		"./service": "./src/service.ts",
@@ -19,6 +20,7 @@
 	"devDependencies": {
 		"@types/node": "20.17.46",
 		"vite": "6.3.5",
+		"vite-plugin-dts": "4.5.4",
 		"vite-plugin-inspect": "11.1.0",
 		"vite-plugin-package-json": "workspace:*",
 		"vite-plugin-static-copy": "3.0.0",

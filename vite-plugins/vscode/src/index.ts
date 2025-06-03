@@ -232,8 +232,7 @@ export function vscode(): Plugin {
 				build: {
 					target: ['node20', 'chrome122'],
 					lib: {
-						entry: '.',
-						fileName: 'index',
+						entry: ['.'],
 						formats: ['cjs'],
 					},
 					rollupOptions: {

@@ -2,6 +2,7 @@
 /// <reference types="remark" />
 /// <reference types="mdast-util-directive" />
 /// <reference types="mdast-util-math" />
+/// <reference path="./bidi-js.d.ts" />
 
 export * from './format/index.ts';
 export * from './directives/index.ts';

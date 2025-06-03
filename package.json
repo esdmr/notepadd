@@ -2,6 +2,7 @@
 	"private": true,
 	"type": "module",
 	"devDependencies": {
+		"@arethetypeswrong/cli": "0.18.1",
 		"typescript": "5.8.3",
 		"vite-node": "3.2.0",
 		"xo": "1.0.5"

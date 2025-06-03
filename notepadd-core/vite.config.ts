@@ -1,3 +1,4 @@
+import {fileURLToPath} from 'node:url';
 import {defineConfig} from 'vite';
 import inspect from 'vite-plugin-inspect';
 import {nearley} from 'vite-plugin-nearley';
@@ -9,6 +10,7 @@ import {
 } from 'vite-plugin-package-json';
 import {viteStaticCopy} from 'vite-plugin-static-copy';
 import {isSubvite, subvite} from 'vite-plugin-subvite';
+import dts from 'vite-plugin-dts';
 
 export default defineConfig((env) => ({
 	cacheDir: 'node_modules/.cache/vite',
@@ -16,8 +18,7 @@ export default defineConfig((env) => ({
 		outDir: 'build',
 		target: ['node20', 'chrome122', 'firefox122'],
 		lib: {
-			entry: '.',
-			fileName: 'index',
+			entry: ['src/index.ts'],
 			formats: ['es'],
 		},
 		sourcemap: env.mode !== 'production',
@@ -39,11 +40,18 @@ export default defineConfig((env) => ({
 			delete json.devDependencies;
 		}),
 		transformBuiltPackageJson(async function (json, bundle) {
-			const [entryChunk] = await findChunksForId(this, bundle, '/');
+			const [entryChunk] = await findChunksForId(
+				this,
+				bundle,
+				'/src/index.ts',
+			);
 
 			json.exports = {
 				/* eslint-disable @typescript-eslint/naming-convention */
-				'.': './' + entryChunk.fileName,
+				'.': {
+					types: './src/index.d.ts',
+					default: './' + entryChunk.fileName,
+				},
 				'./package.json': './package.json',
 				/* eslint-enable @typescript-eslint/naming-convention */
 			};
@@ -51,6 +59,13 @@ export default defineConfig((env) => ({
 		subvite({
 			alwaysExternalize: true,
 		}),
+		!isSubvite() &&
+			dts({
+				root: fileURLToPath(new URL('..', import.meta.url)),
+				outDir: fileURLToPath(new URL('build', import.meta.url)),
+				entryRoot: fileURLToPath(new URL('.', import.meta.url)),
+				include: fileURLToPath(new URL('.', import.meta.url)),
+			}),
 		!isSubvite() &&
 			viteStaticCopy({
 				targets: [

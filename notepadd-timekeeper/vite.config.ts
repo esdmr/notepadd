@@ -1,5 +1,6 @@
-import {builtinModules} from 'node:module';
+import {fileURLToPath} from 'node:url';
 import {defineConfig} from 'vite';
+import dts from 'vite-plugin-dts';
 import inspect from 'vite-plugin-inspect';
 import {
 	findChunksForId,
@@ -16,8 +17,7 @@ export default defineConfig((env) => ({
 		outDir: 'build',
 		target: ['node20', 'chrome122', 'firefox122'],
 		lib: {
-			entry: ['.', './src/service.ts'],
-			fileName: 'index',
+			entry: ['src/index.ts', 'src/service.ts'],
 			formats: ['es'],
 		},
 		sourcemap: env.mode !== 'production',
@@ -36,7 +36,12 @@ export default defineConfig((env) => ({
 			delete json.devDependencies;
 		}),
 		transformBuiltPackageJson(async function (json, bundle) {
-			const [entryChunk] = await findChunksForId(this, bundle, '/');
+			const [entryChunk] = await findChunksForId(
+				this,
+				bundle,
+				'/src/index.ts',
+			);
+
 			const [serviceChunk] = await findChunksForId(
 				this,
 				bundle,
@@ -45,8 +50,14 @@ export default defineConfig((env) => ({
 
 			json.exports = {
 				/* eslint-disable @typescript-eslint/naming-convention */
-				'.': './' + entryChunk.fileName,
-				'./service': './' + serviceChunk.fileName,
+				'.': {
+					types: './src/index.d.ts',
+					default: './' + entryChunk.fileName,
+				},
+				'./service': {
+					types: './src/service.d.ts',
+					default: './' + serviceChunk.fileName,
+				},
 				'./package.json': './package.json',
 				/* eslint-enable @typescript-eslint/naming-convention */
 			};
@@ -54,6 +65,13 @@ export default defineConfig((env) => ({
 		subvite({
 			alwaysExternalize: true,
 		}),
+		!isSubvite() &&
+			dts({
+				root: fileURLToPath(new URL('..', import.meta.url)),
+				outDir: fileURLToPath(new URL('build', import.meta.url)),
+				entryRoot: fileURLToPath(new URL('.', import.meta.url)),
+				include: fileURLToPath(new URL('.', import.meta.url)),
+			}),
 		!isSubvite() &&
 			viteStaticCopy({
 				targets: [
