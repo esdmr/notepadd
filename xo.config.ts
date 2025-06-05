@@ -1,11 +1,12 @@
-import {type FlatXoConfig} from 'xo';
+/* eslint-disable @typescript-eslint/naming-convention */
+import type {FlatXoConfig} from 'xo';
 
 const xoConfig: FlatXoConfig = [
 	{
 		prettier: true,
 	},
 	{
-		ignores: ['node_modules/', 'build/', '*.generated.ts', 'xo.config.ts'],
+		ignores: ['node_modules/', 'build/', '.subvite/', '*.generated.ts'],
 	},
 	{
 		rules: {
