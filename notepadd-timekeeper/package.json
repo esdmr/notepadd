@@ -26,5 +26,5 @@
 		"vite-plugin-static-copy": "3.0.0",
 		"vite-plugin-subvite": "workspace:*"
 	},
-	"packageManager": "pnpm@10.11.0"
+	"packageManager": "pnpm@10.11.1"
 }
