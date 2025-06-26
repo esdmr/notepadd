@@ -4,7 +4,7 @@
 	"devDependencies": {
 		"@arethetypeswrong/cli": "0.18.1",
 		"typescript": "5.8.3",
-		"vite-node": "3.2.1",
+		"vite-node": "3.2.2",
 		"xo": "1.0.5"
 	},
 	"packageManager": "pnpm@10.11.1",
