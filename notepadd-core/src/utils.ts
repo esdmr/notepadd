@@ -340,3 +340,46 @@ export function splitUint8Array(
 
 	return parts;
 }
+
+const pdfChar = '\u202C';
+const pdiChar = '\u2069';
+const unicodeBidiPattern = /[\u202A-\u202E\u2066-\u2069]/g;
+const unicodeLegacyBidiPattern = /[\u202A-\u202E]/;
+
+/**
+ * @see https://meta.stackoverflow.com/a/310228
+ */
+export function sanitizeBidi(text: string): string {
+	const stack: string[] = [];
+
+	text = text.replaceAll(unicodeBidiPattern, (char) => {
+		if (char !== pdfChar && char !== pdiChar) {
+			// Push corresponding closing mark onto the stack.
+			stack.push(unicodeLegacyBidiPattern.test(char) ? pdfChar : pdiChar);
+			return char;
+		}
+
+		let rv = '';
+
+		// PDI always terminates all unclosed embeds/overrides.
+		if (char === pdiChar) {
+			while (stack.length > 0 && stack.at(-1) === pdfChar) {
+				rv += stack.pop();
+			}
+		}
+
+		// Skip this PDF/PDI, unless we have seen the corresponding opening mark.
+		if (stack.length > 0 && stack.at(-1) === char) {
+			rv += stack.pop();
+		}
+
+		return rv;
+	});
+
+	if (stack.length > 0) {
+		stack.reverse();
+		text += stack.join('');
+	}
+
+	return text;
+}

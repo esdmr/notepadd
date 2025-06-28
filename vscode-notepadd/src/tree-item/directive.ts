@@ -1,4 +1,5 @@
 import {
+	sanitizeBidi,
 	type Directive,
 	type DirectiveChild,
 	type InstanceState,
@@ -39,7 +40,11 @@ export class BridgeDirective extends TreeItem {
 		id = data.directive.toString(),
 	) {
 		// FIXME: Add proper instance and directive toLabel method
-		super(data.directive.getLabel() ?? '[Untitled]');
+		super(
+			'\u{2068}' +
+				sanitizeBidi(data.directive.getLabel() ?? '[Untitled]') +
+				'\u{2069}',
+		);
 
 		this.id = id;
 		this.directive = data.directive;
