@@ -6,6 +6,8 @@ node_modules/
 *.generated.ts
 build/
 .subvite/
+cache/
+dist/
 types/
 .vscode/
 /*.ts

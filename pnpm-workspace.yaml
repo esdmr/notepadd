@@ -1,5 +1,6 @@
 packages:
   - notepadd-core
+  - notepadd-docs
   - notepadd-timekeeper
   - vite-plugins/child-process
   - vite-plugins/nearley
@@ -7,3 +8,5 @@ packages:
   - vite-plugins/subvite
   - vite-plugins/vscode
   - vscode-notepadd
+onlyBuiltDependencies:
+  - esbuild
