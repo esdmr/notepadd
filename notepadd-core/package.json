@@ -8,7 +8,7 @@
 		"./package.json": "./package.json"
 	},
 	"scripts": {
-		"vite": "vite --configLoader runner",
+		"build": "vite --configLoader runner build",
 		"build-directives-tsd": "nearleyc src/directives/tsd.ne -o src/directives/tsd.generated.ts"
 	},
 	"dependencies": {

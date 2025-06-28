@@ -8,6 +8,10 @@
 		"xo": "1.1.0"
 	},
 	"packageManager": "pnpm@10.11.1",
+	"scripts": {
+		"typecheck": "tsc -p .",
+		"lint": "xo"
+	},
 	"engines": {
 		"node": ">=20"
 	}

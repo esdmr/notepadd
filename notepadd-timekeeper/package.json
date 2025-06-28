@@ -9,7 +9,7 @@
 		"./package.json": "./package.json"
 	},
 	"scripts": {
-		"vite": "vite --configLoader runner"
+		"build": "vite --configLoader runner build"
 	},
 	"dependencies": {
 		"notepadd-core": "workspace:*",

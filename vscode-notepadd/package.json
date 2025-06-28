@@ -20,8 +20,11 @@
 	"type": "module",
 	"main": "src/index.ts",
 	"scripts": {
-		"vite": "vite --configLoader runner",
-		"vsce": "cd build && vsce"
+		"build": "vite --configLoader runner build",
+		"vsce": "cd build && vsce",
+		"package": "cd build && vsce package",
+		"build-vscode-extension": "pnpm run build && pnpm run package",
+		"install-vscode-extension": "pnpm run build && pnpm run package --out notepadd.vsix && code --install-extension build/notepadd.vsix"
 	},
 	"contributes": {
 		"commands": [
