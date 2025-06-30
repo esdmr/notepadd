@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/triple-slash-reference */
 /// <reference types="vite/client" />
-/// <reference types="vite-plugin-child-process/client" />
-/// <reference types="vite-plugin-vscode/client" />
 import {type ExtensionContext} from 'vscode';
 import {Bookkeeper} from './bookkeeper.ts';
 import {setupBridgeNotification} from './bridge-notification.ts';
