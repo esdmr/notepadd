@@ -39,8 +39,10 @@ export class RecurringPeriod {
 			);
 		}
 
-		if (interval.blank) {
-			throw new RangeError('Recurring period has a zero interval');
+		if (interval.sign <= 0) {
+			throw new RangeError(
+				'Recurring period has a non-positive interval',
+			);
 		}
 
 		this._recurringInstant = new RecurringInstant(

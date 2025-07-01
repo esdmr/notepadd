@@ -36,8 +36,10 @@ export class RecurringInstant {
 			);
 		}
 
-		if (interval.blank) {
-			throw new RangeError('Recurring instant has a zero interval');
+		if (interval.sign <= 0) {
+			throw new RangeError(
+				'Recurring instant has a non-positive interval',
+			);
 		}
 	}
 
