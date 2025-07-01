@@ -5,7 +5,6 @@ import inspect from 'vite-plugin-inspect';
 import {
 	findChunksForId,
 	packageJson,
-	transformBuiltPackageJson,
 	transformPackageJson,
 } from 'vite-plugin-package-json';
 import {viteStaticCopy} from 'vite-plugin-static-copy';
@@ -29,38 +28,40 @@ export default defineConfig((env) => ({
 			outputDir: 'node_modules/.cache/vite-inspect',
 		}),
 		packageJson(),
-		transformPackageJson((json) => {
-			delete json.private;
-			delete json.scripts;
-			delete json.packageManager;
-			delete json.devDependencies;
-		}),
-		transformBuiltPackageJson(async function (json, bundle) {
-			const [entryChunk] = await findChunksForId(
-				this,
-				bundle,
-				'/src/index.ts',
-			);
+		transformPackageJson({
+			transformInput(json) {
+				delete json.private;
+				delete json.scripts;
+				delete json.packageManager;
+				delete json.devDependencies;
+			},
+			async transformOutput(json, bundle) {
+				const [entryChunk] = await findChunksForId(
+					this,
+					bundle,
+					'/src/index.ts',
+				);
 
-			const [serviceChunk] = await findChunksForId(
-				this,
-				bundle,
-				'/src/service.ts',
-			);
+				const [serviceChunk] = await findChunksForId(
+					this,
+					bundle,
+					'/src/service.ts',
+				);
 
-			json.exports = {
-				/* eslint-disable @typescript-eslint/naming-convention */
-				'.': {
-					types: './src/index.d.ts',
-					default: './' + entryChunk.fileName,
-				},
-				'./service': {
-					types: './src/service.d.ts',
-					default: './' + serviceChunk.fileName,
-				},
-				'./package.json': './package.json',
-				/* eslint-enable @typescript-eslint/naming-convention */
-			};
+				json.exports = {
+					/* eslint-disable @typescript-eslint/naming-convention */
+					'.': {
+						types: './src/index.d.ts',
+						default: './' + entryChunk.fileName,
+					},
+					'./service': {
+						types: './src/service.d.ts',
+						default: './' + serviceChunk.fileName,
+					},
+					'./package.json': './package.json',
+					/* eslint-enable @typescript-eslint/naming-convention */
+				};
+			},
 		}),
 		subvite({
 			alwaysExternalize: true,

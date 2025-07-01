@@ -4,11 +4,11 @@ import {builtinModules} from 'node:module';
 import type {PackageJson} from 'type-fest';
 import {normalizePath, type Plugin, type Rollup} from 'vite';
 import {
-	getTransformedPackageJson,
-	isTransformingPackageJson,
-	isBuildingPackageJson,
-	mutatePackageJson,
+	getPackageJsonApi,
 	findChunksForId,
+	packageJsonHooksBrand,
+	type ProvidesPackageJsonHooks,
+	type PackageJsonApi,
 } from 'vite-plugin-package-json';
 import type {ExtensionManifest, ThemePath} from './types.ts';
 
@@ -219,10 +219,37 @@ async function fixIcons(
 }
 
 export function vscode(): Plugin {
-	let bundle: Rollup.OutputBundle | undefined;
+	let packageJson: PackageJsonApi<VsCodePackageJson>;
+	let iconsExtracted = false;
 
 	return {
 		name: 'vscode',
+		api: {
+			[packageJsonHooksBrand]: {
+				async transformInput(json) {
+					if (json.extensionName) {
+						json.name = json.extensionName;
+						delete json.extensionName;
+					}
+
+					if (!iconsExtracted) {
+						await extractIcons(this, json.icons);
+						iconsExtracted = true;
+					}
+
+					await fixIcons(json.contributes, json.icons);
+					delete json.icons;
+				},
+				async transformOutput(json, bundle) {
+					const [entryChunk] = await findChunksForId(
+						this,
+						bundle,
+						'.',
+					);
+					json.main = entryChunk.fileName;
+				},
+			},
+		} satisfies ProvidesPackageJsonHooks<VsCodePackageJson>,
 		config(config, env) {
 			return {
 				resolve: {
@@ -247,6 +274,12 @@ export function vscode(): Plugin {
 				},
 			};
 		},
+		configResolved({plugins}) {
+			packageJson = getPackageJsonApi(plugins);
+		},
+		buildStart() {
+			iconsExtracted = false;
+		},
 		async resolveId(source) {
 			if (source.startsWith('icon:')) {
 				return '\0' + source;
@@ -255,9 +288,8 @@ export function vscode(): Plugin {
 		async load(id, options) {
 			if (id.startsWith('\0icon:')) {
 				const iconName = id.slice(6);
-				const packageJson =
-					await getTransformedPackageJson<VsCodePackageJson>(this);
-				const icon = getIcon(`$(${iconName})`, packageJson.icons);
+				const json = await packageJson.getInputPackageJson(this);
+				const icon = getIcon(`$(${iconName})`, json.icons);
 
 				switch (icon.type) {
 					case 'alias': {
@@ -273,42 +305,6 @@ export function vscode(): Plugin {
 					}
 				}
 			}
-		},
-		async transform(code, id, options) {
-			if (isTransformingPackageJson(id)) {
-				return mutatePackageJson<VsCodePackageJson>(
-					code,
-					async (json) => {
-						if (json.extensionName) {
-							json.name = json.extensionName;
-							delete json.extensionName;
-						}
-
-						await extractIcons(this, json.icons);
-						await fixIcons(json.contributes, json.icons);
-						delete json.icons;
-					},
-				);
-			}
-
-			if (isBuildingPackageJson(id)) {
-				assert.ok(
-					bundle,
-					'Cannot build package.json. Output bundle is not available yet.',
-				);
-
-				const [entryChunk] = await findChunksForId(this, bundle, '.');
-
-				return mutatePackageJson<VsCodePackageJson>(code, (json) => {
-					json.main = entryChunk.fileName;
-				});
-			}
-		},
-		generateBundle: {
-			order: 'pre',
-			handler(options, bundle_, isWrite) {
-				bundle = bundle_;
-			},
 		},
 	};
 }

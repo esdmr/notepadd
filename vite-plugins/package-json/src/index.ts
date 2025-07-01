@@ -3,153 +3,138 @@ import {readFile} from 'node:fs/promises';
 import type {PackageJson} from 'type-fest';
 import {normalizePath, type Plugin, type Rollup} from 'vite';
 
-export type PackageJsonMutator<T extends PackageJson> = (
+export const packageJsonHooksBrand = Symbol('vite-plugin-package-json hooks');
+
+export type InputPackageJsonTransformer<T extends PackageJson = PackageJson> = (
+	this: Rollup.PluginContext,
 	json: T,
 ) => T | void | Promise<T | void>;
 
-export type PackageJsonTransformer<T extends PackageJson> = (
-	this: Rollup.TransformPluginContext,
-	json: T,
-) => T | void | Promise<T | void>;
+export type OutputPackageJsonTransformer<T extends PackageJson = PackageJson> =
+	(
+		this: Rollup.PluginContext,
+		json: T,
+		bundle: Rollup.OutputBundle,
+	) => T | void | Promise<T | void>;
 
-export type PackageJsonBuildTransformer<T extends PackageJson> = (
-	this: Rollup.TransformPluginContext,
-	json: T,
+export type PackageJsonHooks<T extends PackageJson = PackageJson> = {
+	transformInput?: InputPackageJsonTransformer<T>;
+	transformOutput?: OutputPackageJsonTransformer<T>;
+};
+
+export type ProvidesPackageJsonHooks<T extends PackageJson = PackageJson> = {
+	[packageJsonHooksBrand]: PackageJsonHooks<T>;
+};
+
+export type PackageJsonApi<T extends PackageJson = PackageJson> = {
+	getInputPackageJson(context: Rollup.PluginContext): Promise<T>;
+};
+
+export const packageJsonApiBrand = Symbol('vite-plugin-package-json api');
+
+export type ProvidesPackageJsonApi<T extends PackageJson = PackageJson> = {
+	[packageJsonApiBrand]: PackageJsonApi<T>;
+};
+
+export function getPackageJsonApi<T extends PackageJson = PackageJson>(
+	plugins: readonly Rollup.Plugin[],
+): PackageJsonApi<T> {
+	const plugin = plugins.find(
+		(i) =>
+			typeof i.api === 'object' && i.api && packageJsonApiBrand in i.api,
+	);
+
+	assert.ok(plugin, 'This plugin depends on the "package-json" plugin');
+
+	return plugin.api[packageJsonApiBrand] as PackageJsonApi<T>;
+}
+
+async function loadPackageJson(
+	context: Rollup.PluginContext,
+): Promise<PackageJson> {
+	const resolution = await context.resolve('/package.json');
+	assert.ok(resolution, 'Could not resolve package.json');
+
+	const code = await readFile(normalizePath(resolution.id), 'utf8');
+
+	return JSON.parse(code) as PackageJson;
+}
+
+async function getInputPackageJson(
+	context: Rollup.PluginContext,
+	hooks: PackageJsonHooks[],
+): Promise<PackageJson> {
+	let json = await loadPackageJson(context);
+
+	for (const i of hooks) {
+		json = (await i.transformInput?.call(context, json)) ?? json;
+	}
+
+	return json;
+}
+
+async function getOutputPackageJson(
+	context: Rollup.PluginContext,
+	hooks: PackageJsonHooks[],
 	bundle: Rollup.OutputBundle,
-) => T | void | Promise<T | void>;
+): Promise<PackageJson> {
+	let json = await getInputPackageJson(context, hooks);
 
-const transformedId = '\0package-json:transformed';
-const builtId = '\0package-json:built?';
+	for (const i of hooks) {
+		json = (await i.transformOutput?.call(context, json, bundle)) ?? json;
+	}
 
-function encapsulate(code: string): string {
-	return `export default ${JSON.stringify(code)};`;
-}
-
-function decapsulate(content: string): string {
-	return String(JSON.parse(content.slice(15, -1)));
-}
-
-export function isTransformingPackageJson(id: string): boolean {
-	return id === transformedId;
-}
-
-export function isBuildingPackageJson(id: string): boolean {
-	return id.startsWith(builtId);
+	return json;
 }
 
 export function packageJson(): Plugin {
-	let timesGenerated = 0;
+	const hooks: PackageJsonHooks[] = [];
 
 	return {
 		name: 'package-json',
-		resolveId(source, importer, options) {
-			if (
-				isTransformingPackageJson(source) ||
-				isBuildingPackageJson(source)
-			) {
-				return source;
-			}
-		},
-		async load(id, options) {
-			if (isTransformingPackageJson(id)) {
-				const resolution = await this.resolve('/package.json');
-				assert.ok(resolution, 'Could not resolve package.json');
+		api: {
+			[packageJsonApiBrand]: {
+				async getInputPackageJson(context) {
+					return getInputPackageJson(context, hooks);
+				},
+			},
+		} satisfies ProvidesPackageJsonApi,
+		configResolved({plugins}) {
+			hooks.length = 0;
 
-				const code = await readFile(
-					normalizePath(resolution.id),
-					'utf8',
-				);
-
-				return encapsulate(code);
-			}
-
-			if (isBuildingPackageJson(id)) {
-				const module = await this.load({id: transformedId});
-				assert.ok(
-					module.code,
-					'Could not load transformed package.json',
-				);
-
-				return {
-					...module,
-					code: module.code,
-					ast: undefined,
-				};
+			for (const i of plugins) {
+				if (
+					typeof i.api === 'object' &&
+					i.api &&
+					packageJsonHooksBrand in i.api
+				) {
+					hooks.push(
+						i.api[packageJsonHooksBrand] as PackageJsonHooks,
+					);
+				}
 			}
 		},
 		async generateBundle(options, bundle) {
-			const {code} = await this.load({id: builtId + timesGenerated++});
-			assert.ok(code, `Could not load built package.json`);
+			const json = await getOutputPackageJson(this, hooks, bundle);
 
 			this.emitFile({
 				type: 'asset',
 				originalFileName: 'package.json',
 				fileName: 'package.json',
-				source: decapsulate(code),
+				source: JSON.stringify(json),
 			});
 		},
 	};
 }
 
-export async function getTransformedPackageJson<
-	T extends PackageJson = PackageJson,
->(context: Rollup.PluginContext): Promise<T> {
-	const {code} = await context.load({id: transformedId});
-	assert.ok(code, `Could not load transformed package.json`);
-	return JSON.parse(decapsulate(code)) as T;
-}
-
-export async function mutatePackageJson<T extends PackageJson = PackageJson>(
-	code: string,
-	mutator: PackageJsonMutator<T>,
-): Promise<string> {
-	const json = JSON.parse(decapsulate(code)) as T;
-	const mutated = await mutator(json);
-
-	return encapsulate(JSON.stringify(mutated ?? json, undefined, '\t'));
-}
-
 export function transformPackageJson<T extends PackageJson = PackageJson>(
-	transformer: PackageJsonTransformer<T>,
-	name = 'package-json-transform',
+	hooks: PackageJsonHooks<T> & {name?: string},
 ): Plugin {
 	return {
-		name,
-		async transform(code, id, options) {
-			if (!isTransformingPackageJson(id)) return;
-			return mutatePackageJson<T>(code, async (json) =>
-				transformer.call(this, json),
-			);
-		},
-	};
-}
-
-export function transformBuiltPackageJson<T extends PackageJson = PackageJson>(
-	transformer: PackageJsonBuildTransformer<T>,
-	name = 'package-json-built-transform',
-): Plugin {
-	let bundle: Rollup.OutputBundle | undefined;
-
-	return {
-		name,
-		async transform(code, id, options) {
-			if (!isBuildingPackageJson(id)) return;
-
-			assert.ok(
-				bundle,
-				'Cannot build package.json. Output bundle is not available yet.',
-			);
-
-			return mutatePackageJson<T>(code, async (json) =>
-				transformer.call(this, json, bundle!),
-			);
-		},
-		generateBundle: {
-			order: 'pre',
-			handler(options, bundle_, isWrite) {
-				bundle = {...bundle, ...bundle_};
-			},
-		},
+		name: hooks.name ?? 'transform-package-json',
+		api: {
+			[packageJsonHooksBrand]: hooks,
+		} satisfies ProvidesPackageJsonHooks<T>,
 	};
 }
 

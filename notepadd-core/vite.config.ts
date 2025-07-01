@@ -5,7 +5,6 @@ import {nearley} from 'vite-plugin-nearley';
 import {
 	findChunksForId,
 	packageJson,
-	transformBuiltPackageJson,
 	transformPackageJson,
 } from 'vite-plugin-package-json';
 import {viteStaticCopy} from 'vite-plugin-static-copy';
@@ -33,28 +32,30 @@ export default defineConfig((env) => ({
 			extension: '.ts',
 		}),
 		packageJson(),
-		transformPackageJson((json) => {
-			delete json.private;
-			delete json.scripts;
-			delete json.packageManager;
-			delete json.devDependencies;
-		}),
-		transformBuiltPackageJson(async function (json, bundle) {
-			const [entryChunk] = await findChunksForId(
-				this,
-				bundle,
-				'/src/index.ts',
-			);
+		transformPackageJson({
+			transformInput(json) {
+				delete json.private;
+				delete json.scripts;
+				delete json.packageManager;
+				delete json.devDependencies;
+			},
+			async transformOutput(json, bundle) {
+				const [entryChunk] = await findChunksForId(
+					this,
+					bundle,
+					'/src/index.ts',
+				);
 
-			json.exports = {
-				/* eslint-disable @typescript-eslint/naming-convention */
-				'.': {
-					types: './src/index.d.ts',
-					default: './' + entryChunk.fileName,
-				},
-				'./package.json': './package.json',
-				/* eslint-enable @typescript-eslint/naming-convention */
-			};
+				json.exports = {
+					/* eslint-disable @typescript-eslint/naming-convention */
+					'.': {
+						types: './src/index.d.ts',
+						default: './' + entryChunk.fileName,
+					},
+					'./package.json': './package.json',
+					/* eslint-enable @typescript-eslint/naming-convention */
+				};
+			},
 		}),
 		subvite({
 			alwaysExternalize: true,

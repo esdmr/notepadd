@@ -2,7 +2,7 @@ import process from 'node:process';
 import path from 'node:path';
 import {sendMessage} from 'execa';
 import {createFilter, type FilterPattern, type Plugin} from 'vite';
-import {getTransformedPackageJson} from 'vite-plugin-package-json';
+import {getPackageJsonApi, type PackageJsonApi} from 'vite-plugin-package-json';
 import {
 	isSubvite,
 	subviteOutputDirectory,
@@ -27,6 +27,7 @@ export function subvite({
 	const filter = createFilter(include, exclude);
 	let registry: SubviteRegistry;
 	let mode = process.env.NODE_ENV ?? 'production';
+	let packageJson: PackageJsonApi;
 
 	return {
 		name: 'subvite',
@@ -70,8 +71,10 @@ export function subvite({
 					config.root,
 				),
 			);
+
+			packageJson = getPackageJsonApi(config.plugins);
 		},
-		async buildStart() {
+		async buildStart({plugins}) {
 			registry ??= new SubviteRegistry(this, mode, filter);
 
 			if (isSubvite()) {
@@ -80,7 +83,7 @@ export function subvite({
 				} satisfies SubviteIpcMessage);
 			}
 
-			const json = await getTransformedPackageJson(this);
+			const json = await packageJson.getInputPackageJson(this);
 			await registry.update(json);
 		},
 		resolveId: {
