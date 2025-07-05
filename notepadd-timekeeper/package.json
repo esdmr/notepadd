@@ -23,7 +23,7 @@
 		"vite-plugin-dts": "4.5.4",
 		"vite-plugin-inspect": "11.1.0",
 		"vite-plugin-package-json": "workspace:*",
-		"vite-plugin-static-copy": "3.0.0",
+		"vite-plugin-static-copy": "3.0.2",
 		"vite-plugin-subvite": "workspace:*"
 	},
 	"packageManager": "pnpm@10.12.1"
