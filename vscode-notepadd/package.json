@@ -480,7 +480,7 @@
 		"@vscode/vsce": "3.5.0",
 		"vite": "6.3.5",
 		"vite-plugin-child-process": "workspace:*",
-		"vite-plugin-inspect": "11.1.0",
+		"vite-plugin-inspect": "11.2.0",
 		"vite-plugin-package-json": "workspace:*",
 		"vite-plugin-static-copy": "3.0.2",
 		"vite-plugin-subvite": "workspace:*",
