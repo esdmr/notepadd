@@ -15,8 +15,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite-node:
-        specifier: 3.2.3
-        version: 3.2.3(@types/node@20.19.0)(yaml@2.8.0)
+        specifier: 3.2.4
+        version: 3.2.4(@types/node@20.19.0)(yaml@2.8.0)
       xo:
         specifier: 1.1.0
         version: 1.1.0(@types/eslint@8.56.12)(typescript@5.8.3)
@@ -4359,8 +4359,8 @@ packages:
     peerDependencies:
       vite: ^2.6.0 || ^3.0.0 || ^4.0.0 || ^5.0.0-0 || ^6.0.0-0
 
-  vite-node@3.2.3:
-    resolution: {integrity: sha512-gc8aAifGuDIpZHrPjuHyP4dpQmYXqWw7D1GmDnWeNWP654UEXzVfQ5IHPSK5HaHkwB/+p1atpYpSdw/2kOv8iQ==}
+  vite-node@3.2.4:
+    resolution: {integrity: sha512-EbKSKh+bh1E1IFxeO0pg1n4dvoOTt0UDiXMd/qn++r98+jPO1xtJilvXldeuQ8giIB5IkpjCgMleHMNEsGH6pg==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
 
@@ -9429,7 +9429,7 @@ snapshots:
     dependencies:
       vite: 6.3.5(@types/node@20.19.0)(yaml@2.8.0)
 
-  vite-node@3.2.3(@types/node@20.19.0)(yaml@2.8.0):
+  vite-node@3.2.4(@types/node@20.19.0)(yaml@2.8.0):
     dependencies:
       cac: 6.7.14
       debug: 4.4.1
