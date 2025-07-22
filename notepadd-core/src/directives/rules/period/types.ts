@@ -4,7 +4,7 @@ import {
 	durationSchema,
 	transformFallible,
 	getDiscriminator,
-	zonedDateTimeSchema,
+	zdtSchema,
 } from '../../../utils.ts';
 import {Instance} from '../directive/base.ts';
 
@@ -12,8 +12,8 @@ export class Period {
 	static readonly schema = v.pipe(
 		v.object({
 			_type: v.literal('Period'),
-			start: zonedDateTimeSchema,
-			endOrDuration: v.union([durationSchema, zonedDateTimeSchema]),
+			start: zdtSchema,
+			endOrDuration: v.union([durationSchema, zdtSchema]),
 		}),
 		transformFallible((i) => new Period(i.start, i.endOrDuration)),
 	);

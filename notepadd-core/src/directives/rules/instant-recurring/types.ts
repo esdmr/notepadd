@@ -6,7 +6,7 @@ import {
 	getDiscriminator,
 	getSmallestDurationUnit,
 	multiplyDuration,
-	zonedDateTimeSchema,
+	zdtSchema,
 	addZdtNegativeSafe,
 } from '../../../utils.ts';
 import {Instance} from '../directive/base.ts';
@@ -15,9 +15,9 @@ export class RecurringInstant {
 	static readonly schema = v.pipe(
 		v.object({
 			_type: v.literal('RecurringInstant'),
-			first: zonedDateTimeSchema,
+			first: zdtSchema,
 			interval: durationSchema,
-			end: v.optional(zonedDateTimeSchema),
+			end: v.optional(zdtSchema),
 		}),
 		transformFallible(
 			(i) => new RecurringInstant(i.first, i.interval, i.end),

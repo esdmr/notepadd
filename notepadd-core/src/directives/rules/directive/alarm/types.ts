@@ -3,7 +3,7 @@ import * as v from 'valibot';
 import {
 	getDiscriminator,
 	transformFallible,
-	zonedDateTimeSchema,
+	zdtSchema,
 } from '../../../../utils.ts';
 import {RecurringInstant} from '../../instant-recurring/types.ts';
 import {Instance} from '../base.ts';
@@ -12,7 +12,7 @@ export class OneShotAlarm {
 	static readonly schema = v.pipe(
 		v.object({
 			_type: v.literal('OneShotAlarm'),
-			when: zonedDateTimeSchema,
+			when: zdtSchema,
 		}),
 		transformFallible((i) => new OneShotAlarm(i.when)),
 	);

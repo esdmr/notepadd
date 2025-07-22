@@ -5,7 +5,7 @@ import {
 	transformFallible,
 	getDiscriminator,
 	minDuration,
-	zonedDateTimeSchema,
+	zdtSchema,
 } from '../../../utils.ts';
 import {Instance} from '../directive/base.ts';
 import {RecurringInstant} from '../instant-recurring/types.ts';
@@ -17,7 +17,7 @@ export class RecurringPeriod {
 			_type: v.literal('RecurringPeriod'),
 			first: Period.schema,
 			interval: durationSchema,
-			end: v.optional(zonedDateTimeSchema),
+			end: v.optional(zdtSchema),
 		}),
 		transformFallible(
 			(i) => new RecurringPeriod(i.first, i.interval, i.end),

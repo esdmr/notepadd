@@ -3,7 +3,7 @@ import * as v from 'valibot';
 import {
 	getDiscriminator,
 	transformFallible,
-	zonedDateTimeSchema,
+	zdtSchema,
 } from '../../../utils.ts';
 
 const instanceStateSchema = v.picklist(['pulse', 'high', 'low']);
@@ -13,8 +13,8 @@ export class Instance {
 	static readonly schema = v.pipe(
 		v.object({
 			_type: v.literal('Instance'),
-			previous: v.optional(zonedDateTimeSchema),
-			next: v.optional(zonedDateTimeSchema),
+			previous: v.optional(zdtSchema),
+			next: v.optional(zdtSchema),
 			currentState: instanceStateSchema,
 		}),
 		transformFallible(

@@ -177,7 +177,7 @@ export const durationSchema = v.pipe(
 	transformFallible((i) => Temporal.Duration.from(i)),
 );
 
-export const zonedDateTimeSchema = v.pipe(
+export const zdtSchema = v.pipe(
 	v.string(),
 	transformFallible((i) => Temporal.ZonedDateTime.from(i)),
 );
