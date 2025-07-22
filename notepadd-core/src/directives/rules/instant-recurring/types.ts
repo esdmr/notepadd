@@ -7,6 +7,7 @@ import {
 	getSmallestDurationUnit,
 	multiplyDuration,
 	zonedDateTimeSchema,
+	addZdtNegativeSafe,
 } from '../../../utils.ts';
 import {Instance} from '../directive/base.ts';
 
@@ -76,7 +77,7 @@ export class RecurringInstant {
 		// distinguish it and calculate the other.
 		const previous =
 			Temporal.ZonedDateTime.compare(now, guessedInstant) < 0
-				? guessedInstant.subtract(this.interval)
+				? addZdtNegativeSafe(guessedInstant, this.interval.negated())
 				: guessedInstant;
 
 		const next =
@@ -134,7 +135,8 @@ export class RecurringInstant {
 
 		const estimatedCoefficient = Math.trunc(deltaTime / estimatedInterval);
 
-		return this.first.add(
+		return addZdtNegativeSafe(
+			this.first,
 			multiplyDuration(this.interval, estimatedCoefficient),
 		);
 	}
@@ -156,7 +158,10 @@ export class RecurringInstant {
 				errorDirection > 0 ? this.interval.negated() : this.interval;
 
 			do {
-				guessedInstant = guessedInstant.add(instantStep);
+				guessedInstant = addZdtNegativeSafe(
+					guessedInstant,
+					instantStep,
+				);
 			} while (
 				Temporal.ZonedDateTime.compare(guessedInstant, now) ===
 				errorDirection
