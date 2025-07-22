@@ -2,22 +2,22 @@ import type {MooToken} from '@esdmr/nearley';
 import type {Temporal} from 'temporal-polyfill';
 import {SyntaxNode} from '../../ast.ts';
 import {DurationNode} from '../../duration/ast.ts';
-import {InstantRecurringNode} from '../../instant-recurring/ast.ts';
-import {InstantNode} from '../../instant/ast.ts';
+import {ZdtRecurringNode} from '../../zdt-recurring/ast.ts';
+import {ZdtNode} from '../../zdt/ast.ts';
 import {OneShotAlarm, RecurringAlarm} from './types.ts';
 
 export class AlarmNode extends SyntaxNode<
-	[MooToken, InstantRecurringNode | InstantNode | DurationNode]
+	[MooToken, ZdtRecurringNode | ZdtNode | DurationNode]
 > {
 	readonly when = this._children[1];
 
 	toDirective(now: Temporal.ZonedDateTime): OneShotAlarm | RecurringAlarm {
-		if (this.when instanceof InstantRecurringNode) {
-			return new RecurringAlarm(this.when.toRecurringInstant(now));
+		if (this.when instanceof ZdtRecurringNode) {
+			return new RecurringAlarm(this.when.toRecurringZdt(now));
 		}
 
-		if (this.when instanceof InstantNode) {
-			return new OneShotAlarm(this.when.toInstant(now));
+		if (this.when instanceof ZdtNode) {
+			return new OneShotAlarm(this.when.toZdt(now));
 		}
 
 		if (this.when instanceof DurationNode) {

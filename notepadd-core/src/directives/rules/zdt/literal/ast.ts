@@ -4,14 +4,14 @@ import type {PlainDateNode} from '../../plain-date/ast.ts';
 import type {PlainTimeNode} from '../../plain-time/ast.ts';
 import type {TimeZoneNode} from '../../time-zone/ast.ts';
 
-export class InstantLiteralNode extends SyntaxNode<
+export class ZdtLiteralNode extends SyntaxNode<
 	[PlainDateNode, PlainTimeNode, TimeZoneNode | undefined]
 > {
 	readonly date = this._children[0];
 	readonly time = this._children[1];
 	readonly timeZone = this._children[2];
 
-	toInstant(now: Temporal.ZonedDateTime): Temporal.ZonedDateTime {
+	toZdt(now: Temporal.ZonedDateTime): Temporal.ZonedDateTime {
 		if (this.timeZone) {
 			now = now.withTimeZone(this.timeZone.toTimeZone());
 		}

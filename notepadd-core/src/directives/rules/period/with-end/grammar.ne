@@ -7,6 +7,6 @@ period ->
 	{% $(PeriodNode) %}
 
 period_with_end ->
-	instant
-	%until instant
+	zdt
+	%until zdt
 	{% $(PeriodWithEndNode) %}

@@ -11,20 +11,18 @@ import {
 } from '../../../utils.ts';
 import {Instance} from '../directive/base.ts';
 
-export class RecurringInstant {
+export class RecurringZdt {
 	static readonly schema = v.pipe(
 		v.object({
-			_type: v.literal('RecurringInstant'),
+			_type: v.literal('RecurringZdt'),
 			first: zdtSchema,
 			interval: durationSchema,
 			end: v.optional(zdtSchema),
 		}),
-		transformFallible(
-			(i) => new RecurringInstant(i.first, i.interval, i.end),
-		),
+		transformFallible((i) => new RecurringZdt(i.first, i.interval, i.end)),
 	);
 
-	readonly _type = getDiscriminator(RecurringInstant);
+	readonly _type = getDiscriminator(RecurringZdt);
 
 	constructor(
 		readonly first: Temporal.ZonedDateTime,
@@ -33,14 +31,12 @@ export class RecurringInstant {
 	) {
 		if (end && Temporal.ZonedDateTime.compare(end, first) < 0) {
 			throw new RangeError(
-				`Recurring instant ends (${end.toString()}) before it starts (${first.toString()})`,
+				`Recurring zdt ends (${end.toString()}) before it starts (${first.toString()})`,
 			);
 		}
 
 		if (interval.sign <= 0) {
-			throw new RangeError(
-				'Recurring instant has a non-positive interval',
-			);
+			throw new RangeError('Recurring zdt has a non-positive interval');
 		}
 	}
 
@@ -71,19 +67,19 @@ export class RecurringInstant {
 			}
 		}
 
-		const guessedInstant = this._estimateInstancePrecise(now);
+		const guessedZdt = this._estimateInstancePrecise(now);
 
 		// The guessed instance might be before or after now. We will
 		// distinguish it and calculate the other.
 		const previous =
-			Temporal.ZonedDateTime.compare(now, guessedInstant) < 0
-				? addZdtNegativeSafe(guessedInstant, this.interval.negated())
-				: guessedInstant;
+			Temporal.ZonedDateTime.compare(now, guessedZdt) < 0
+				? addZdtNegativeSafe(guessedZdt, this.interval.negated())
+				: guessedZdt;
 
 		const next =
-			Temporal.ZonedDateTime.compare(now, guessedInstant) < 0
-				? guessedInstant
-				: guessedInstant.add(this.interval);
+			Temporal.ZonedDateTime.compare(now, guessedZdt) < 0
+				? guessedZdt
+				: guessedZdt.add(this.interval);
 
 		return new Instance(
 			this._checkBounds(previous) === 0 ? previous : undefined,
@@ -103,11 +99,11 @@ export class RecurringInstant {
 	}
 
 	private _checkBounds(
-		instant: Temporal.ZonedDateTime,
+		zdt: Temporal.ZonedDateTime,
 	): Temporal.ComparisonResult {
-		return Temporal.ZonedDateTime.compare(instant, this.first) < 0
+		return Temporal.ZonedDateTime.compare(zdt, this.first) < 0
 			? -1
-			: this.end && Temporal.ZonedDateTime.compare(this.end, instant) < 0
+			: this.end && Temporal.ZonedDateTime.compare(this.end, zdt) < 0
 				? 1
 				: 0;
 	}
@@ -144,30 +140,24 @@ export class RecurringInstant {
 	private _estimateInstancePrecise(
 		now: Temporal.ZonedDateTime,
 	): Temporal.ZonedDateTime {
-		let guessedInstant = this._estimateInstanceImprecise(now);
+		let guessedZdt = this._estimateInstanceImprecise(now);
 
-		const errorDirection = Temporal.ZonedDateTime.compare(
-			guessedInstant,
-			now,
-		);
+		const errorDirection = Temporal.ZonedDateTime.compare(guessedZdt, now);
 
 		// We will compensate for the estimation inaccuracy. This will adjust the
-		// instant to the closest instance before or after now.
+		// ZDF to the closest instance before or after now.
 		if (errorDirection !== 0) {
-			const instantStep =
+			const step =
 				errorDirection > 0 ? this.interval.negated() : this.interval;
 
 			do {
-				guessedInstant = addZdtNegativeSafe(
-					guessedInstant,
-					instantStep,
-				);
+				guessedZdt = addZdtNegativeSafe(guessedZdt, step);
 			} while (
-				Temporal.ZonedDateTime.compare(guessedInstant, now) ===
+				Temporal.ZonedDateTime.compare(guessedZdt, now) ===
 				errorDirection
 			);
 		}
 
-		return guessedInstant;
+		return guessedZdt;
 	}
 }

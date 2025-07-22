@@ -10,7 +10,7 @@ directive =
 
 alarm =
 	"alarm",
-	(instant_recurring | instant | duration),
+	(zdt_recurring | zdt | duration),
 	[comment];
 
 timer =
@@ -33,7 +33,7 @@ reference =
 period_recurring =
 	period,
 	"every", duration (* relative to start of period, must be longer than its duration *),
-	["until", instant (* defaults to never *)];
+	["until", zdt (* defaults to never *)];
 
 period =
 	period_with_duration |
@@ -41,38 +41,38 @@ period =
 	period_whole_day;
 
 period_with_duration =
-	instant,
+	zdt,
 	"for", duration (* relative to start of period *);
 
 period_with_end =
-	instant,
-	"until", instant;
+	zdt,
+	"until", zdt;
 
 period_whole_day =
 	plain_date,
 	"whole day",
 	[time_zone (* defaults to local *)];
 
-instant_recurring =
-	[instant (* defaults to now *)],
+zdt_recurring =
+	[zdt (* defaults to now *)],
 	"every", duration,
-	["until", instant (* defaults to never *)];
+	["until", zdt (* defaults to never *)];
 
-instant =
-	instant_literal |
-	instant_later |
-	instant_now;
+zdt =
+	zdt_literal |
+	zdt_later |
+	zdt_now;
 
-instant_literal =
+zdt_literal =
 	plain_date,
 	plain_time,
 	[time_zone (* defaults to local *)];
 
-instant_later =
+zdt_later =
 	plain_time (* next occurrence, either today or tomorrow *),
 	[time_zone (* defaults to local *)];
 
-instant_now =
+zdt_now =
 	"now" (* shorthand for today this time *),
 	[time_zone (* defaults to local *)];
 

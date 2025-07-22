@@ -5,5 +5,5 @@
 period_recurring ->
 	period
 	%every duration
-	(%until instant {% (i) => i[1] %}):?
+	(%until zdt {% (i) => i[1] %}):?
 	{% $(PeriodRecurringNode) %}

@@ -3,11 +3,11 @@ import type {Temporal} from 'temporal-polyfill';
 import {SyntaxNode} from '../ast.ts';
 import type {PeriodNode} from '../period/ast.ts';
 import type {DurationNode} from '../duration/ast.ts';
-import type {InstantNode} from '../instant/ast.ts';
+import type {ZdtNode} from '../zdt/ast.ts';
 import {RecurringPeriod} from './types.ts';
 
 export class PeriodRecurringNode extends SyntaxNode<
-	[PeriodNode, MooToken, DurationNode, InstantNode | undefined]
+	[PeriodNode, MooToken, DurationNode, ZdtNode | undefined]
 > {
 	readonly first = this._children[0];
 	readonly interval = this._children[2];
@@ -17,7 +17,7 @@ export class PeriodRecurringNode extends SyntaxNode<
 		return new RecurringPeriod(
 			this.first?.toPeriod(now),
 			this.interval.toDuration(),
-			this.end?.toInstant(now),
+			this.end?.toZdt(now),
 		);
 	}
 }

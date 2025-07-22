@@ -3,13 +3,13 @@ import {SyntaxNode} from '../../ast.ts';
 import type {PlainTimeNode} from '../../plain-time/ast.ts';
 import type {TimeZoneNode} from '../../time-zone/ast.ts';
 
-export class InstantLaterNode extends SyntaxNode<
+export class ZdtLaterNode extends SyntaxNode<
 	[PlainTimeNode, TimeZoneNode | undefined]
 > {
 	readonly time = this._children[0];
 	readonly timeZone = this._children[1];
 
-	toInstant(now: Temporal.ZonedDateTime): Temporal.ZonedDateTime {
+	toZdt(now: Temporal.ZonedDateTime): Temporal.ZonedDateTime {
 		if (this.timeZone) {
 			now = now.withTimeZone(this.timeZone.toTimeZone());
 		}

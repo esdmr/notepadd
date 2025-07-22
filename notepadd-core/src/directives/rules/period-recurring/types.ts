@@ -8,7 +8,7 @@ import {
 	zdtSchema,
 } from '../../../utils.ts';
 import {Instance} from '../directive/base.ts';
-import {RecurringInstant} from '../instant-recurring/types.ts';
+import {RecurringZdt} from '../zdt-recurring/types.ts';
 import {Period} from '../period/types.ts';
 
 export class RecurringPeriod {
@@ -25,7 +25,7 @@ export class RecurringPeriod {
 	);
 
 	readonly _type = getDiscriminator(RecurringPeriod);
-	private readonly _recurringInstant;
+	private readonly _recurringZdt;
 	private readonly _periodDuration;
 
 	constructor(
@@ -45,7 +45,7 @@ export class RecurringPeriod {
 			);
 		}
 
-		this._recurringInstant = new RecurringInstant(
+		this._recurringZdt = new RecurringZdt(
 			this.first.start,
 			this.interval,
 			this.end,
@@ -58,7 +58,7 @@ export class RecurringPeriod {
 	toJSON(): unknown {
 		return {
 			...this,
-			_recurringInstant: undefined,
+			_recurringZdt: undefined,
 			_periodDuration: undefined,
 		};
 	}
@@ -68,7 +68,7 @@ export class RecurringPeriod {
 	}
 
 	getInstance(now: Temporal.ZonedDateTime): Instance {
-		const instance = this._recurringInstant.getInstance(now);
+		const instance = this._recurringZdt.getInstance(now);
 
 		if (!instance.previous) {
 			return new Instance(undefined, instance.next, 'low');
@@ -112,7 +112,7 @@ export class RecurringPeriod {
 		const previousStart = instance.previous;
 		const previousEnd = instance.next;
 
-		const nextStart = this._recurringInstant.getNextInstance(
+		const nextStart = this._recurringZdt.getNextInstance(
 			new Instance(undefined, previousStart),
 		).next;
 

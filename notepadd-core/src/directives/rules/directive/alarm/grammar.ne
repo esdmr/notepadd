@@ -10,8 +10,8 @@ directive ->
 alarm ->
 	%alarm
 	(
-		instant_recurring {% nearley.id %} |
-		instant {% nearley.id %} |
+		zdt_recurring {% nearley.id %} |
+		zdt {% nearley.id %} |
 		duration {% nearley.id %}
 	)
 	{% $(AlarmNode) %}

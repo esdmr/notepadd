@@ -7,6 +7,6 @@ period ->
 	{% $(PeriodNode) %}
 
 period_with_duration ->
-	instant
+	zdt
 	%for duration
 	{% $(PeriodWithDurationNode) %}

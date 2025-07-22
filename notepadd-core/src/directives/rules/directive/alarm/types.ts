@@ -5,7 +5,7 @@ import {
 	transformFallible,
 	zdtSchema,
 } from '../../../../utils.ts';
-import {RecurringInstant} from '../../instant-recurring/types.ts';
+import {RecurringZdt} from '../../zdt-recurring/types.ts';
 import {Instance} from '../base.ts';
 
 export class OneShotAlarm {
@@ -40,14 +40,14 @@ export class RecurringAlarm {
 	static readonly schema = v.pipe(
 		v.object({
 			_type: v.literal('RecurringAlarm'),
-			when: RecurringInstant.schema,
+			when: RecurringZdt.schema,
 		}),
 		transformFallible((i) => new RecurringAlarm(i.when)),
 	);
 
 	readonly _type = getDiscriminator(RecurringAlarm);
 
-	constructor(readonly when: RecurringInstant) {}
+	constructor(readonly when: RecurringZdt) {}
 
 	getInstance(now: Temporal.ZonedDateTime): Instance {
 		return this.when.getInstance(now);

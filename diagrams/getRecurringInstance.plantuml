@@ -32,7 +32,7 @@ This is either now, or some checkpoint in the past.
 Using a checkpoint is recommended to avoid missing instances.
 ----
 <latex>e(t\colon \mathrm{zdt}) = \operatorname{sign}(t - t_{\mathrm{now}})</latex>
-The error direction of instant <i>t</i> from now.
+The error direction of zdt <i>t</i> from now.
 It is positive if after, negative if before, or zero if at the current time.
 Adjustments should happen in the opposite direction of this.
 ----
@@ -45,8 +45,8 @@ Compares the given instance to the recurrence bounds.
 Note that this only checks the boundary, not the alignment to the interval.
 ----
 <latex>\frac{T}{u} \kern{-11mu}-\kern{-8mu}|\;t\colon \mathbb{R}\pod{T \colon \mathrm{dur},\, u \colon \mathrm{unit},\, t \colon \mathrm{zdt}}\\\frac{T}{u(T)} \kern{-11mu}-\kern{-8mu}|\;t\colon \mathbb{Z}</latex>
-Division of duration <i>T</i> by <i>u</i> units, at instant <i>t</i>.
-This gives a numeric value of duration <i>T</i>, which is accurate if and only if either the duration is date-independent, or the result is only used at the instant <i>t</i>.
+Division of duration <i>T</i> by <i>u</i> units, at ZDT <i>t</i>.
+This gives a numeric value of duration <i>T</i>, which is accurate if and only if either the duration is date-independent, or the result is only used at the ZDT <i>t</i>.
 In other words, if duration <i>T</i> is an arbitrary interval, the result is only accurate for the first instance.
 If unit <i>u</i> is the smallest unit of duration <i>T</i>, the result would be integral.
 ----
