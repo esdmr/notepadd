@@ -145,7 +145,7 @@ export class RecurringZdt {
 		const errorDirection = Temporal.ZonedDateTime.compare(guessedZdt, now);
 
 		// We will compensate for the estimation inaccuracy. This will adjust the
-		// ZDF to the closest instance before or after now.
+		// ZDT to the closest instance before or after now.
 		if (errorDirection !== 0) {
 			const step =
 				errorDirection > 0 ? this.interval.negated() : this.interval;
