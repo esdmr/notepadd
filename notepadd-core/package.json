@@ -9,7 +9,8 @@
 	},
 	"scripts": {
 		"build": "vite --configLoader runner build",
-		"build-directives-tsd": "nearleyc src/directives/tsd.ne -o src/directives/tsd.generated.ts"
+		"build-directives-tsd": "nearleyc src/directives/tsd.ne -o src/directives/tsd.generated.ts",
+		"test": "vitest --configLoader runner"
 	},
 	"dependencies": {
 		"@esdmr/nearley": "3.0.3",
@@ -32,11 +33,13 @@
 		"yaml": "2.8.0"
 	},
 	"devDependencies": {
+		"@fast-check/vitest": "0.2.1",
 		"@types/data-urls": "3.0.4",
 		"@types/escape-latex": "0.1.36",
 		"@types/hast": "3.0.4",
 		"@types/mdast": "4.0.4",
 		"@types/whatwg-mimetype": "3.0.2",
+		"fast-check": "4.1.1",
 		"mdast-util-directive": "3.1.0",
 		"mdast-util-math": "3.0.0",
 		"vite": "6.3.5",
@@ -45,7 +48,8 @@
 		"vite-plugin-nearley": "workspace:*",
 		"vite-plugin-package-json": "workspace:*",
 		"vite-plugin-static-copy": "3.1.0",
-		"vite-plugin-subvite": "workspace:*"
+		"vite-plugin-subvite": "workspace:*",
+		"vitest": "3.2.4"
 	},
 	"packageManager": "pnpm@10.12.4"
 }

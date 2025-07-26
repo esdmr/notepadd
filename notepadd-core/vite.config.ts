@@ -1,5 +1,5 @@
 import {fileURLToPath} from 'node:url';
-import {defineConfig} from 'vite';
+import {defineConfig} from 'vitest/config';
 import inspect from 'vite-plugin-inspect';
 import {nearley} from 'vite-plugin-nearley';
 import {
