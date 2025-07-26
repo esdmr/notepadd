@@ -279,34 +279,6 @@ export function getSmallestDurationUnit(
 	return 'years';
 }
 
-export function addZdtNegativeSafe(
-	zdt: Temporal.ZonedDateTime,
-	duration: Temporal.Duration,
-): Temporal.ZonedDateTime {
-	// If the duration is non-negative, we do not need to do anything special.
-	if (duration.sign >= 0) return zdt.add(duration);
-
-	try {
-		// We will attempt to use `ZonedDateTime.add`. If this addition does not
-		// overflow, nothing needs to be done.
-		return zdt.add(duration, {overflow: 'reject'});
-	} catch {
-		// It overflew. This could be either a legitimate overflow, which we
-		// cannot bypass even after our attempts below, or the order of addition
-		// mattered and adding the components in reverse-order fixes this
-		// conundrum.
-		//
-		// According to [the spec for CalendarDateAdd](https://tc39.es/proposal-temporal/#sec-temporal-calendardateadd),
-		// the iso8601 calendar adds years and months first, checks the day to
-		// be in range, and only then days and weeks are added and constrained.
-		// Other calendars are left as implementation-defined. I will assume
-		// that other calendars are following a similar logic.
-		return zdt
-			.add(duration.with({years: 0, months: 0}))
-			.add({years: duration.years, months: duration.months});
-	}
-}
-
 export function addDurations(
 	a: Temporal.Duration,
 	b: Temporal.Duration,

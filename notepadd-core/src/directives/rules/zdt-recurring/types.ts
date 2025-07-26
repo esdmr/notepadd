@@ -7,7 +7,6 @@ import {
 	getSmallestDurationUnit,
 	multiplyDuration,
 	zdtSchema,
-	addZdtNegativeSafe,
 } from '../../../utils.ts';
 import {Instance} from '../directive/base.ts';
 
@@ -67,50 +66,6 @@ export class RecurringZdt {
 			}
 		}
 
-		const guessedZdt = this._estimateInstancePrecise(now);
-
-		// The guessed instance might be before or after now. We will
-		// distinguish it and calculate the other.
-		const previous =
-			Temporal.ZonedDateTime.compare(now, guessedZdt) < 0
-				? addZdtNegativeSafe(guessedZdt, this.interval.negated())
-				: guessedZdt;
-
-		const next =
-			Temporal.ZonedDateTime.compare(now, guessedZdt) < 0
-				? guessedZdt
-				: guessedZdt.add(this.interval);
-
-		return new Instance(
-			this._checkBounds(previous) === 0 ? previous : undefined,
-			this._checkBounds(next) === 0 ? next : undefined,
-		);
-	}
-
-	getNextInstance(instance: Instance): Instance {
-		if (!instance.next) return instance;
-
-		const next = instance.next.add(this.interval);
-
-		return new Instance(
-			instance.next,
-			this._checkBounds(next) === 0 ? next : undefined,
-		);
-	}
-
-	private _checkBounds(
-		zdt: Temporal.ZonedDateTime,
-	): Temporal.ComparisonResult {
-		return Temporal.ZonedDateTime.compare(zdt, this.first) < 0
-			? -1
-			: this.end && Temporal.ZonedDateTime.compare(this.end, zdt) < 0
-				? 1
-				: 0;
-	}
-
-	private _estimateInstanceImprecise(
-		now: Temporal.ZonedDateTime,
-	): Temporal.ZonedDateTime {
 		const smallestUnit = getSmallestDurationUnit(this.interval);
 
 		// This is ‘estimated’ because it represents the interval between the first
@@ -129,35 +84,88 @@ export class RecurringZdt {
 				relativeTo: this.first,
 			});
 
-		const estimatedCoefficient = Math.trunc(deltaTime / estimatedInterval);
-
-		return addZdtNegativeSafe(
-			this.first,
+		let estimatedCoefficient = Math.trunc(deltaTime / estimatedInterval);
+		let estimatedZdt = this.first.add(
 			multiplyDuration(this.interval, estimatedCoefficient),
 		);
-	}
 
-	private _estimateInstancePrecise(
-		now: Temporal.ZonedDateTime,
-	): Temporal.ZonedDateTime {
-		let guessedZdt = this._estimateInstanceImprecise(now);
-
-		const errorDirection = Temporal.ZonedDateTime.compare(guessedZdt, now);
+		const errorDirection = Temporal.ZonedDateTime.compare(
+			estimatedZdt,
+			now,
+		);
 
 		// We will compensate for the estimation inaccuracy. This will adjust the
 		// ZDT to the closest instance before or after now.
 		if (errorDirection !== 0) {
-			const step =
-				errorDirection > 0 ? this.interval.negated() : this.interval;
-
 			do {
-				guessedZdt = addZdtNegativeSafe(guessedZdt, step);
+				estimatedCoefficient -= errorDirection;
+
+				// Due to a peculiarity regarding date durations possibly
+				// causing overflows, datetime arithmetic is **not**
+				// associative. $z + d - d$ might not equal $z$. We must defer
+				// to calculating $z + d * c$ every time.
+				estimatedZdt = this.first.add(
+					multiplyDuration(this.interval, estimatedCoefficient),
+				);
 			} while (
-				Temporal.ZonedDateTime.compare(guessedZdt, now) ===
+				Temporal.ZonedDateTime.compare(estimatedZdt, now) ===
 				errorDirection
 			);
 		}
 
-		return guessedZdt;
+		// The guessed instance might be before or after now. We will
+		// distinguish it and calculate the other.
+		const previous =
+			Temporal.ZonedDateTime.compare(now, estimatedZdt) < 0
+				? this.first.add(
+						multiplyDuration(
+							this.interval,
+							estimatedCoefficient - 1,
+						),
+					)
+				: estimatedZdt;
+
+		const next =
+			Temporal.ZonedDateTime.compare(now, estimatedZdt) < 0
+				? estimatedZdt
+				: this.first.add(
+						multiplyDuration(
+							this.interval,
+							estimatedCoefficient + 1,
+						),
+					);
+
+		return new Instance(
+			this._checkBounds(previous) === 0 ? previous : undefined,
+			this._checkBounds(next) === 0 ? next : undefined,
+		);
+	}
+
+	getNextInstance(instance: Instance): Instance {
+		if (!instance.next) return instance;
+
+		// TODO: Maybe replace this with $z + d * c$ too.
+		//
+		// Overflow inaccuracies mostly show up if the duration has months or
+		// years, so it is unlikely that someone will run timekeeper long enough
+		// for it to become inaccurate. On the other hand, replacing this only
+		// adds an extra `multiplyDuration` which should already be quite fast,
+		// so it is not much of a performance penalty.
+		const next = instance.next.add(this.interval);
+
+		return new Instance(
+			instance.next,
+			this._checkBounds(next) === 0 ? next : undefined,
+		);
+	}
+
+	private _checkBounds(
+		zdt: Temporal.ZonedDateTime,
+	): Temporal.ComparisonResult {
+		return Temporal.ZonedDateTime.compare(zdt, this.first) < 0
+			? -1
+			: this.end && Temporal.ZonedDateTime.compare(this.end, zdt) < 0
+				? 1
+				: 0;
 	}
 }
