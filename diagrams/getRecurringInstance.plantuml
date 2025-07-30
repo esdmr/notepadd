@@ -22,8 +22,8 @@ It must not be before the start of recurrence.
 <latex>T\colon \mathrm{dur}^+</latex>
 Defines the interval between each instance.
 ----
-<latex>t_{i}\colon \mathrm{zdt} = t_0 + iT \pod{i\colon \mathbb{Z}}</latex>
-The <i>i</i>-th instance.
+<latex>t_c\colon \mathrm{zdt} \pod{c\colon \mathbb{Z}}\\t_c = t_0 + cT</latex>
+The <i>c</i>-th instance.
 This is aligned to the interval but might be out-of-bounds.
 ----
 <latex>t_{\mathrm{now}}\colon \mathrm{zdt}</latex>
@@ -31,7 +31,7 @@ The current time.
 This is either now, or some checkpoint in the past.
 Using a checkpoint is recommended to avoid missing instances.
 ----
-<latex>e(t\colon \mathrm{zdt}) = \operatorname{sign}(t - t_{\mathrm{now}})</latex>
+<latex>e: \mathrm{zdt} \to \{-1, 0, 1\}\\e(t) = \operatorname{sign}(t - t_{\mathrm{now}})</latex>
 The error direction of zdt <i>t</i> from now.
 It is positive if after, negative if before, or zero if at the current time.
 Adjustments should happen in the opposite direction of this.
@@ -40,15 +40,18 @@ Adjustments should happen in the opposite direction of this.
 The smallest unit of a duration.
 This is used as a baseline to calculate the integral value of a duration.
 ----
-<latex>p(t\colon \mathrm{zdt}) = \begin{cases}-1 \quad& t < t_0\\0 \quad& t_{\mathrm{end}} = \varnothing \land t_0 \le t\\0 \quad& t_{\mathrm{end}} \ne \varnothing \land t_0 \le t \le t_{\mathrm{end}}\\1 \quad& t_{\mathrm{end}} \ne \varnothing \land t_{\mathrm{end}} < t\end{cases}</latex>
+<latex>p\colon \mathrm{zdt} \to \{-1, 0, 1\}\\p(t) = \begin{cases}-1 \quad& t < t_0\\0 \quad& t_{\mathrm{end}} = \varnothing \land t_0 \le t\\0 \quad& t_{\mathrm{end}} \ne \varnothing \land t_0 \le t \le t_{\mathrm{end}}\\1 \quad& t_{\mathrm{end}} \ne \varnothing \land t_{\mathrm{end}} < t\end{cases}</latex>
 Compares the given instance to the recurrence bounds.
 Note that this only checks the boundary, not the alignment to the interval.
 ----
-<latex>\frac{T}{u} \kern{-11mu}-\kern{-8mu}|\;t\colon \mathbb{R}\pod{T \colon \mathrm{dur},\, u \colon \mathrm{unit},\, t \colon \mathrm{zdt}}\\\frac{T}{u(T)} \kern{-11mu}-\kern{-8mu}|\;t\colon \mathbb{Z}</latex>
+<latex>\Bigl(\frac{T}{u} \kern{-11mu}-\kern{-8mu}|\;t \Bigr)\colon \mathbb{R}\pod{T \colon \mathrm{dur},\, u \colon \mathrm{unit},\, t \colon \mathrm{zdt}}\\\Bigl(\frac{T}{u(T)} \kern{-11mu}-\kern{-8mu}|\;t\Bigr)\colon \mathbb{Z}</latex>
 Division of duration <i>T</i> by <i>u</i> units, at ZDT <i>t</i>.
 This gives a numeric value of duration <i>T</i>, which is accurate if and only if either the duration is date-independent, or the result is only used at the ZDT <i>t</i>.
 In other words, if duration <i>T</i> is an arbitrary interval, the result is only accurate for the first instance.
 If unit <i>u</i> is the smallest unit of duration <i>T</i>, the result would be integral.
+----
+<latex>t_{\mathrm{prev}} \colon zdt \cup\{\varnothing\}\\t_{\mathrm{next}} \colon zdt \cup\{\varnothing\}</latex>
+The previous and the next instances, respectively.
 ----
 = End of Definitions;
 detach
@@ -60,12 +63,12 @@ start
 group edge case
 	switch (<latex>p(t_{\mathrm{now}})</latex>)
 	case (<latex>= -1</latex>)
-		:<latex>t_{\mathrm{prev}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow \varnothing\\t_{\mathrm{next}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow t_0</latex>
+		:<latex>t_{\mathrm{prev}} \mathrel\leftarrow \varnothing\\t_{\mathrm{next}} \mathrel\leftarrow t_0</latex>
 		Recurrence has not started yet.
 		This means that the following algorithm would likely estimate some instance from before the start and then filter it at the bounds checking, yielding no instance.;
 		stop
 	case (<latex>= 1</latex>)
-		:<latex>t_{\mathrm{now}}\colon \mathrm{zdt} \mathrel\leftarrow t_{\mathrm{end}} \pod{t_{\mathrm{end}} \ne \varnothing}</latex>
+		:<latex>t_{\mathrm{now}} \mathrel\leftarrow t_{\mathrm{end}} \pod{t_{\mathrm{end}} \ne \varnothing}</latex>
 		Recurrence has ended already.
 		This means that the following algorithm would likely estimate some instance from after the end and then filter it at the bounds checking, yielding no instance.
 		Since the last instance may be before the end of recurrence, we must calculate it and cannot return early.
@@ -76,43 +79,44 @@ group edge case
 end group
 
 group estimate imprecise
-	:<latex>\Delta t_1\colon \mathbb{Z}^+ = \frac{T}{u(T)} \kern{-11mu}-\kern{-8mu}|\;t_0</latex>
+	:<latex>\Delta t_1\colon \mathbb{Z}^+\\\Delta t_1 \mathrel\leftarrow \frac{T}{u(T)} \kern{-11mu}-\kern{-8mu}|\;t_0</latex>
 	Duration which elapses between the first two instances, i.e., the interval, converted to a numeric value (specifically, an integer).
 	----
-	<latex>\Delta t_{\mathrm{now}}\colon \mathbb{R}^+ \cup \{0\} = \frac{t_{\mathrm{now}} - t_0}{u(T)} \kern{-11mu}-\kern{-8mu}|\;t_0</latex>
+	<latex>\Delta t_{\mathrm{now}}\colon \mathbb{R}^+ \cup \{0\} \\\Delta t_{\mathrm{now}} \mathrel\leftarrow \frac{t_{\mathrm{now}} - t_0}{u(T)} \kern{-11mu}-\kern{-8mu}|\;t_0</latex>
 	Duration which has elapsed between the first instance and the current time, converted to a numeric value.
 	Since the current time is almost always unaligned, this is unlikely to be an integer.
 	----
-	<latex>\hat \imath\colon \mathbb{Z} = \left\lfloor \frac{\Delta t_{\mathrm{now}}}{\Delta t_1} \right\rfloor = \left\lfloor \frac{t_{\mathrm{now}} - t_0}{T} \kern{-11mu}-\kern{-8mu}|\;t_0 \right\rfloor</latex>
+	<latex>\hat c\colon \mathbb{Z}^{+} \cup \{0\}\\\hat c \mathrel\leftarrow \left\lfloor \frac{\Delta t_{\mathrm{now}}}{\Delta t_1} \right\rfloor \pod{= \textstyle \left\lfloor \frac{t_{\mathrm{now}} - t_0}{T} \kern{-11mu}-\kern{-8mu}|\;t_0 \right\rfloor}</latex>
 	Estimated index of instance before the current time.
-	Since the division is relative to the first instance only, this might not be accurate.;
+	Since the division is relative to the first instance only, this might not be accurate.
+	----
+	<latex>\hat t\colon \mathrm{zdt}\\\hat t \mathrel\leftarrow t_{\hat c}</latex>
+	The currently estimated instance.
+	This is aligned to the interval, but might be out-of-bounds.;
 end group
 
 group estimate precise
-	:<latex>\bar t\colon \mathrm{zdt} \mathrel\leftarrow t_{\hat \imath}</latex>
-	The currently guessed instance.
-	This is aligned to the interval, but might be out-of-bounds.;
-	if (<latex>e(t_{\hat \imath})</latex>) then
-		:<latex>T_{\mathrm{step}}\colon \mathrm{dur}^- \cup \mathrm{dur}^+ = -e(t_{\hat \imath})T</latex>
-		The adjustment duration.
-		Adjustment is opposite to the direction of error, so this must be negative.
-		Since this is an integer multiple of the interval, it keeps the guessed instance aligned.;
+	:<latex>e_{\mathrm{orig}}\colon \{-1,0,1\}\\e_{\mathrm{orig}} \mathrel\leftarrow e(\hat t)</latex>;
+	if (<latex>e_{\mathrm{orig}}</latex>) then
 		repeat
-			:<latex>\bar t \mathrel\leftarrow \bar t + T_{\mathrm{step}}</latex>
-			Guessed instance is kept aligned, because the adjustment duration is aligned.;
-		repeat while (<latex>e(\bar t)</latex>) is (<latex>= e(t_{\hat \imath})</latex>)
+			:<latex>\hat c \mathrel\leftarrow \hat c - e_{\mathrm{orig}}</latex>
+			Adjustment is opposite to the direction of error, so this must be a subtraction.
+			Since the estimated instance remains an integer, it keeps it aligned.
+			----
+			<latex>\hat t \mathrel\leftarrow t_{\hat c}</latex>;
+		repeat while (<latex>e(\hat t)</latex>) is (<latex>= e_{\mathrm{orig}}</latex>)
 	else (<latex>= 0</latex>)
 	endif
-	:The guessed instance should now be immediately before, at, or immediately after the current time.;
+	:The estimated instance should now be immediately before, at, or immediately after the current time.;
 end group
 
 group reorder
-	if (<latex>\bar t</latex>) is (<latex>\gt t_{\mathrm{now}}</latex>) then
-		:<latex>t_{\mathrm{prev}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow \bar t - T\\t_{\mathrm{next}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow \bar t</latex>
-		The guessed instance was after the current time, so it is the next instance.;
+	if (<latex>\hat t</latex>) is (<latex>\gt t_{\mathrm{now}}</latex>) then
+		:<latex>t_{\mathrm{prev}} \mathrel\leftarrow t_{\hat c - 1}\\t_{\mathrm{next}} \mathrel\leftarrow \hat t</latex>
+		The estimated instance was after the current time, so it is the next instance.;
 	else (<latex>\le t_{\mathrm{now}}</latex>)
-		:<latex>t_{\mathrm{prev}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow \bar t\\t_{\mathrm{next}}\colon \mathrm{zdt}\cup \{\varnothing\} \mathrel\leftarrow \bar t + T</latex>
-		The guessed instance was before or at the current time, so it is the previous instance.;
+		:<latex>t_{\mathrm{prev}} \mathrel\leftarrow \hat t\\t_{\mathrm{next}} \mathrel\leftarrow t_{\hat c + 1}</latex>
+		The estimated instance was before or at the current time, so it is the previous instance.;
 	endif
 end group
 
