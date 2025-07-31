@@ -1,0 +1,21 @@
+:root {
+	--c-neutral-25p: color-mix(in srgb, var(--vp-c-neutral) 25%, transparent);
+	--c-neutral-50p: color-mix(in srgb, var(--vp-c-neutral) 50%, transparent);
+	--c-neutral-75p: color-mix(in srgb, var(--vp-c-neutral) 75%, transparent);
+}
+
+kbd:not(:has(> kbd)),
+kbd > kbd {
+	margin: 2px;
+
+	display: inline-block;
+	box-shadow: 0 2px 0 1px var(--c-neutral-50p);
+
+	border: 1px solid var(--c-neutral-75p);
+	border-radius: 3px;
+
+	padding: 2px 5px;
+
+	font-size: 0.9em;
+	line-height: 1;
+}

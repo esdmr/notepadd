@@ -38,16 +38,6 @@ Assuming that everything went well, you can create an empty file ending with `.n
 
 ## Taking Notes
 
-<style>
-  kbd > kbd {
-    border-radius: 3px;
-    padding: 1px 2px 0;
-    margin: 2px;
-    border: 1px solid #0004;
-    box-shadow: 0 2px 2px #0008;
-  }
-</style>
-
 Whenever you open a `*.np.md` file, NotePADD opens it in a (Jupyter) notebook-style interface.
 
 You can write your notes in markdown cells. Press the “Stop editing cell” button (<kbd><kbd>ctrl</kbd>+<kbd>enter</kbd></kbd> by default) to see a preview of that cell.
