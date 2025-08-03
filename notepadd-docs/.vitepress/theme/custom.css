@@ -19,3 +19,17 @@ kbd > kbd {
 	font-size: 0.9em;
 	line-height: 1;
 }
+
+p img {
+	display: inline-block;
+}
+
+.vp-doc blockquote {
+  margin: 16px 0;
+  border-inline-start: 2px solid var(--vp-c-divider);
+  border-inline-end: 0;
+  padding-inline-start: 16px;
+  padding-inline-end: 0;
+  transition: border-color 0.5s;
+  color: var(--vp-c-text-2);
+}
