@@ -121,8 +121,8 @@ importers:
         specifier: workspace:*
         version: link:../vite-plugins/package-json
       vite-plugin-static-copy:
-        specifier: 3.1.0
-        version: 3.1.0(vite@6.3.5(@types/node@20.19.0)(yaml@2.8.0))
+        specifier: 3.1.1
+        version: 3.1.1(vite@6.3.5(@types/node@20.19.0)(yaml@2.8.0))
       vite-plugin-subvite:
         specifier: workspace:*
         version: link:../vite-plugins/subvite
@@ -170,8 +170,8 @@ importers:
         specifier: workspace:*
         version: link:../vite-plugins/package-json
       vite-plugin-static-copy:
-        specifier: 3.1.0
-        version: 3.1.0(vite@6.3.5(@types/node@20.19.0)(yaml@2.8.0))
+        specifier: 3.1.1
+        version: 3.1.1(vite@6.3.5(@types/node@20.19.0)(yaml@2.8.0))
       vite-plugin-subvite:
         specifier: workspace:*
         version: link:../vite-plugins/subvite
@@ -294,8 +294,8 @@ importers:
         specifier: workspace:*
         version: link:../vite-plugins/package-json
       vite-plugin-static-copy:
-        specifier: 3.1.0
-        version: 3.1.0(vite@6.3.5(@types/node@20.19.0)(yaml@2.8.0))
+        specifier: 3.1.1
+        version: 3.1.1(vite@6.3.5(@types/node@20.19.0)(yaml@2.8.0))
       vite-plugin-subvite:
         specifier: workspace:*
         version: link:../vite-plugins/subvite
@@ -4577,8 +4577,8 @@ packages:
       '@nuxt/kit':
         optional: true
 
-  vite-plugin-static-copy@3.1.0:
-    resolution: {integrity: sha512-ONFBaYoN1qIiCxMCfeHI96lqLza7ujx/QClIXp4kEULUbyH2qLgYoaL8JHhk3FWjSB4TpzoaN3iMCyCFldyXzw==}
+  vite-plugin-static-copy@3.1.1:
+    resolution: {integrity: sha512-oR53SkL5cX4KT1t18E/xU50vJDo0N8oaHza4EMk0Fm+2/u6nQivxavOfrDk3udWj+dizRizB/QnBvJOOQrTTAQ==}
     engines: {node: ^18.0.0 || >=20.0.0}
     peerDependencies:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0
@@ -9920,7 +9920,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-static-copy@3.1.0(vite@6.3.5(@types/node@20.19.0)(yaml@2.8.0)):
+  vite-plugin-static-copy@3.1.1(vite@6.3.5(@types/node@20.19.0)(yaml@2.8.0)):
     dependencies:
       chokidar: 3.6.0
       fs-extra: 11.3.0
