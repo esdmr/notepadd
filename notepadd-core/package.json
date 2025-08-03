@@ -33,7 +33,7 @@
 		"yaml": "2.8.0"
 	},
 	"devDependencies": {
-		"@fast-check/vitest": "0.2.1",
+		"@fast-check/vitest": "0.2.2",
 		"@types/data-urls": "3.0.4",
 		"@types/escape-latex": "0.1.36",
 		"@types/hast": "3.0.4",
