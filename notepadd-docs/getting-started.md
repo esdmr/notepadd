@@ -44,9 +44,9 @@ You can write your notes in markdown cells. Press the “Stop editing cell” bu
 
 ## Using Tools
 
-By selecting the “NotePADD Directives” language, you can use one of the many commands available.
+By selecting the “NotePADD Directives” language, you can use one of the many<sup aria-hidden="true">&lbrack;<i>citation needed</i>]</sup> commands available.
 
-NotePADD also supports Plant UML diagrams. Simply, select the language for a cell. You will need the Plant UML extension and the compiler.
+NotePADD also supports Plant UML diagrams. Simply, select the language for a cell. You will need the Plant UML extension and compiler.
 
 ::: tip NOTE
 You must run the cell to trigger the tool.
