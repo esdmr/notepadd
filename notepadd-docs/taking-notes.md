@@ -1,6 +1,8 @@
 # Taking Notes
 
-NotePADD allows you to take textual notes. You can use special markings to format your text, using a language called Markdown.
+## Overview
+
+NotePADD lets you take textual notes. You can also use special markings to format your text, using a language called Markdown.
 
 ## Paragraphs
 
@@ -20,7 +22,12 @@ Paragraph 2
 
 Headings are lines starting with 1 or up to 6 number signs (`#`) followed by a space.
 
-The number of hash signs represent the level of the heading. The level 1 heading represents the document title and should only appear once in a document.
+
+::: tip NOTE
+Level 1 headings represent the document title and should only appear once in a document.
+
+Levels 2–6 may appear any number of times, but should be well-structured. (Do not use a level 3 heading immediately after a level 1 one.)
+:::
 
 ```md
 # Title
@@ -38,9 +45,11 @@ The number of hash signs represent the level of the heading. The level 1 heading
 
 ## Unordered Lists
 
-Unordered list items start with either a dash, a plus, or an asterisk, followed by a space.
+Items of unordered lists start with either a hyphen-minus (`-`), a plus (`+`), or an asterisk (`*`), followed by a space.
 
-Nested lists should be indented by two spaces.
+::: tip NOTE
+Nested lists and non-initial lines should be indented by two spaces.
+:::
 
 ```md
 - Apple
@@ -56,11 +65,15 @@ Nested lists should be indented by two spaces.
 
 ## Ordered Lists
 
-Ordered list items start with a number, followed by a dot (or open parenthesis) and a space.
+Items of ordered lists start with a number, followed by a full stop symbol (`.`) and a space.
 
+::: tip NOTE
 The number of the first item in a list represents the starting index. Lists not starting with one are not supported in some viewers.
+:::
 
-Nested lists should be indented by three spaces.
+::: tip NOTE
+Nested lists and non-initial lines should be indented by three spaces.
+:::
 
 ```md
 1. Install dependencies
@@ -82,7 +95,9 @@ Tables start with a heading row, followed by a heading separator, and then by th
 
 Table columns are separated by the vertical bar symbol (`|`). Additionally, table rows usually start and end with the vertical bar symbol.
 
-You can specify column alignments by placing colon symbols (`:`) in the heading separator.
+::: tip NOTE
+You can optionally specify column alignments by placing colon symbols (`:`) in the heading separator.
+:::
 
 ```md
 | index | name | description   |
@@ -104,7 +119,9 @@ Code Blocks can be written in two different ways:
 
 All lines should start with four spaces.
 
-You cannot specify the language in this way.
+::: tip NOTE
+You cannot specify the language this way.
+:::
 
 ```md
     This is a
@@ -122,7 +139,9 @@ You cannot specify the language in this way.
 
 Three or more backticks (`` ` ``) should be placed before and after the code block on its own line.
 
-The one before the code block may be followed by a language identifier to enable syntax highlighting.
+::: tip NOTE
+The backticks at the start may be followed by a language identifier to enable syntax highlighting.
+:::
 
 ````md
 ```js
@@ -136,21 +155,25 @@ console.log('Hello, World!');
 
 ## Block Quotes
 
-All lines inside a block quote start with a greater than sign (`>`) and an optional space. Multiple greater than signs represent nested block quotes.
+All lines inside a block quote start with a greater than sign (`>`) and an optional space.
+
+::: tip NOTE
+Multiple greater than signs represent nested block quotes.
+:::
 
 ```md
 Reply to bob@example.com
 
 > Reply to alice@example.com
 >
->> This is my changes
->> ~Alice
+> > This is my changes
+> > ~Alice
 >
 > LGTM
 > ~Bob
 
 Please sign off on the commit, too.
-~Mgmt.
+~Mgmt
 ```
 
 > Reply to bob@example.com
@@ -164,11 +187,11 @@ Please sign off on the commit, too.
 > > ~Bob
 >
 > Please sign off on the commit, too.
-> ~Mgmt.
+> ~Mgmt
 
 ## Thematic Breaks
 
-Thematic Breaks are made of three or more dashes.
+Thematic Breaks are made of three or more hyphen-minuses (`-`).
 
 ```md
 … and so they went on.
@@ -205,7 +228,13 @@ $$ \left\lVert p \right\rVert^2 = p_x^2 + p_y^2 \text{.} $$
 
 You can define a footnote anywhere by placing its content after `[^number]: ` and placing `[^number]` wherever it should appear.
 
-Footnote definitions are isolated inside each cell. Therefore, a footnote definition should appear in the same cell as its usage.
+::: tip NOTE
+Non-initial lines should be indented by four spaces.
+:::
+
+::: warning
+Footnote definitions are isolated inside each cell. So, a footnote definition should appear in the same cell as its usage.
+:::
 
 ```md
 This was widely regarded as a bad move[^1].
@@ -323,7 +352,9 @@ Hyperlinked text are wrapped in square brackets (`[]`) and followed by the targe
 
 Images are made of an exclamation mark (`!`) followed by a hyperlink.
 
+::: tip NOTE
 The hyperlink text acts as the alternative text for the image.
+:::
 
 ```md
 If you see ![World Wide Web Consortium logo](https://www.w3.org/assets/logos/w3c/w3c-no-bars.svg), you have taken a wrong turn somewhere.
@@ -337,7 +368,7 @@ If you see ![World Wide Web Consortium logo](https://www.w3.org/assets/logos/w3c
 
 ## Inline Codes
 
-Inline codes are wrapped in two or more pairs of backticks (`` ` ``).
+Inline codes are wrapped in one or more pairs of backticks (`` ` ``).
 
 ```md
 Go to `/usr/lib` and delete `libvirus.so.1`.
