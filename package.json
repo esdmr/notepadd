@@ -3,7 +3,7 @@
 	"type": "module",
 	"devDependencies": {
 		"@arethetypeswrong/cli": "0.18.2",
-		"typescript": "5.8.3",
+		"typescript": "5.9.2",
 		"vite-node": "3.2.4",
 		"xo": "1.2.1"
 	},
