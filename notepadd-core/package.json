@@ -30,7 +30,7 @@
 		"uint8array-extras": "1.4.0",
 		"valibot": "1.1.0",
 		"whatwg-mimetype": "4.0.0",
-		"yaml": "2.8.0"
+		"yaml": "2.8.1"
 	},
 	"devDependencies": {
 		"@fast-check/vitest": "0.2.2",
