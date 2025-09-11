@@ -482,7 +482,7 @@
 		"vite-plugin-child-process": "workspace:*",
 		"vite-plugin-inspect": "11.3.2",
 		"vite-plugin-package-json": "workspace:*",
-		"vite-plugin-static-copy": "3.1.1",
+		"vite-plugin-static-copy": "3.1.2",
 		"vite-plugin-subvite": "workspace:*",
 		"vite-plugin-vscode": "workspace:*"
 	},
