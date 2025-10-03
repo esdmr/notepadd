@@ -486,7 +486,7 @@
 		"vite-plugin-subvite": "workspace:*",
 		"vite-plugin-vscode": "workspace:*"
 	},
-	"packageManager": "pnpm@10.15.1",
+	"packageManager": "pnpm@10.16.0",
 	"engines": {
 		"vscode": "^1.91.0"
 	},
