@@ -15,7 +15,7 @@
 	"dependencies": {
 		"@esdmr/nearley": "3.0.3",
 		"bidi-js": "1.0.3",
-		"data-urls": "5.0.0",
+		"data-urls": "6.0.0",
 		"escape-latex": "1.2.0",
 		"rehype": "13.0.2",
 		"rehype-remark": "10.0.1",
