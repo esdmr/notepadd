@@ -60,8 +60,8 @@ importers:
         specifier: 6.0.0
         version: 6.0.0
       srcset:
-        specifier: 5.0.1
-        version: 5.0.1
+        specifier: 5.0.2
+        version: 5.0.2
       temporal-polyfill:
         specifier: 0.3.0
         version: 0.3.0
@@ -4175,8 +4175,8 @@ packages:
   sprintf-js@1.0.3:
     resolution: {integrity: sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==}
 
-  srcset@5.0.1:
-    resolution: {integrity: sha512-/P1UYbGfJVlxZag7aABNRrulEXAwCSDo7fklafOQrantuPTDmYgijJMks2zusPCVzgW9+4P69mq7w6pYuZpgxw==}
+  srcset@5.0.2:
+    resolution: {integrity: sha512-pucR5KmXL7uWI59sXE2nuodomLsfnIQDa5Fck0TooiyxsIx+JYGiFm+wFO7aaDvvl/43ipjUjAb5je7dcAwlzQ==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
   stable-hash-x@0.2.0:
@@ -9461,7 +9461,7 @@ snapshots:
 
   sprintf-js@1.0.3: {}
 
-  srcset@5.0.1: {}
+  srcset@5.0.2: {}
 
   stable-hash-x@0.2.0: {}
 
