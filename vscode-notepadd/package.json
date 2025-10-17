@@ -477,7 +477,7 @@
 	"devDependencies": {
 		"@types/node": "20.19.0",
 		"@types/vscode": "1.91.0",
-		"@vscode/vsce": "3.6.1",
+		"@vscode/vsce": "3.6.2",
 		"vite": "6.3.6",
 		"vite-plugin-child-process": "workspace:*",
 		"vite-plugin-inspect": "11.3.3",
