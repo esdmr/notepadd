@@ -7,7 +7,7 @@
 		"vite-node": "3.2.4",
 		"xo": "1.2.3"
 	},
-	"packageManager": "pnpm@10.18.2",
+	"packageManager": "pnpm@10.18.3",
 	"scripts": {
 		"typecheck": "tsc -p .",
 		"lint": "xo"
