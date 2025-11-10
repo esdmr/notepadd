@@ -27,7 +27,7 @@
 		"remark-math": "6.0.0",
 		"srcset": "5.0.2",
 		"temporal-polyfill": "0.3.0",
-		"uint8array-extras": "1.4.1",
+		"uint8array-extras": "1.5.0",
 		"valibot": "1.1.0",
 		"whatwg-mimetype": "4.0.0",
 		"yaml": "2.8.1"
