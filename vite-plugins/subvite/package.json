@@ -19,7 +19,7 @@
 	"dependencies": {
 		"execa": "9.6.0",
 		"resolve.exports": "2.0.3",
-		"type-fest": "4.41.0",
+		"type-fest": "5.1.0",
 		"valibot": "1.1.0"
 	}
 }
