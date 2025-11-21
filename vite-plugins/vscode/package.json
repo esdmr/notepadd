@@ -10,7 +10,7 @@
 		"./package.json": "./package.json"
 	},
 	"dependencies": {
-		"type-fest": "4.41.0",
+		"type-fest": "5.1.0",
 		"vite-plugin-package-json": "workspace:*"
 	},
 	"devDependencies": {
