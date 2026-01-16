@@ -478,7 +478,7 @@
 		"@types/node": "20.19.0",
 		"@types/vscode": "1.91.0",
 		"@vscode/vsce": "3.6.2",
-		"vite": "6.4.1",
+		"vite": "7.1.12",
 		"vite-plugin-child-process": "workspace:*",
 		"vite-plugin-inspect": "11.3.3",
 		"vite-plugin-package-json": "workspace:*",
